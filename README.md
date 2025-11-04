@@ -1,1 +1,1 @@
-# No1.NHibernateNodaTime
+# NHibernate.NodaTime
