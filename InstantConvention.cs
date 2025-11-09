@@ -2,20 +2,12 @@
 using FluentNHibernate.Conventions.AcceptanceCriteria;
 using FluentNHibernate.Conventions.Inspections;
 using FluentNHibernate.Conventions.Instances;
+using JetBrains.Annotations;
 using NodaTime;
 
 namespace NHibernate.NodaTime;
 
-public class InstantConvention : IPropertyConvention, IPropertyConventionAcceptance
+[UsedImplicitly]
+public class InstantConvention : UserTypeConvention<InstantUserType>
 {
-    public void Accept(IAcceptanceCriteria<IPropertyInspector> criteria)
-    {
-        criteria.Expect(x => x.Property.PropertyType == typeof(Instant) ||
-                            x.Property.PropertyType == typeof(Instant?));
-    }
-
-    public void Apply(IPropertyInstance instance)
-    {
-        instance.CustomType<InstantType>();
-    }
 }
