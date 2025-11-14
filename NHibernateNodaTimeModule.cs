@@ -1,12 +1,7 @@
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
-using FluentNHibernate.Conventions;
-using NHibernate.Cfg;
-using NHibernate.Type;
-using NHibernate.UserTypes;
-using NodaTime;
 
-namespace NHibernate.NodaTime;
+namespace No1.NHibernate.NodaTime;
 
 public static class NHibernateNodaTimeModule
 {

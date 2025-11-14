@@ -1,13 +1,11 @@
-﻿using NHibernate.Engine;
+﻿using NHibernate;
+using NHibernate.Engine;
 using NHibernate.SqlTypes;
 using NHibernate.UserTypes;
 using NodaTime;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Text;
 
-namespace NHibernate.NodaTime;
+namespace No1.NHibernate.NodaTime;
 
 public class InstantUserType : IUserType
 {
