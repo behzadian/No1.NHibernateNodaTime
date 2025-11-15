@@ -7,12 +7,12 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
       <PackageOutputPath>/Users/homayoun/nuget/local/repo</PackageOutputPath>
       <IsPackable>true</IsPackable>
-      <AssemblyName>No1.NHibernate.NodaTime</AssemblyName>
-      <RootNamespace>No1.NHibernate.NodaTime</RootNamespace>
-      <PackageId>No1.NHibernate.NodaTime</PackageId>
+      <AssemblyName>No1.NHibernateNodaTime</AssemblyName>
+      <RootNamespace>No1.NHibernateNodaTime</RootNamespace>
+      <PackageId>No1.NHibernateNodaTime</PackageId>
       <Authors>Hank Ben</Authors>
       <Company>No1</Company>
-      <Product>No1.NHibernate.NodaTime</Product>
+      <Product>No1.NHibernateNodaTime</Product>
   </PropertyGroup>
 
 
@@ -22,15 +22,5 @@
 		<PackageReference Include="NHibernate" Version="5.6.0" />
 		<PackageReference Include="System.Data.SQLite" Version="2.0.2" />
 		<PackageReference Include="NodaTime" Version="3.2.2" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <EditorConfigFiles Remove="C:\Users\Homayoun\source\repos\NHibernate.NodaTime\.editorconfig" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <None Include="C:\Users\Homayoun\source\repos\NHibernate.NodaTime\.editorconfig" />
 	</ItemGroup>
 </Project>
