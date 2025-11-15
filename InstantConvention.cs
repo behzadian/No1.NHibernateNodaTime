@@ -1,7 +1,7 @@
 ﻿using FluentNHibernate.Conventions;
 using JetBrains.Annotations;
 
-namespace No1.NHibernate.NodaTime;
+namespace No1.NHibernateNodaTime;
 
 [UsedImplicitly]
 public class InstantConvention : UserTypeConvention<InstantUserType>

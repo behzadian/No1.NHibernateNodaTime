@@ -5,7 +5,7 @@ using NHibernate.UserTypes;
 using NodaTime;
 using System.Data.Common;
 
-namespace No1.NHibernate.NodaTime;
+namespace No1.NHibernateNodaTime;
 
 public class InstantUserType : IUserType
 {
