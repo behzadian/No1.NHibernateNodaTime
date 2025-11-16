@@ -28,12 +28,12 @@ public class InstantUserType : IUserType
     {
         if (value == null)
         {
-            NHibernateUtil.DateTime.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
         }
         else
         {
             var instant = (Instant)value;
-            NHibernateUtil.DateTime.NullSafeSet(cmd, instant.ToUnixTimeTicks(), index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, instant.ToUnixTimeTicks(), index, session);
         }
     }
 
