@@ -9,7 +9,7 @@ namespace No1.NHibernateNodaTime;
 
 public class InstantUserType : IUserType
 {
-    public SqlType[] SqlTypes => [NHibernateUtil.Int64.SqlType];
+    public SqlType[] SqlTypes => [NHibernateUtil.UtcDbTimestamp.SqlType];
 
     public System.Type ReturnedType => typeof(Instant);
 
@@ -17,7 +17,7 @@ public class InstantUserType : IUserType
 
     public object? NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
     {
-        var value = NHibernateUtil.Int64.NullSafeGet(rs, names[0], session);
+        var value = NHibernateUtil.UtcDbTimestamp.NullSafeGet(rs, names[0], session);
         if (value == null) return null;
 
         var epoch = (long)value;
@@ -28,12 +28,12 @@ public class InstantUserType : IUserType
     {
         if (value == null)
         {
-            NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.UtcDbTimestamp.NullSafeSet(cmd, null, index, session);
         }
         else
         {
             var instant = (Instant)value;
-            NHibernateUtil.Int64.NullSafeSet(cmd, instant.ToUnixTimeTicks(), index, session);
+            NHibernateUtil.UtcDbTimestamp.NullSafeSet(cmd, instant.InUtc(), index, session);
         }
     }
 
