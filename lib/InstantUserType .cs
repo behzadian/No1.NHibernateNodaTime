@@ -9,7 +9,7 @@ namespace No1.NHibernateNodaTime;
 
 public class InstantUserType : IUserType
 {
-    public SqlType[] SqlTypes => [NHibernateUtil.UtcDbTimestamp.SqlType];
+    public SqlType[] SqlTypes => [NHibernateUtil.Int64.SqlType,NHibernateUtil.Int64.SqlType];
 
     public System.Type ReturnedType => typeof(Instant);
 
@@ -17,23 +17,30 @@ public class InstantUserType : IUserType
 
     public object? NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
     {
-        var value = NHibernateUtil.UtcDbTimestamp.NullSafeGet(rs, names[0], session);
-        if (value == null) return null;
-
-        var epoch = (long)value;
-        return Instant.FromUnixTimeTicks(epoch);
+        var secVal = NHibernateUtil.Int64.NullSafeGet(rs, names[0], session);
+        var nanVal = NHibernateUtil.Int64.NullSafeGet(rs, names[1], session);
+        return (secVal,nanVal) switch
+        {
+            (null,null) => null,
+            (null,_) => null,
+            (_,null) => null,
+            (long seconds,long nanoseconds) => Instant.FromUnixTimeTicks(seconds).PlusNanoseconds(nanoseconds),
+            _ => throw new UnexpectedTypeException($"Stored value for Instant's second",secVal, typeof(long))
+        };
     }
 
-    public void NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session)
+    public void NullSafeSet(DbCommand cmd, object? value, int index, ISessionImplementor session)
     {
         if (value == null)
         {
-            NHibernateUtil.UtcDbTimestamp.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, null, index+1, session);
         }
         else
         {
-            var instant = (Instant)value;
-            NHibernateUtil.UtcDbTimestamp.NullSafeSet(cmd, instant.InUtc(), index, session);
+            (long seconds, int nanoseconds) = ((Instant)value).ToUnixTimeSecondsAndNanoseconds();
+            NHibernateUtil.Int64.NullSafeSet(cmd, seconds, index, session);
+            NHibernateUtil.Int64.NullSafeSet(cmd, nanoseconds, index, session);
         }
     }
 

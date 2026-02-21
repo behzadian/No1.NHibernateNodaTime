@@ -18,15 +18,18 @@ public class EventMap : ClassMap<Event>
             .Not.Nullable();
 
         Map(x => x.CreatedAt)
-            .Column("created_at")
+            .Column("created_at_seconds")
+            .Column("created_at_nanoseconds")
             .Not.Nullable();
 
         Map(x => x.ModifiedAt)
-            .Column("modified_at")
+            .Column("modified_at_seconds")
+            .Column("modified_at_nanoseconds")
             .Nullable();
 
         Map(x => x.EventDate)
-            .Column("event_date")
+            .Column("event_date_seconds")
+            .Column("event_date_nanoseconds")
             .Not.Nullable();
     }
 }

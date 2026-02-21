@@ -44,7 +44,7 @@ public class NHibernateTestFixture : IAsyncLifetime
             .ExposeConfiguration(cfg =>
             {
                 // Register custom user types if not using conventions
-                cfg.Properties[NHibernate.Cfg.Environment.PropertyUseReflectionOptimizer] = "false";
+                //cfg.Properties[NHibernate.Cfg.Environment.PropertyUseReflectionOptimizer] = "false";
 
                 // Create schema
                 new SchemaExport(cfg).Create(false, true);
