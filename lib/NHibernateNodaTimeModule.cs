@@ -5,7 +5,7 @@ namespace No1.NHibernateNodaTime;
 
 public static class NHibernateNodaTimeModule
 {
-    public static AutoPersistenceModel EnableNodaTime(this AutoPersistenceModel convention)
+    /*public static AutoPersistenceModel EnableNodaTime(this AutoPersistenceModel convention)
     {
         return convention.Conventions.Add<InstantConvention>();
     }
@@ -13,5 +13,5 @@ public static class NHibernateNodaTimeModule
     public static AutoPersistenceModel EnableNodaTime(this SetupConventionFinder<AutoPersistenceModel> convention)
     {
         return convention.Add<InstantConvention>();
-    }
+    }*/
 }
