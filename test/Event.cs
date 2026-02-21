@@ -1,6 +1,6 @@
 using NodaTime;
 
-namespace No1.NodaTimeNHibernate.Tests.TestEntities;
+namespace No1.NHibernateNodaTimeTests;
 
 /// <summary>
 /// Sample entity for testing NodaTime Instant persistence
@@ -23,7 +23,7 @@ public class Event
         EventDate = eventDate;
     }
 
-    public void UpdateModifiedAt(Instant modifiedAt)
+    public virtual void UpdateModifiedAt(Instant modifiedAt)
     {
         ModifiedAt = modifiedAt;
     }

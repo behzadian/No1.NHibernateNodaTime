@@ -2,11 +2,9 @@ using FluentAssertions;
 using NHibernate;
 using NHibernate.Linq;
 using NodaTime;
-using No1.NodaTimeNHibernate.Tests.Infrastructure;
-using No1.NodaTimeNHibernate.Tests.TestEntities;
 using Xunit;
 
-namespace No1.NodaTimeNHibernate.Tests;
+namespace No1.NHibernateNodaTimeTests;
 
 /// <summary>
 /// Integration tests for NodaTime Instant persistence with NHibernate and PostgreSQL
@@ -101,7 +99,7 @@ public class InstantPersistenceTests : IClassFixture<NHibernateTestFixture>
         // Arrange - Create an Instant with nanosecond precision
         var preciseInstant = Instant.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00 UTC
             .PlusNanoseconds(123456789);
-        
+
         var eventEntity = new Event("Precision Test", preciseInstant, preciseInstant);
 
         int savedId;
@@ -176,7 +174,7 @@ public class InstantPersistenceTests : IClassFixture<NHibernateTestFixture>
         // Arrange
         var minInstant = Instant.MinValue;
         var maxInstant = Instant.MaxValue;
-        
+
         var minEvent = new Event("Min Event", minInstant, minInstant);
         var maxEvent = new Event("Max Event", maxInstant, maxInstant);
 
@@ -202,7 +200,7 @@ public class InstantPersistenceTests : IClassFixture<NHibernateTestFixture>
         // Assert
         retrievedMinEvent.Should().NotBeNull();
         retrievedMinEvent!.CreatedAt.Should().Be(minInstant);
-        
+
         retrievedMaxEvent.Should().NotBeNull();
         retrievedMaxEvent!.CreatedAt.Should().Be(maxInstant);
     }
@@ -286,7 +284,7 @@ public class InstantPersistenceTests : IClassFixture<NHibernateTestFixture>
         // Assert
         event1.Should().NotBeNull();
         event1!.CreatedAt.Should().Be(time1);
-        
+
         event2.Should().NotBeNull();
         event2!.CreatedAt.Should().Be(time2);
     }

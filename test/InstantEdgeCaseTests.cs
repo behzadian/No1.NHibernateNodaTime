@@ -2,11 +2,9 @@ using FluentAssertions;
 using NHibernate;
 using NHibernate.Linq;
 using NodaTime;
-using No1.NodaTimeNHibernate.Tests.Infrastructure;
-using No1.NodaTimeNHibernate.Tests.TestEntities;
 using Xunit;
 
-namespace No1.NodaTimeNHibernate.Tests;
+namespace No1.NHibernateNodaTimeTests;
 
 /// <summary>
 /// Additional edge case tests for Instant persistence
