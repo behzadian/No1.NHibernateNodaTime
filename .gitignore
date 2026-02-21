@@ -3,5 +3,5 @@
 !.gitattributes
 !.editorconfig
 !.github/
-bin/*
-obj/*
+bin
+obj

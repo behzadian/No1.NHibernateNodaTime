@@ -1,0 +1,164 @@
+# NodaTime.NHibernate Tests
+
+Integration tests for NodaTime Instant persistence with NHibernate using PostgreSQL Testcontainers.
+
+## Overview
+
+This test project validates that:
+- `InstantUserType` correctly persists and retrieves NodaTime `Instant` values
+- `InstantConvention` automatically applies the user type to `Instant` properties
+- Nullable `Instant?` properties work correctly
+- Precision is preserved (including nanoseconds)
+- Querying by `Instant` ranges works as expected
+- Edge cases (min/max values) are handled properly
+
+## Prerequisites
+
+- .NET 8.0 SDK
+- Docker (for Testcontainers)
+- Your NodaTime.NHibernate library project
+
+## Project Structure
+
+```
+├── NodaTime.NHibernate.Tests.csproj    # Test project file
+├── Infrastructure/
+│   └── NHibernateTestFixture.cs        # Testcontainer setup and NHibernate config
+├── TestEntities/
+│   └── Event.cs                         # Sample entity with Instant properties
+├── Mappings/
+│   └── EventMap.cs                      # FluentNHibernate mapping
+├── Stubs/
+│   ├── InstantUserType.cs              # Stub implementation (replace with your library)
+│   └── InstantConvention.cs            # Stub implementation (replace with your library)
+└── InstantPersistenceTests.cs          # Integration tests
+```
+
+## Setup
+
+1. **Update Project Reference**: 
+   Edit `NodaTime.NHibernate.Tests.csproj` and uncomment/update the `ProjectReference` line to point to your actual library:
+   ```xml
+   <ProjectReference Include="..\YourLibraryName\YourLibraryName.csproj" />
+   ```
+
+2. **Remove Stub Files**: 
+   Delete the `Stubs/` directory once your library is referenced, as these are just placeholder implementations.
+
+3. **Install Docker**: 
+   Ensure Docker is running on your machine (Testcontainers needs it to spin up PostgreSQL).
+
+## Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run with detailed output
+dotnet test --logger "console;verbosity=detailed"
+
+# Run specific test
+dotnet test --filter "FullyQualifiedName~ShouldPersistAndRetrieveInstant"
+```
+
+## Test Coverage
+
+### Basic Operations
+- **ShouldPersistAndRetrieveInstant**: Tests basic save and load operations
+- **ShouldHandleNullableInstant**: Verifies nullable `Instant?` support
+- **ShouldUpdateInstantValues**: Tests updating existing Instant values
+
+### Precision & Edge Cases
+- **ShouldPreservePrecisionWithNanoseconds**: Validates nanosecond precision preservation
+- **ShouldHandleMinAndMaxInstants**: Tests boundary values (Instant.MinValue/MaxValue)
+
+### Querying
+- **ShouldQueryByInstantRange**: Tests LINQ queries with Instant range predicates
+
+### Concurrency
+- **ShouldHandleMultipleConcurrentSessions**: Verifies thread-safe operations
+
+## How It Works
+
+### Testcontainers
+The `NHibernateTestFixture` class:
+1. Starts a PostgreSQL container before tests run
+2. Configures NHibernate with the container's connection string
+3. Creates the database schema automatically
+4. Cleans up the container after tests complete
+
+### Test Isolation
+Each test class gets its own fixture instance (via `IClassFixture<NHibernateTestFixture>`), ensuring:
+- Fresh database for each test class
+- No cross-contamination between test classes
+- Automatic cleanup
+
+### Assertions
+Tests use FluentAssertions for readable assertions:
+```csharp
+retrievedEvent.CreatedAt.Should().Be(expectedInstant);
+retrievedEvent.ModifiedAt.Should().BeNull();
+```
+
+## Customization
+
+### Add More Entity Types
+1. Create new entity in `TestEntities/`
+2. Create mapping in `Mappings/`
+3. Update fixture to include new mapping
+4. Write tests
+
+### Test Different Databases
+Modify `NHibernateTestFixture.cs` to use different Testcontainer builders:
+```csharp
+// MySQL
+var container = new MySqlBuilder().Build();
+
+// SQL Server
+var container = new MsSqlBuilder().Build();
+```
+
+### Adjust Container Settings
+In `NHibernateTestFixture.cs`:
+```csharp
+_container = new PostgreSqlBuilder()
+    .WithImage("postgres:15-alpine")  // Different version
+    .WithPortBinding(5432, true)       // Fixed port
+    .Build();
+```
+
+## Troubleshooting
+
+### Docker Not Running
+```
+Error: Docker daemon is not running
+```
+**Solution**: Start Docker Desktop or Docker daemon
+
+### Port Already in Use
+```
+Error: Address already in use
+```
+**Solution**: Testcontainers automatically assigns random ports. If issues persist, restart Docker.
+
+### Schema Creation Fails
+Check that your `InstantUserType` properly implements all `IUserType` methods and that the `InstantConvention` is correctly registered in the fixture.
+
+## CI/CD Integration
+
+These tests work great in CI pipelines since Testcontainers handles all infrastructure:
+
+```yaml
+# GitHub Actions example
+- name: Run Tests
+  run: dotnet test
+```
+
+No need to configure external databases or connection strings!
+
+## Additional Notes
+
+- Tests use `IAsyncLifetime` for proper async setup/teardown
+- Connection strings are automatically generated by Testcontainers
+- PostgreSQL container uses Alpine Linux for smaller image size
+- Schema is created fresh for each test class run
