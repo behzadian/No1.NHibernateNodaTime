@@ -14,7 +14,7 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public class InstantCompositeUserType : ICompositeUserType
 {
-    public Type ReturnedClass => typeof(Instant);
+    public Type ReturnedClass => typeof(Instant?);
 
     public bool IsMutable => false;
 

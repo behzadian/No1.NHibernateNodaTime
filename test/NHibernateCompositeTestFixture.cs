@@ -47,6 +47,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
                 ex);
         }
 
+        Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/hbms");
         // Configure NHibernate with AutoMapping and InstantCompositeUserType
         var configuration = Fluently.Configure()
             .Database(PostgreSQLConfiguration.Standard
@@ -54,18 +55,16 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
                 .ShowSql()
                 .FormatSql())
             .Mappings(m => m
-                .AutoMappings.Add(
-                    AutoMap.AssemblyOf<Event>(new AutoMappingConfiguration())
-                        .Conventions.Add<InstantCompositeConvention>()
-                        .UseOverridesFromAssemblyOf<Event>()
-                )
+                .AutoMappings
+                .Add(AutoMap.AssemblyOf<Event>(new AutoMappingConfiguration()).Conventions.Add<InstantComponentConvention>().UseOverridesFromAssemblyOf<EventOverride>())
+                .ExportTo("hbms")
             )
             .ExposeConfiguration(cfg =>
             {
                 cfg.Properties[NHibernate.Cfg.Environment.PropertyUseReflectionOptimizer] = "false";
 
                 // Create schema
-                new SchemaExport(cfg).Create(false, true);
+                new SchemaExport(cfg).Create(true, true);
             })
             .BuildConfiguration();
 

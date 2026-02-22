@@ -9,6 +9,6 @@ public class Event
 {
     public virtual int Id { get; set; }
     public virtual string Name { get; set; } = string.Empty;
-    public virtual Instant CreatedAt { get; set; } 
-    public virtual Instant? ModifiedAt { get; set; }
+    public virtual Instant JustInstant { get; set; } 
+    public virtual Instant? NullableInstant { get; set; }
 }

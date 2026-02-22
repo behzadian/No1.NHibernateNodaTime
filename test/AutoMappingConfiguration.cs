@@ -1,4 +1,6 @@
+using FluentNHibernate;
 using FluentNHibernate.Automapping;
+using NHibernate.Criterion;
 using NodaTime;
 
 namespace No1.NHibernateNodaTimeTests;
@@ -11,7 +13,7 @@ public class AutoMappingConfiguration : DefaultAutomappingConfiguration
     public override bool ShouldMap(Type type)
     {
         // Only map classes in TestEntities namespace
-        return type.Namespace != null && 
+        return type.Namespace != null &&
                type.Namespace.Contains("TestEntities");
     }
 
@@ -20,9 +22,12 @@ public class AutoMappingConfiguration : DefaultAutomappingConfiguration
         // Map properties named "Id" as identifiers
         return member.Name == "Id";
     }
-    public override bool IsComponent(Type type)
+    
+    public override bool ShouldMap(Member member)
     {
-        // Treat Instant as a component (value type), not an entity
-        return type == typeof(Instant);// || type == typeof(Instant?);
+        var type = member.PropertyType;
+        if (type == typeof(Instant) || type == typeof(Instant?))
+            return true;
+        return base.ShouldMap(member);
     }
 }
