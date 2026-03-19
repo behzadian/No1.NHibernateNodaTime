@@ -38,8 +38,8 @@ public class InstantCompositeUserTypeTests : IClassFixture<NHibernateCompositeTe
         using (var session = _sessionFactory.OpenSession())
         {
             var sql = @"
-                SELECT created_at_seconds, created_at_nanoseconds 
-                FROM events 
+                SELECT Seconds, Nanoseconds 
+                FROM ""Event""
                 WHERE id = :id";
 
             var result = await session.CreateSQLQuery(sql)
@@ -101,7 +101,7 @@ public class InstantCompositeUserTypeTests : IClassFixture<NHibernateCompositeTe
     {
         // Arrange
         var now = SystemClock.Instance.GetCurrentInstant();
-        var entity = new Event() { Name = "Test", JustInstant = now, NullableInstant = now };
+        var entity = new Event() { Name = "Test", JustInstant = now, NullableInstant = null };
 
         // Act - Save without ModifiedAt
         int savedId;
@@ -116,8 +116,8 @@ public class InstantCompositeUserTypeTests : IClassFixture<NHibernateCompositeTe
         using (var session = _sessionFactory.OpenSession())
         {
             var sql = @"
-                SELECT modified_at_seconds, modified_at_nanoseconds 
-                FROM events 
+                SELECT NullableInstant_Seconds, NullableInstant_Nanoseconds 
+                FROM ""Event""
                 WHERE id = :id";
 
             var result = await session.CreateSQLQuery(sql)

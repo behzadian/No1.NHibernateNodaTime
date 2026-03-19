@@ -56,7 +56,11 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
                 .FormatSql())
             .Mappings(m => m
                 .AutoMappings
-                .Add(AutoMap.AssemblyOf<Event>(new AutoMappingConfiguration()).Conventions.Add<InstantComponentConvention>().UseOverridesFromAssemblyOf<EventOverride>())
+                .Add(AutoMap
+                    .AssemblyOf<Event>(new AutoMappingConfiguration())
+                    .Conventions.Add<InstantComponentConvention>()
+                    .UseOverridesFromAssemblyOf<EventOverride>()
+                 )
                 .ExportTo("hbms")
             )
             .ExposeConfiguration(cfg =>

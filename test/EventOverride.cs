@@ -14,8 +14,5 @@ public class EventOverride : IAutoMappingOverride<Event>
     {
         mapping.Map(x => x.JustInstant)
                .CustomType<InstantCompositeUserType>();
-
-        mapping.Map(x => x.NullableInstant)
-               .CustomType<InstantCompositeUserType>();
     }
 }
