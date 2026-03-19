@@ -16,7 +16,7 @@ public class InstantComponentConvention : IPropertyConvention
     {
         if (instance.Type == typeof(Instant) || instance.Type == typeof(Instant?))
         {
-            instance.CustomType<InstantCompositeUserType>(instance.Name+"_");
+            instance.CustomType<InstantCompositeUserType>(instance.Name + "_");
         }
     }
 }

@@ -38,7 +38,7 @@ public class InstantCompositeUserTypeTests : IClassFixture<NHibernateCompositeTe
         using (var session = _sessionFactory.OpenSession())
         {
             var sql = @"
-                SELECT Seconds, Nanoseconds 
+                SELECT JustInstant_Seconds, JustInstant_Nanoseconds 
                 FROM ""Event""
                 WHERE id = :id";
 
@@ -51,7 +51,7 @@ public class InstantCompositeUserTypeTests : IClassFixture<NHibernateCompositeTe
 
             // Assert - Verify raw column values
             seconds.Should().Be(instant.ToUnixTimeSeconds());
-            //nanoseconds.Should().Be(instant.NanosecondOfSecond);
+            nanoseconds.Should().Be(instant.Nanoseconds());
         }
 
         // Act - Retrieve via NHibernate
