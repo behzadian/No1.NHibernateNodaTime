@@ -34,7 +34,7 @@ public class InstantCompositeUserType : ICompositeUserType
 		if (dr[names[1]] is not int nanos)
 			return null;
 
-		return Instant.FromDateTimeUtc(new DateTime(utc.Ticks, DateTimeKind.Utc)).PlusNanoseconds(nanos);
+		return Instant.FromDateTimeUtc(NodaTimeUtility.AsUtc(utc)).PlusNanoseconds(nanos);
 	}
 
 	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)

@@ -11,4 +11,6 @@ public class Event
     public virtual string Name { get; set; } = string.Empty;
     public virtual Instant JustInstant { get; set; } 
     public virtual Instant? NullableInstant { get; set; }
+	public virtual ZonedDateTime AlwaysZdt { get; set; } = SystemClock.Instance.GetCurrentInstant().InUtc();
+    public virtual ZonedDateTime? NullableZdt { get; set; }
 }

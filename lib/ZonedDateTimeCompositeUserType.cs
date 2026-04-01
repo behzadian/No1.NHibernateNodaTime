@@ -43,7 +43,7 @@ public class ZonedDateTimeCompositeUserType : ICompositeUserType
 			return null;
 
 		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new Exception($"Zone {zoneId} not found");
-		var instant = Instant.FromDateTimeUtc(utc).PlusNanoseconds(nanos);
+		var instant = Instant.FromDateTimeUtc(NodaTimeUtility.AsUtc(utc)).PlusNanoseconds(nanos);
 		var zdt = instant.InZone(DateTimeZone.Utc);
 		return zdt.WithZone(zone);
 	}
@@ -55,14 +55,14 @@ public class ZonedDateTimeCompositeUserType : ICompositeUserType
 			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUtc(), index, session);
 			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUnspecified(), index + 1, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, index + 2, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.Zone.Id, index + 3, session);
+			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, index + 3, session);
 		}
 		else
 		{
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 1, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, index, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, index + 1, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 2, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 4, session);
+			NHibernateUtil.String.NullSafeSet(cmd, null, index + 3, session);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class ZonedDateTimeCompositeUserType : ICompositeUserType
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
-		return ((Instant)x).Equals((Instant)y);
+		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
 	}
 
 	public int GetHashCode(object? x)

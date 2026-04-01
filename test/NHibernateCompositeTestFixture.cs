@@ -58,7 +58,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
                 .AutoMappings
                 .Add(AutoMap
                     .AssemblyOf<Event>(new AutoMappingConfiguration())
-                    .Conventions.Add<InstantComponentConvention>()
+					.EnableNodaTime()
                     .UseOverridesFromAssemblyOf<EventOverride>()
                  )
                 .ExportTo("hbms")

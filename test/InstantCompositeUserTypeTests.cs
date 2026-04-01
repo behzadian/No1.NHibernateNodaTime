@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NHibernate;
+using No1.NHibernateNodaTime;
 using No1.NHibernateNodaTimeTests.TestEntities;
 using NodaTime;
 using Xunit;
