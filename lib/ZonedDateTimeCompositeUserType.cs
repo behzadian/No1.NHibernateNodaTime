@@ -12,64 +12,80 @@ namespace No1.NHibernateNodaTime;
 /// - Seconds since Unix epoch (long)
 /// - Nanoseconds component (int)
 /// </summary>
-public class InstantCompositeUserType : ICompositeUserType
+public class ZonedDateTimeCompositeUserType : ICompositeUserType
 {
-	public Type ReturnedClass => typeof(Instant?);
+	public Type ReturnedClass => typeof(ZonedDateTime?);
 
 	public bool IsMutable => false;
 
-	public string[] PropertyNames => ["Timestamp", "Nanoseconds"];
+	public string[] PropertyNames => ["UTC", "Local", "Nanoseconds", "ZoneID"];
 
 	public IType[] PropertyTypes =>
 	[
-		NHibernateUtil.UtcDateTimeNoMs,	// Timestamp
-        NHibernateUtil.Int32			// Nanoseconds
-    ];
+		NHibernateUtil.DateTimeNoMs,// Utc
+		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.Int32,		// Nanoseconds
+		NHibernateUtil.String,		// ZoneID
+	];
 
 	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		if (dr[names[0]] is not DateTime utc)
 			return null;
 
-		if (dr[names[1]] is not int nanos)
+		if (dr[names[1]] is not DateTime local)
 			return null;
 
-		return Instant.FromDateTimeUtc(new DateTime(utc.Ticks, DateTimeKind.Utc)).PlusNanoseconds(nanos);
+		if (dr[names[2]] is not int nanos)
+			return null;
+
+		if (dr[names[3]] is not string zoneId)
+			return null;
+
+		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new Exception($"Zone {zoneId} not found");
+		var instant = Instant.FromDateTimeUtc(utc).PlusNanoseconds(nanos);
+		var zdt = instant.InZone(DateTimeZone.Utc);
+		return zdt.WithZone(zone);
 	}
 
 	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is Instant instant)
+		if (value is ZonedDateTime zdt)
 		{
-			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, instant.ToDateTimeUtc(), index, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds, index + 1, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUtc(), index, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUnspecified(), index + 1, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, index + 2, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.Zone.Id, index + 3, session);
 		}
 		else
 		{
-			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, null, index, session);
+			NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 1, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 2, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 4, session);
 		}
 	}
 
 	public object GetPropertyValue(object component, int property)
 	{
-		var instant = (Instant)component;
+		var val = (ZonedDateTime)component;
 		return property switch
 		{
-			0 => instant.ToDateTimeUtc(),
-			1 => instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
+			0 => val.ToDateTimeUtc(),
+			1 => val.ToDateTimeUnspecified(),
+			2 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
+			3 => val.Zone.Id,
 			_ => throw new ArgumentOutOfRangeException(nameof(property))
 		};
 	}
 
 	public void SetPropertyValue(object component, int property, object value)
 	{
-		throw new InvalidOperationException("Instant is immutable");
+		throw new InvalidOperationException("immutable");
 	}
 
 	public object DeepCopy(object value)
 	{
-		// Instant is immutable
 		return value;
 	}
 
