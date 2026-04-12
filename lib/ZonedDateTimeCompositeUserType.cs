@@ -1,16 +1,15 @@
+using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
+using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
 /// <summary>
-/// Composite UserType that stores NodaTime Instant as two separate columns:
-/// - Seconds since Unix epoch (long)
-/// - Nanoseconds component (int)
 /// </summary>
 public class ZonedDateTimeCompositeUserType : ICompositeUserType
 {
@@ -18,32 +17,34 @@ public class ZonedDateTimeCompositeUserType : ICompositeUserType
 
 	public bool IsMutable => false;
 
-	public string[] PropertyNames => ["UTC", "Local", "Nanoseconds", "ZoneID"];
+	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+
+	public string[] PropertyNames => Columns;
 
 	public IType[] PropertyTypes =>
 	[
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.Int64,		// Seconds
 		NHibernateUtil.Int32,		// Nanoseconds
 		NHibernateUtil.String,		// ZoneID
+		NHibernateUtil.DateTimeNoMs,// Utc
+		NHibernateUtil.DateTimeNoMs,// Local
 	];
 
 	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
-		if (dr[names[0]] is not DateTime utc)
+		var counter = 0;
+
+		if (dr[names[counter++]] is not long secs)
 			return null;
 
-		if (dr[names[1]] is not DateTime local)
+		if (dr[names[counter++]] is not int nanos)
 			return null;
 
-		if (dr[names[2]] is not int nanos)
-			return null;
-
-		if (dr[names[3]] is not string zoneId)
+		if (dr[names[counter++]] is not string zoneId)
 			return null;
 
 		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new Exception($"Zone {zoneId} not found");
-		var instant = Instant.FromDateTimeUtc(NodaTimeUtility.AsUtc(utc)).PlusNanoseconds(nanos);
+		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
 		var zdt = instant.InZone(DateTimeZone.Utc);
 		return zdt.WithZone(zone);
 	}
@@ -52,29 +53,34 @@ public class ZonedDateTimeCompositeUserType : ICompositeUserType
 	{
 		if (value is ZonedDateTime zdt)
 		{
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUtc(), index, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUnspecified(), index + 1, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, index + 2, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, index + 3, session);
+			var counter = index;
+			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUtcOrNull(), counter++, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUnspecifiedOrNull(), counter++, session);
 		}
 		else
 		{
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, index, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, index + 1, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 2, session);
-			NHibernateUtil.String.NullSafeSet(cmd, null, index + 3, session);
+			var counter = index;
+			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
-	public object GetPropertyValue(object component, int property)
+	public object? GetPropertyValue(object component, int property)
 	{
 		var val = (ZonedDateTime)component;
 		return property switch
 		{
-			0 => val.ToDateTimeUtc(),
-			1 => val.ToDateTimeUnspecified(),
-			2 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			3 => val.Zone.Id,
+			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
+			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
+			2 => val.Zone.Id,
+			3 => val.ToDateTimeUtcOrNull(),
+			4 => val.ToDateTimeUnspecifiedOrNull(),
 			_ => throw new ArgumentOutOfRangeException(nameof(property))
 		};
 	}

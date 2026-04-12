@@ -1,9 +1,12 @@
+using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
+using NHibernate.Mapping;
 using NHibernate.Type;
 using NHibernate.UserTypes;
 using NodaTime;
 using System.Data.Common;
+using System.Diagnostics.Metrics;
 
 namespace No1.NHibernateNodaTime;
 
@@ -18,46 +21,56 @@ public class InstantCompositeUserType : ICompositeUserType
 
 	public bool IsMutable => false;
 
-	public string[] PropertyNames => ["Timestamp", "Nanoseconds"];
+	internal static string[] Columns => ["Seconds", "Nanoseconds", "Timestamp",];
+
+	public string[] PropertyNames => Columns;
 
 	public IType[] PropertyTypes =>
 	[
+		NHibernateUtil.Int64,			// Seconds
+        NHibernateUtil.Int32,			// Nanoseconds
 		NHibernateUtil.UtcDateTimeNoMs,	// Timestamp
-        NHibernateUtil.Int32			// Nanoseconds
     ];
 
 	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
-		if (dr[names[0]] is not DateTime utc)
+		var index = 0;
+
+		if (dr[names[index++]] is not long secs)
 			return null;
 
-		if (dr[names[1]] is not int nanos)
+		if (dr[names[index++]] is not int nanos)
 			return null;
 
-		return Instant.FromDateTimeUtc(NodaTimeUtility.AsUtc(utc)).PlusNanoseconds(nanos);
+		return Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
 	}
 
 	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
 		if (value is Instant instant)
 		{
-			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, instant.ToDateTimeUtc(), index, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds, index + 1, session);
+			var counter = index;
+			NHibernateUtil.Int64.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().seconds, counter++, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
+			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, instant.ToDateTimeUtcOrNull(), counter++, session);
 		}
 		else
 		{
-			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, null, index, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, index + 1, session);
+			var counter = index;
+			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
-	public object GetPropertyValue(object component, int property)
+	public object? GetPropertyValue(object component, int property)
 	{
 		var instant = (Instant)component;
 		return property switch
 		{
-			0 => instant.ToDateTimeUtc(),
+			0 => instant.ToUnixTimeSecondsAndNanoseconds().seconds,
 			1 => instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
+			2 => instant.ToDateTimeUtcOrNull(),
 			_ => throw new ArgumentOutOfRangeException(nameof(property))
 		};
 	}

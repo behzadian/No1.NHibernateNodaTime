@@ -11,7 +11,7 @@ using System.Text;
 
 namespace No1.NHibernateNodaTime;
 
-public class InstantComponentConvention : IPropertyConvention
+public class NodaTimeTypesComponentConvention : IPropertyConvention
 {
     void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
     {
@@ -23,6 +23,10 @@ public class InstantComponentConvention : IPropertyConvention
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(ZonedDateTime) || instance.Type == typeof(ZonedDateTime?):
 				instance.CustomType<ZonedDateTimeCompositeUserType>(instance.Name + "_");
+				break;
+
+			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Duration) || instance.Type == typeof(Duration?):
+				instance.CustomType<DurationCompositeUserType>(instance.Name + "_");
 				break;
 		}
     }

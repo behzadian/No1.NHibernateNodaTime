@@ -61,7 +61,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 					.EnableNodaTime()
                     .UseOverridesFromAssemblyOf<EventOverride>()
                  )
-                .ExportTo("hbms")
+                //.ExportTo("hbms")
             )
             .ExposeConfiguration(cfg =>
             {

@@ -10,16 +10,16 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistInstantInTwoColumns()
+	public async Task ShouldPersistZonedDateTimeIn5Columns()
 	{
 		// Arrange
-		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
-		var entity = new Event() { Name = "Test Event", InstantValuable = instant, InstantNullable = instant };
+		var zdt = Instant.FromUtc(2024, 12, 25, 10, 30, 45).InZone(DateTimeZoneProviders.Tzdb["Asia/Tehran"]);
+		var entity = new Event() { Name = "Test Event", ZdtValauable = zdt };
 
 		// Act - Save
 		int savedId;
@@ -30,11 +30,11 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			await transaction.CommitAsync();
 		}
 
-		// Act - Verify in database (check two columns were created)
+		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT InstantValuable_Seconds, InstantValuable_Nanoseconds 
+				SELECT ZdtValauable_Seconds, ZdtValauable_Nanoseconds, ZdtValauable_ZoneID, ZdtValauable_UTC, ZdtValauable_Local
 				FROM ""Event""
 				WHERE id = :id";
 
@@ -42,12 +42,18 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var ts = Convert.ToInt64(result[0]);
-			var ns = Convert.ToInt32(result[1]);
+			var seconds = Convert.ToInt64(result[0]);
+			var nanos = Convert.ToInt32(result[1]);
+			var zone = Convert.ToString(result[2]);
+			var utc = Convert.ToDateTime(result[3]);
+			var local = Convert.ToDateTime(result[4]);
 
 			// Assert - Verify raw column values
-			ts.Should().Be(instant.ToUnixTimeSeconds());
-			ns.Should().Be(instant.OnlyNanoseconds());
+			seconds.Should().Be(zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds);
+			nanos.Should().Be(zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds);
+			zone.Should().Be("Asia/Tehran");
+			utc.Should().Be(new DateTime(new DateOnly(2024, 12, 25), new TimeOnly(10, 30, 45), DateTimeKind.Local));
+			local.Should().Be(new DateTime(new DateOnly(2024, 12, 25), new TimeOnly(14, 0, 45), DateTimeKind.Utc));
 		}
 
 		// Act - Retrieve via NHibernate
@@ -59,18 +65,18 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.InstantValuable.Should().Be(instant);
+		retrievedEvent!.ZdtValauable.Should().Be(zdt);
 	}
 
 	[Fact]
 	public async Task ShouldPreserveNanosecondPrecision()
 	{
-		// Arrange - Create instant with specific nanosecond value
-		var instant = Instant
+		var zdt = Instant
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
-			.PlusNanoseconds(123456789);
+			.PlusNanoseconds(123456789)
+			.InUtc();
 
-		var entity = new Event() { Name = "Precision Test", InstantValuable = instant, InstantNullable = instant };
+		var entity = new Event() { Name = "Precision Test", ZdtValauable = zdt };
 
 		// Act
 		int savedId;
@@ -89,16 +95,16 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 
 		// Assert
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.InstantValuable.Should().Be(instant);
-		retrievedEvent.InstantValuable.OnlyNanoseconds().Should().Be(123456789);
+		retrievedEvent!.ZdtValauable.Should().Be(zdt);
+		retrievedEvent.ZdtValauable.ToInstant().OnlyNanoseconds().Should().Be(123456789);
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullableInstant()
+	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var now = SystemClock.Instance.GetCurrentInstant();
-		var entity = new Event() { Name = "Test", InstantValuable = now, InstantNullable = null };
+		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
+		var entity = new Event() { Name = "Test", ZdtValauable = now, ZdtNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -113,7 +119,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT InstantNullable_Seconds, InstantNullable_Nanoseconds 
+				SELECT ZdtNullable_Seconds, ZdtNullable_Nanoseconds, ZdtNullable_ZoneID, ZdtNullable_UTC, ZdtNullable_Local
 				FROM ""Event""
 				WHERE id = :id";
 
@@ -121,19 +127,20 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			result[0].Should().BeNull();
-			result[1].Should().BeNull();
+			for (int i = 0; i < result.Length; i++)
+			{
+				result[i].Should().BeNull();
+			}
 		}
 	}
 
 	[Fact]
-	public async Task ShouldHandleMinInstants()
+	public async Task ShouldHandleMin()
 	{
 		// Arrange
-		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
-		var minInstant = Instant.MinValue;
+		var min = Instant.MinValue.InUtc();
 
-		var minEntity = new Event() { Name = "Min", InstantValuable = minInstant, InstantNullable = minInstant };
+		var minEntity = new Event() { Name = "Min", ZdtNullable = min };
 
 		// Act
 		int minId;
@@ -151,17 +158,16 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			retrievedMin = await session.GetAsync<Event>(minId);
 		}
 
-		retrievedMin!.InstantValuable.Should().Be(minInstant);
+		retrievedMin!.ZdtNullable.Should().Be(min);
 	}
 
 	[Fact]
-	public async Task ShouldHandleMaxInstant()
+	public async Task ShouldHandleMax()
 	{
 		// Arrange
-		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
-		var maxInstant = Instant.MaxValue;
+		var max = Instant.MaxValue.InUtc();
 
-		var maxEntity = new Event() { Name = "Max", InstantValuable = maxInstant, InstantNullable = maxInstant };
+		var maxEntity = new Event() { Name = "Max", ZdtNullable = max };
 
 		// Act
 		int maxId;
@@ -179,6 +185,6 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			retrievedMax = await session.GetAsync<Event>(maxId);
 		}
 
-		retrievedMax!.InstantValuable.Should().Be(maxInstant);
+		retrievedMax.ZdtNullable.Should().Be(max);
 	}
 }

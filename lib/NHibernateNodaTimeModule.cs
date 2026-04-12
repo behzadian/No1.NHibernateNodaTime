@@ -8,31 +8,36 @@ public static class NHibernateNodaTimeModule
 {
 	public static AutoPersistenceModel EnableNodaTime(this AutoPersistenceModel convention)
 	{
-		return convention
-			.Conventions.Add<InstantComponentConvention>()
-			;
+		return convention.Conventions.Add<NodaTimeTypesComponentConvention>();
 	}
 
 	public static AutoPersistenceModel EnableNodaTime(this SetupConventionFinder<AutoPersistenceModel> convention)
 	{
-		return convention.Add<InstantComponentConvention>();
+		return convention.Add<NodaTimeTypesComponentConvention>();
 	}
 
 	public static void MapInstantProperty(PropertyPart propertyPart, string propertyName)
 	{
-		propertyPart.CustomType<InstantCompositeUserType>();
-		propertyPart.Columns.Clear();
-		propertyPart.Columns.Add(propertyName + "_Timestamp");
-		propertyPart.Columns.Add(propertyName + "_Nanoseconds");
+		MapColumns<InstantCompositeUserType>(propertyPart, propertyName, InstantCompositeUserType.Columns);
 	}
 
 	public static void MapZonedDateTimeProperty(PropertyPart propertyPart, string propertyName)
 	{
-		propertyPart.CustomType<ZonedDateTimeCompositeUserType>();
+		MapColumns<ZonedDateTimeCompositeUserType>(propertyPart, propertyName, ZonedDateTimeCompositeUserType.Columns);
+	}
+
+	public static void MapDurationProperty(PropertyPart propertyPart, string propertyName)
+	{
+		MapColumns<DurationCompositeUserType>(propertyPart, propertyName, DurationCompositeUserType.Columns);
+	}
+
+	private static void MapColumns<T>(PropertyPart propertyPart, string prefix, string[] columns)
+	{
+		propertyPart.CustomType<T>();
 		propertyPart.Columns.Clear();
-		propertyPart.Columns.Add(propertyName + "_UTC");
-		propertyPart.Columns.Add(propertyName + "_Local");
-		propertyPart.Columns.Add(propertyName + "_Nanoseconds");
-		propertyPart.Columns.Add(propertyName + "_ZoneID");
+		foreach (var property in columns)
+		{
+			propertyPart.Columns.Add($"{prefix}_{property}");
+		}
 	}
 }

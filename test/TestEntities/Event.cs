@@ -9,8 +9,10 @@ public class Event
 {
     public virtual int Id { get; set; }
     public virtual string Name { get; set; } = string.Empty;
-    public virtual Instant JustInstant { get; set; } 
-    public virtual Instant? NullableInstant { get; set; }
-	public virtual ZonedDateTime AlwaysZdt { get; set; } = SystemClock.Instance.GetCurrentInstant().InUtc();
-    public virtual ZonedDateTime? NullableZdt { get; set; }
+    public virtual Instant InstantValuable { get; set; } 
+    public virtual Instant? InstantNullable { get; set; }
+	public virtual ZonedDateTime ZdtValauable { get; set; } = SystemClock.Instance.GetCurrentInstant().InUtc();
+    public virtual ZonedDateTime? ZdtNullable { get; set; }
+	public virtual Duration DurationValauable { get; set; } = Duration.Epsilon;
+    public virtual Duration? DurationNullable { get; set; }
 }

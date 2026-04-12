@@ -13,7 +13,8 @@ public class EventOverride : IAutoMappingOverride<Event>
 {
     public void Override(AutoMapping<Event> mapping)
     {
-		NHibernateNodaTimeModule.MapInstantProperty(mapping.Map(x => x.JustInstant), nameof(Event.JustInstant));
-		NHibernateNodaTimeModule.MapZonedDateTimeProperty(mapping.Map(x => x.AlwaysZdt), nameof(Event.AlwaysZdt));
+		NHibernateNodaTimeModule.MapInstantProperty(mapping.Map(x => x.InstantValuable), nameof(Event.InstantValuable));
+		NHibernateNodaTimeModule.MapZonedDateTimeProperty(mapping.Map(x => x.ZdtValauable), nameof(Event.ZdtValauable));
+		NHibernateNodaTimeModule.MapDurationProperty(mapping.Map(x => x.DurationValauable), nameof(Event.DurationValauable));
 	}
 }
