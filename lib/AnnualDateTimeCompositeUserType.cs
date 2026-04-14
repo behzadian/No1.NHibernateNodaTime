@@ -11,76 +11,58 @@ namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// </summary>
-public class LocalDateTimeCompositeUserType : ICompositeUserType
+public class AnnualDateCompositeUserType : ICompositeUserType
 {
-	public Type ReturnedClass => typeof(ZonedDateTime?);
+	public Type ReturnedClass => typeof(AnnualDate?);
 
 	public bool IsMutable => false;
 
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+	internal static string[] Columns => ["Month", "Day",];
 
 	public string[] PropertyNames => Columns;
 
 	public IType[] PropertyTypes =>
 	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.Int16,		// Month
+		NHibernateUtil.Int16,		// Day
 	];
 
 	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long secs)
+		if (dr[names[counter++]] is not short month)
 			return null;
 
-		if (dr[names[counter++]] is not int nanos)
+		if (dr[names[counter++]] is not short day)
 			return null;
 
-		if (dr[names[counter++]] is not string zoneId)
-			return null;
-
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new Exception($"Zone {zoneId} not found");
-		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
-		var zdt = instant.InZone(DateTimeZone.Utc);
-		return zdt.WithZone(zone);
+		return new AnnualDate(month, day);
 	}
 
 	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is ZonedDateTime zdt)
+		if (value is AnnualDate ad)
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUtcOrNull(), counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUnspecifiedOrNull(), counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, ad.Month, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, ad.Day, counter++, session);
 		}
 		else
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
 	public object? GetPropertyValue(object component, int property)
 	{
-		var val = (ZonedDateTime)component;
+		var val = (AnnualDate)component;
 		return property switch
 		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => val.ToDateTimeUtcOrNull(),
-			4 => val.ToDateTimeUnspecifiedOrNull(),
+			0 => val.Month,
+			1 => val.Day,
 			_ => throw new ArgumentOutOfRangeException(nameof(property))
 		};
 	}
@@ -114,7 +96,7 @@ public class LocalDateTimeCompositeUserType : ICompositeUserType
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
-		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
+		return ((AnnualDate)x).Equals((AnnualDate)y);
 	}
 
 	public int GetHashCode(object? x)

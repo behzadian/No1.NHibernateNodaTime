@@ -16,5 +16,6 @@ public class EventOverride : IAutoMappingOverride<Event>
 		NHibernateNodaTimeModule.MapInstantProperty(mapping.Map(x => x.InstantValuable), nameof(Event.InstantValuable));
 		NHibernateNodaTimeModule.MapZonedDateTimeProperty(mapping.Map(x => x.ZdtValauable), nameof(Event.ZdtValauable));
 		NHibernateNodaTimeModule.MapDurationProperty(mapping.Map(x => x.DurationValauable), nameof(Event.DurationValauable));
+		NHibernateNodaTimeModule.MapAnnualDateProperty(mapping.Map(x => x.AnnualDateValauable), nameof(Event.AnnualDateValauable));
 	}
 }

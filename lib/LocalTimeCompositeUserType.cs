@@ -11,7 +11,7 @@ namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// </summary>
-public class LocalDateTimeCompositeUserType : ICompositeUserType
+public class LocalTimeCompositeUserType : ICompositeUserType
 {
 	public Type ReturnedClass => typeof(ZonedDateTime?);
 

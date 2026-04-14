@@ -31,6 +31,11 @@ public static class NHibernateNodaTimeModule
 		MapColumns<DurationCompositeUserType>(propertyPart, propertyName, DurationCompositeUserType.Columns);
 	}
 
+	public static void MapAnnualDateProperty(PropertyPart propertyPart, string propertyName)
+	{
+		MapColumns<AnnualDateCompositeUserType>(propertyPart, propertyName, AnnualDateCompositeUserType.Columns);
+	}
+
 	private static void MapColumns<T>(PropertyPart propertyPart, string prefix, string[] columns)
 	{
 		propertyPart.CustomType<T>();
