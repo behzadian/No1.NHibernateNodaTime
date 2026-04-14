@@ -63,42 +63,10 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanosecondPrecision()
-	{
-		var zdt = Instant
-			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
-			.PlusNanoseconds(123456789)
-			.InUtc();
-
-		var entity = new Event() { Name = "Precision Test", ZdtValauable = zdt };
-
-		// Act
-		int savedId;
-		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
-			savedId = (int)await session.SaveAsync(entity);
-			await transaction.CommitAsync();
-		}
-
-		Event? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
-		}
-
-		// Assert
-		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.ZdtValauable.Should().Be(zdt);
-		retrievedEvent.ZdtValauable.ToInstant().OnlyNanoseconds().Should().Be(123456789);
-	}
-
-	[Fact]
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
-		var entity = new Event() { Name = "Test", ZdtValauable = now, ZdtNullable = null };
+		var entity = new Event() { Name = "Test Event", AnnualDateNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -113,7 +81,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ZdtNullable_Seconds, ZdtNullable_Nanoseconds, ZdtNullable_ZoneID, ZdtNullable_UTC, ZdtNullable_Local
+				SELECT AnnualDateNullable_Month, AnnualDateNullable_Day
 				FROM ""Event""
 				WHERE id = :id";
 
@@ -126,6 +94,17 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 				result[i].Should().BeNull();
 			}
 		}
+
+		// Act - Retrieve via NHibernate
+		Event? retrievedEvent;
+		using (var session = _sessionFactory.OpenSession())
+		{
+			retrievedEvent = await session.GetAsync<Event>(savedId);
+		}
+
+		// Assert - Verify object reconstruction
+		retrievedEvent.Should().NotBeNull();
+		retrievedEvent!.AnnualDateNullable.Should().BeNull();
 	}
 
 	[Fact]
