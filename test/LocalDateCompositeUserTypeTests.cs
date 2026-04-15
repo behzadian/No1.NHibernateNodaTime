@@ -3,6 +3,7 @@ using NHibernate;
 using No1.NHibernateNodaTime;
 using No1.NHibernateNodaTimeTests.TestEntities;
 using NodaTime;
+using NodaTime.Calendars;
 using Xunit;
 
 namespace No1.NHibernateNodaTimeTests;
@@ -34,7 +35,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdValauable_Gregorian, LdValauable_Calendar, LdValauable_Era, LdValauable_YearOfEra
+				SELECT LdValauable_Gregorian, LdValauable_Calendar, LdValauable_Era, LdValauable_Year, LdValauable_Month, LdValauable_Day
 				FROM ""Event""
 				WHERE id = :id";
 
@@ -45,13 +46,17 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 			var date = Convert.ToDateTime(result[0]);
 			var cal = Convert.ToString(result[1]);
 			var era = Convert.ToString(result[2]);
-			var yearOfEra = Convert.ToInt16(result[3]);
+			var year = Convert.ToInt16(result[3]);
+			var month = Convert.ToInt16(result[4]);
+			var day = Convert.ToInt16(result[5]);
 
 			// Assert - Verify raw column values
 			date.Should().Be(val.ToDateTimeUnspecified());
 			cal.Should().Be("Persian Simple");
 			era.Should().Be("AP");
-			yearOfEra.Should().Be(1405);
+			year.Should().Be(1405);
+			month.Should().Be(1);
+			day.Should().Be(25);
 		}
 
 		// Act - Retrieve via NHibernate
@@ -67,14 +72,10 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanosecondPrecision()
+	public async Task ShouldPreserveEra()
 	{
-		var zdt = Instant
-			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
-			.PlusNanoseconds(123456789)
-			.InUtc();
-
-		var entity = new Event() { Name = "Precision Test", ZdtValauable = zdt };
+		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
+		var entity = new Event() { Name = "Precision Test", LdValauable = val };
 
 		// Act
 		int savedId;
@@ -93,16 +94,15 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 
 		// Assert
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.ZdtValauable.Should().Be(zdt);
-		retrievedEvent.ZdtValauable.ToInstant().OnlyNanoseconds().Should().Be(123456789);
+		retrievedEvent.LdValauable.Should().Be(val);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
-		var entity = new Event() { Name = "Test", ZdtValauable = now, ZdtNullable = null };
+		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
+		var entity = new Event() { Name = "Test", LdNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -117,7 +117,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ZdtNullable_Seconds, ZdtNullable_Nanoseconds, ZdtNullable_ZoneID, ZdtNullable_UTC, ZdtNullable_Local
+				SELECT LdNullable_Gregorian, LdNullable_Calendar, LdNullable_Era, LdNullable_Year, LdNullable_Month, LdNullable_Day
 				FROM ""Event""
 				WHERE id = :id";
 
@@ -136,9 +136,8 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	public async Task ShouldHandleMin()
 	{
 		// Arrange
-		var min = Instant.MinValue.InUtc();
-
-		var minEntity = new Event() { Name = "Min", ZdtNullable = min };
+		var min = LocalDate.MinIsoValue;
+		var minEntity = new Event() { Name = "Min", LdNullable = min };
 
 		// Act
 		int minId;
@@ -156,16 +155,15 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 			retrievedMin = await session.GetAsync<Event>(minId);
 		}
 
-		retrievedMin!.ZdtNullable.Should().Be(min);
+		retrievedMin.LdNullable.Should().Be(min);
 	}
 
 	[Fact]
 	public async Task ShouldHandleMax()
 	{
 		// Arrange
-		var max = Instant.MaxValue.InUtc();
-
-		var maxEntity = new Event() { Name = "Max", ZdtNullable = max };
+		var max = LocalDate.MaxIsoValue;
+		var maxEntity = new Event() { Name = "Max", LdNullable = max };
 
 		// Act
 		int maxId;
@@ -183,6 +181,6 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 			retrievedMax = await session.GetAsync<Event>(maxId);
 		}
 
-		retrievedMax.ZdtNullable.Should().Be(max);
+		retrievedMax.LdNullable.Should().Be(max);
 	}
 }

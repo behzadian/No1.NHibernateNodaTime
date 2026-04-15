@@ -32,6 +32,10 @@ public class NodaTimeTypesComponentConvention : IPropertyConvention
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(AnnualDate) || instance.Type == typeof(AnnualDate?):
 				instance.CustomType<AnnualDateCompositeUserType>(instance.Name + "_");
 				break;
+
+			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(LocalDate) || instance.Type == typeof(LocalDate?):
+				instance.CustomType<LocalDateCompositeUserType>(instance.Name + "_");
+				break;
 		}
     }
 }

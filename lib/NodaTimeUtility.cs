@@ -65,6 +65,18 @@ public static class NodaTimeUtility
 		}
 	}
 
+	internal static DateTime? ToDateTimeUnspecifiedOrNull(this LocalDate value)
+	{
+		try
+		{
+			return value.ToDateTimeUnspecified();
+		}
+		catch (Exception)
+		{
+			return null;
+		}
+	}
+
 
 	private static readonly Dictionary<string, Era> Eras = new() {
 			{   Era.AnnoHegirae.Name    , Era.AnnoHegirae},
