@@ -1,6 +1,7 @@
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Mapping;
+using NodaTime;
 
 namespace No1.NHibernateNodaTime;
 
@@ -15,6 +16,17 @@ public static class NHibernateNodaTimeModule
 	{
 		return convention.Add<NodaTimeTypesComponentConvention>();
 	}
+
+	/*public static void MapNodaProperties<T>(AutoMapping<T> mapping)
+	{
+		var t = typeof(T);
+		foreach (var property in t.GetProperties())
+		{
+			if(property.PropertyType == typeof(Instant)){
+				//mapping.Map()
+			}
+		}
+	}*/
 
 	public static void MapInstantProperty(PropertyPart propertyPart, string propertyName)
 	{
@@ -34,6 +46,11 @@ public static class NHibernateNodaTimeModule
 	public static void MapAnnualDateProperty(PropertyPart propertyPart, string propertyName)
 	{
 		MapColumns<AnnualDateCompositeUserType>(propertyPart, propertyName, AnnualDateCompositeUserType.Columns);
+	}
+
+	public static void MapLocalDateProperty(PropertyPart propertyPart, string propertyName)
+	{
+		MapColumns<LocalDateCompositeUserType>(propertyPart, propertyName, LocalDateCompositeUserType.Columns);
 	}
 
 	private static void MapColumns<T>(PropertyPart propertyPart, string prefix, string[] columns)

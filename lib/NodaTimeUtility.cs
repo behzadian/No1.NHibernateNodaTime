@@ -68,8 +68,8 @@ public static class NodaTimeUtility
 
 	private static readonly Dictionary<string, Era> Eras = new() {
 			{   Era.AnnoHegirae.Name    , Era.AnnoHegirae},
-			{   Era.AnnoMartyrum.Name    , Era.AnnoMartyrum},
-			{   Era.AnnoMundi.Name    , Era.AnnoMundi},
+			{   /*Era.AnnoMartyrum*/ "Martyrum"    , Era.AnnoMartyrum},
+			{   /*Era.AnnoMundi*/ "Mundi" , Era.AnnoMundi},
 			{   Era.AnnoPersico.Name    , Era.AnnoPersico},
 			{   Era.Bahai.Name    , Era.Bahai},
 			{   Era.BeforeCommon.Name    , Era.BeforeCommon},
@@ -79,5 +79,10 @@ public static class NodaTimeUtility
 	internal static Era GetEra(string eraId)
 	{
 		return Eras[eraId] ?? throw new Exception($"Unable to find Era with name {eraId}");
+	}
+
+	internal static string EraName(Era era)
+	{
+		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new Exception("Era not found");
 	}
 }

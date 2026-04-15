@@ -34,7 +34,7 @@ public class LocalDateCompositeUserType : ICompositeUserType
 	{
 		var counter = 0;
 
-		if (dr[names[counter++]] is not DateOnly date)
+		if (dr[names[counter++]] is not DateTime date)
 			return null;
 
 		if (dr[names[counter++]] is not string calendarId)
@@ -48,7 +48,7 @@ public class LocalDateCompositeUserType : ICompositeUserType
 
 		var calendar = CalendarSystem.ForId(calendarId);
 		var era = NodaTimeUtility.GetEra(eraId);
-		var ld = LocalDate.FromDateOnly(date).WithCalendar(calendar);
+		var ld = LocalDate.FromDateTime(date).WithCalendar(calendar);
 
 		return new LocalDate(era, yearOfEra, ld.Month, ld.Day, calendar);
 	}
@@ -58,9 +58,9 @@ public class LocalDateCompositeUserType : ICompositeUserType
 		if (value is LocalDate ld)
 		{
 			var counter = index;
-			NHibernateUtil.Date.NullSafeSet(cmd, ld.ToDateOnly(), counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, ld.Calendar.Name, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, ld.Era.Name, counter++, session);
+			NHibernateUtil.Date.NullSafeSet(cmd, ld.ToDateTimeUnspecified(), counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, ld.Calendar.Id, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, NodaTimeUtility.EraName(ld.Era), counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, ld.YearOfEra, counter++, session);
 		}
 		else
