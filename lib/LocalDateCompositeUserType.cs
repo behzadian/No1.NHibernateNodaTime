@@ -5,6 +5,7 @@ using NHibernate.Type;
 using NHibernate.UserTypes;
 using NHibernate.Util;
 using NodaTime;
+using NodaTime.Calendars;
 using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
@@ -13,111 +14,117 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public class LocalDateCompositeUserType : ICompositeUserType
 {
-	public Type ReturnedClass => typeof(ZonedDateTime?);
+	Type ICompositeUserType.ReturnedClass => typeof(LocalDate?);
 
-	public bool IsMutable => false;
+	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+	internal static string[] Columns => ["Gregorian", "Calendar", "Era", "YearOfEra",];
 
-	public string[] PropertyNames => Columns;
+	string[] ICompositeUserType.PropertyNames => Columns;
 
-	public IType[] PropertyTypes =>
+	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.Date,		// Date
+		NHibernateUtil.String,		// Calendar
+		NHibernateUtil.String,		// Era
+		NHibernateUtil.Int16,		// YearOfEra
 	];
 
-	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long secs)
+		if (dr[names[counter++]] is not DateOnly date)
 			return null;
 
-		if (dr[names[counter++]] is not int nanos)
+		if (dr[names[counter++]] is not string calendarId)
 			return null;
 
-		if (dr[names[counter++]] is not string zoneId)
+		if (dr[names[counter++]] is not string eraId)
 			return null;
 
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new Exception($"Zone {zoneId} not found");
-		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
-		var zdt = instant.InZone(DateTimeZone.Utc);
-		return zdt.WithZone(zone);
+		if (dr[names[counter++]] is not short yearOfEra)
+			return null;
+
+		var calendar = CalendarSystem.ForId(calendarId);
+		var era = NodaTimeUtility.GetEra(eraId);
+		var ld = LocalDate.FromDateOnly(date).WithCalendar(calendar);
+
+		return new LocalDate(era, yearOfEra, ld.Month, ld.Day, calendar);
 	}
 
-	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is ZonedDateTime zdt)
+		if (value is LocalDate ld)
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUtcOrNull(), counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, zdt.ToDateTimeUnspecifiedOrNull(), counter++, session);
+			NHibernateUtil.Date.NullSafeSet(cmd, ld.ToDateOnly(), counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, ld.Calendar.Name, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, ld.Era.Name, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, ld.YearOfEra, counter++, session);
 		}
 		else
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Date.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
-	public object? GetPropertyValue(object component, int property)
+	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var val = (ZonedDateTime)component;
-		return property switch
+		if (component is LocalDate ld)
 		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => val.ToDateTimeUtcOrNull(),
-			4 => val.ToDateTimeUnspecifiedOrNull(),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property switch
+			{
+				0 => ld.ToDateOnly(),
+				1 => ld.Calendar.Name,
+				2 => ld.Era.Name,
+				3 => ld.YearOfEra,
+				_ => throw new ArgumentOutOfRangeException(nameof(property))
+			};
+		}
+		else
+		{
+			throw new Exception($"Object is not LocalDate, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
-	public void SetPropertyValue(object component, int property, object value)
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
 	{
 		throw new InvalidOperationException("immutable");
 	}
 
-	public object DeepCopy(object value)
+	object ICompositeUserType.DeepCopy(object value)
 	{
 		return value;
 	}
 
-	public object Disassemble(object value, ISessionImplementor session)
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
 	{
 		return value;
 	}
 
-	public object Assemble(object cached, ISessionImplementor session, object owner)
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
 	{
 		return cached;
 	}
 
-	public object Replace(object original, object target, ISessionImplementor session, object owner)
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
 	{
 		return original;
 	}
 
-	public new bool Equals(object? x, object? y)
+	bool ICompositeUserType.Equals(object? x, object? y)
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
-		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
+		return ((LocalDate)x).Equals((LocalDate)y);
 	}
 
-	public int GetHashCode(object? x)
+	int ICompositeUserType.GetHashCode(object? x)
 	{
 		return x?.GetHashCode() ?? 0;
 	}

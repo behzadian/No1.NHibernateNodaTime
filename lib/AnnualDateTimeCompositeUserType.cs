@@ -13,21 +13,21 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public class AnnualDateCompositeUserType : ICompositeUserType
 {
-	public Type ReturnedClass => typeof(AnnualDate?);
+	Type ICompositeUserType.ReturnedClass => typeof(AnnualDate?);
 
-	public bool IsMutable => false;
+	bool ICompositeUserType.IsMutable => false;
 
 	internal static string[] Columns => ["Month", "Day",];
 
-	public string[] PropertyNames => Columns;
+	string[] ICompositeUserType.PropertyNames => Columns;
 
-	public IType[] PropertyTypes =>
+	IType[] ICompositeUserType.PropertyTypes =>
 	[
 		NHibernateUtil.Int16,		// Month
 		NHibernateUtil.Int16,		// Day
 	];
 
-	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		var counter = 0;
 
@@ -40,7 +40,7 @@ public class AnnualDateCompositeUserType : ICompositeUserType
 		return new AnnualDate(month, day);
 	}
 
-	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
 		if (value is AnnualDate ad)
 		{
@@ -56,7 +56,7 @@ public class AnnualDateCompositeUserType : ICompositeUserType
 		}
 	}
 
-	public object? GetPropertyValue(object component, int property)
+	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
 		var val = (AnnualDate)component;
 		return property switch
@@ -67,39 +67,39 @@ public class AnnualDateCompositeUserType : ICompositeUserType
 		};
 	}
 
-	public void SetPropertyValue(object component, int property, object value)
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
 	{
 		throw new InvalidOperationException("immutable");
 	}
 
-	public object DeepCopy(object value)
+	object ICompositeUserType.DeepCopy(object value)
 	{
 		return value;
 	}
 
-	public object Disassemble(object value, ISessionImplementor session)
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
 	{
 		return value;
 	}
 
-	public object Assemble(object cached, ISessionImplementor session, object owner)
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
 	{
 		return cached;
 	}
 
-	public object Replace(object original, object target, ISessionImplementor session, object owner)
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
 	{
 		return original;
 	}
 
-	public new bool Equals(object? x, object? y)
+	bool ICompositeUserType.Equals(object? x, object? y)
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((AnnualDate)x).Equals((AnnualDate)y);
 	}
 
-	public int GetHashCode(object? x)
+	int ICompositeUserType.GetHashCode(object? x)
 	{
 		return x?.GetHashCode() ?? 0;
 	}

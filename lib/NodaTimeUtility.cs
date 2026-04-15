@@ -1,6 +1,7 @@
 using FluentNHibernate.Mapping;
 using NHibernate.Mapping;
 using NodaTime;
+using NodaTime.Calendars;
 
 namespace No1.NHibernateNodaTime;
 
@@ -62,5 +63,21 @@ public static class NodaTimeUtility
 		{
 			return null;
 		}
+	}
+
+
+	private static readonly Dictionary<string, Era> Eras = new() {
+			{   Era.AnnoHegirae.Name    , Era.AnnoHegirae},
+			{   Era.AnnoMartyrum.Name    , Era.AnnoMartyrum},
+			{   Era.AnnoMundi.Name    , Era.AnnoMundi},
+			{   Era.AnnoPersico.Name    , Era.AnnoPersico},
+			{   Era.Bahai.Name    , Era.Bahai},
+			{   Era.BeforeCommon.Name    , Era.BeforeCommon},
+			{   Era.Common.Name    , Era.Common},
+		};
+
+	internal static Era GetEra(string eraId)
+	{
+		return Eras[eraId] ?? throw new Exception($"Unable to find Era with name {eraId}");
 	}
 }
