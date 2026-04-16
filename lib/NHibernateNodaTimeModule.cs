@@ -9,11 +9,13 @@ public static class NHibernateNodaTimeModule
 {
 	public static AutoPersistenceModel EnableNodaTime(this AutoPersistenceModel convention)
 	{
+		ArgumentNullException.ThrowIfNull(convention);
 		return convention.Conventions.Add<NodaTimeTypesComponentConvention>();
 	}
 
 	public static AutoPersistenceModel EnableNodaTime(this SetupConventionFinder<AutoPersistenceModel> convention)
 	{
+		ArgumentNullException.ThrowIfNull(convention);
 		return convention.Add<NodaTimeTypesComponentConvention>();
 	}
 
@@ -30,26 +32,31 @@ public static class NHibernateNodaTimeModule
 
 	public static void MapInstantProperty(PropertyPart propertyPart, string propertyName)
 	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
 		MapColumns<InstantCompositeUserType>(propertyPart, propertyName, InstantCompositeUserType.Columns);
 	}
 
 	public static void MapZonedDateTimeProperty(PropertyPart propertyPart, string propertyName)
 	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
 		MapColumns<ZonedDateTimeCompositeUserType>(propertyPart, propertyName, ZonedDateTimeCompositeUserType.Columns);
 	}
 
 	public static void MapDurationProperty(PropertyPart propertyPart, string propertyName)
 	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
 		MapColumns<DurationCompositeUserType>(propertyPart, propertyName, DurationCompositeUserType.Columns);
 	}
 
 	public static void MapAnnualDateProperty(PropertyPart propertyPart, string propertyName)
 	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
 		MapColumns<AnnualDateCompositeUserType>(propertyPart, propertyName, AnnualDateCompositeUserType.Columns);
 	}
 
 	public static void MapLocalDateProperty(PropertyPart propertyPart, string propertyName)
 	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
 		MapColumns<LocalDateCompositeUserType>(propertyPart, propertyName, LocalDateCompositeUserType.Columns);
 	}
 

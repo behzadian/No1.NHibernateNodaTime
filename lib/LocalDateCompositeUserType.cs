@@ -7,12 +7,13 @@ using NHibernate.Util;
 using NodaTime;
 using NodaTime.Calendars;
 using System.Data.Common;
+using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// </summary>
-public class LocalDateCompositeUserType : ICompositeUserType
+public sealed class LocalDateCompositeUserType : ICompositeUserType
 {
 	Type ICompositeUserType.ReturnedClass => typeof(LocalDate?);
 
@@ -52,7 +53,7 @@ public class LocalDateCompositeUserType : ICompositeUserType
 			return null;
 
 		var calendar = CalendarSystem.ForId(calendarId);
-		var era = NodaTimeUtility.GetEra(eraId);
+		var era = EraByID(eraId);
 		return new LocalDate(era, year, month, day, calendar);
 	}
 
@@ -62,11 +63,11 @@ public class LocalDateCompositeUserType : ICompositeUserType
 		{
 			var counter = index;
 			NHibernateUtil.String.NullSafeSet(cmd, ld.Calendar.Id, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, NodaTimeUtility.EraName(ld.Era), counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, EraID(ld.Era), counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, ld.YearOfEra, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, ld.Month, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, ld.Day, counter++, session);
-			NHibernateUtil.Date.NullSafeSet(cmd, ld.ToDateTimeUnspecifiedOrNull(), counter++, session);
+			NHibernateUtil.Date.NullSafeSet(cmd, TryOrDefault(ld.ToDateTimeUnspecified), counter++, session);
 		}
 		else
 		{
@@ -86,18 +87,18 @@ public class LocalDateCompositeUserType : ICompositeUserType
 		{
 			return property switch
 			{
-				0 => ld.ToDateTimeUnspecifiedOrNull(),
-				1 => ld.Calendar.Name,
-				2 => ld.Era.Name,
-				3 => ld.YearOfEra,
-				4 => ld.Month,
-				5 => ld.Day,
+				0 => ld.Calendar.Name,
+				1 => EraID(ld.Era),
+				2 => ld.YearOfEra,
+				3 => ld.Month,
+				4 => ld.Day,
+				5 => TryOrDefault(ld.ToDateTimeUnspecified),
 				_ => throw new ArgumentOutOfRangeException(nameof(property))
 			};
 		}
 		else
 		{
-			throw new Exception($"Object is not LocalDate, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new MismatchTypeException($"Object is not LocalDate, is {component?.GetType()?.Name ?? "NULL"}");
 		}
 	}
 

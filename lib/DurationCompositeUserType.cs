@@ -13,7 +13,7 @@ namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// </summary>
-public class DurationCompositeUserType : ICompositeUserType
+public sealed class DurationCompositeUserType : ICompositeUserType
 {
 	internal static readonly string[] Columns = ["Seconds", "Nanos"];
 

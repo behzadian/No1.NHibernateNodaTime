@@ -11,7 +11,7 @@ namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// </summary>
-public class AnnualDateCompositeUserType : ICompositeUserType
+public sealed class AnnualDateCompositeUserType : ICompositeUserType
 {
 	Type ICompositeUserType.ReturnedClass => typeof(AnnualDate?);
 

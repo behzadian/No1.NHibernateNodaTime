@@ -11,7 +11,7 @@ using System.Text;
 
 namespace No1.NHibernateNodaTime;
 
-public class NodaTimeTypesComponentConvention : IPropertyConvention
+public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 {
     void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
     {

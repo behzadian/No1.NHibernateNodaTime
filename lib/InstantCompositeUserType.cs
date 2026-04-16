@@ -7,6 +7,7 @@ using NHibernate.UserTypes;
 using NodaTime;
 using System.Data.Common;
 using System.Diagnostics.Metrics;
+using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
@@ -15,24 +16,24 @@ namespace No1.NHibernateNodaTime;
 /// - Seconds since Unix epoch (long)
 /// - Nanoseconds component (int)
 /// </summary>
-public class InstantCompositeUserType : ICompositeUserType
+public sealed class InstantCompositeUserType : ICompositeUserType
 {
-	public Type ReturnedClass => typeof(Instant?);
+	Type ICompositeUserType.ReturnedClass => typeof(Instant?);
 
-	public bool IsMutable => false;
+	bool ICompositeUserType.IsMutable => false;
 
 	internal static string[] Columns => ["Seconds", "Nanoseconds", "Timestamp",];
 
-	public string[] PropertyNames => Columns;
+	string[] ICompositeUserType.PropertyNames => Columns;
 
-	public IType[] PropertyTypes =>
+	IType[] ICompositeUserType.PropertyTypes =>
 	[
 		NHibernateUtil.Int64,			// Seconds
         NHibernateUtil.Int32,			// Nanoseconds
-		NHibernateUtil.UtcDateTimeNoMs,	// Timestamp
+		NHibernateUtil.DateTimeNoMs,	// Timestamp
     ];
 
-	public object? NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		var index = 0;
 
@@ -45,70 +46,70 @@ public class InstantCompositeUserType : ICompositeUserType
 		return Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
 	}
 
-	public void NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
 		if (value is Instant instant)
 		{
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().seconds, counter++, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, instant.ToDateTimeUtcOrNull(), counter++, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(instant.ToDateTimeUtc), counter++, session);
 		}
 		else
 		{
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.UtcDateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
-	public object? GetPropertyValue(object component, int property)
+	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
 		var instant = (Instant)component;
 		return property switch
 		{
 			0 => instant.ToUnixTimeSecondsAndNanoseconds().seconds,
 			1 => instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => instant.ToDateTimeUtcOrNull(),
+			2 => TryOrDefault(instant.ToDateTimeUtc),
 			_ => throw new ArgumentOutOfRangeException(nameof(property))
 		};
 	}
 
-	public void SetPropertyValue(object component, int property, object value)
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
 	{
 		throw new InvalidOperationException("Instant is immutable");
 	}
 
-	public object DeepCopy(object value)
+	object ICompositeUserType.DeepCopy(object value)
 	{
 		// Instant is immutable
 		return value;
 	}
 
-	public object Disassemble(object value, ISessionImplementor session)
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
 	{
 		return value;
 	}
 
-	public object Assemble(object cached, ISessionImplementor session, object owner)
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
 	{
 		return cached;
 	}
 
-	public object Replace(object original, object target, ISessionImplementor session, object owner)
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
 	{
 		return original;
 	}
 
-	public new bool Equals(object? x, object? y)
+	bool ICompositeUserType.Equals(object? x, object? y)
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((Instant)x).Equals((Instant)y);
 	}
 
-	public int GetHashCode(object? x)
+	int ICompositeUserType.GetHashCode(object? x)
 	{
 		return x?.GetHashCode() ?? 0;
 	}
