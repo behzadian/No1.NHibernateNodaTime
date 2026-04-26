@@ -19,4 +19,6 @@ public class Event
 	public virtual AnnualDate? AnnualDateNullable { get; set; }
 	public virtual LocalDate LdValauable { get; set; } = new LocalDate();
 	public virtual LocalDate? LdNullable { get; set; }
+	public virtual LocalDateTime LdtValauable { get; set; } = new LocalDateTime();
+	public virtual LocalDateTime? LdtNullable { get; set; }
 }

@@ -60,6 +60,12 @@ public static class NHibernateNodaTimeModule
 		MapColumns<LocalDateCompositeUserType>(propertyPart, propertyName, LocalDateCompositeUserType.Columns);
 	}
 
+	public static void MapLocalDateTimeProperty(PropertyPart propertyPart, string propertyName)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		MapColumns<LocalDateTimeCompositeUserType>(propertyPart, propertyName, LocalDateTimeCompositeUserType.Columns);
+	}
+
 	private static void MapColumns<T>(PropertyPart propertyPart, string prefix, string[] columns)
 	{
 		propertyPart.CustomType<T>();
