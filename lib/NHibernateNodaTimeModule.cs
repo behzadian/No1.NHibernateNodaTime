@@ -66,13 +66,22 @@ public static class NHibernateNodaTimeModule
 		MapColumns<LocalDateTimeCompositeUserType>(propertyPart, propertyName, LocalDateTimeCompositeUserType.Columns);
 	}
 
-	private static void MapColumns<T>(PropertyPart propertyPart, string prefix, string[] columns)
+	public static void MapLocalTimeProperty(PropertyPart propertyPart, string propertyName)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		MapColumns<LocalTimeUserType>(propertyPart);
+	}
+
+	private static void MapColumns<T>(PropertyPart propertyPart, string? prefix = null, params string[] columns)
 	{
 		propertyPart.CustomType<T>();
 		propertyPart.Columns.Clear();
-		foreach (var property in columns)
+		if (prefix.IsUsable() && columns?.Length > 0)
 		{
-			propertyPart.Columns.Add($"{prefix}_{property}");
+			foreach (var property in columns)
+			{
+				propertyPart.Columns.Add($"{prefix}_{property}");
+			}
 		}
 	}
 }

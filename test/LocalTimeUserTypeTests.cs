@@ -11,16 +11,16 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistLocalDateTimeInMultiColumns()
+	public async Task ShouldPersistLocalDateTimeIn1Column()
 	{
 		// Arrange
-		var val = new LocalDateTime(1405, 1, 25, 17, 16, 15, 14, CalendarSystem.PersianSimple);
-		var entity = new Event() { Name = "Test Event", LdtValauable = val };
+		var val = new LocalTime(17, 16, 15, 14);
+		var entity = new Event() { Name = "Test Event", LtValauable = val };
 
 		// Act - Save
 		int savedId;
@@ -35,28 +35,19 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdtValauable_Gregorian, LdtValauable_Calendar, LdtValauable_Year, LdtValauable_Month, LdtValauable_Day, LdtValauable_Nanos
+				SELECT LtValauable, id
 				FROM ""Event""
 				WHERE id = :id";
 
-			var result = await session.CreateSQLQuery(sql)
+			var result = await session
+				.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var date = Convert.ToDateTime(result[0]);
-			var cal = Convert.ToString(result[1]);
-			var year = Convert.ToInt16(result[2]);
-			var month = Convert.ToInt16(result[3]);
-			var day = Convert.ToInt16(result[4]);
-			var time = Convert.ToInt64(result[5]);
+			var nanos = Convert.ToInt64(result[0]);
 
 			// Assert - Verify raw column values
-			date.Should().Be(val.ToDateTimeUnspecified().Date);
-			cal.Should().Be("Persian Simple");
-			year.Should().Be(1405);
-			month.Should().Be(1);
-			day.Should().Be(25);
-			time.Should().Be((long)TimeSpan.Parse("17:16:15.014").TotalNanoseconds);
+			nanos.Should().Be((long)TimeSpan.Parse("17:16:15.014").TotalNanoseconds);
 		}
 
 		// Act - Retrieve via NHibernate
@@ -68,14 +59,14 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.LdtValauable.Should().Be(val);
+		retrievedEvent.LtValauable.Should().Be(val);
 	}
 
 	[Fact]
-	public async Task ShouldPreserveEra()
+	public async Task ShouldPreserveNanoseconds()
 	{
-		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new Event() { Name = "Precision Test", LdValauable = val };
+		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
+		var entity = new Event() { Name = "Precision Test", LtValauable = val };
 
 		// Act
 		int savedId;
@@ -94,15 +85,15 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 		// Assert
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent.LdValauable.Should().Be(val);
+		retrievedEvent.LtValauable.Should().Be(val);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new Event() { Name = "Test", LdNullable = null };
+		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
+		var entity = new Event() { Name = "Test", LtNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -117,7 +108,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdNullable_Gregorian, LdNullable_Calendar, LdNullable_Era, LdNullable_Year, LdNullable_Month, LdNullable_Day
+				SELECT LtNullable, Id
 				FROM ""Event""
 				WHERE id = :id";
 
@@ -125,10 +116,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			for (int i = 0; i < result.Length; i++)
-			{
-				result[i].Should().BeNull();
-			}
+			result[0].Should().BeNull();
 		}
 	}
 
@@ -136,8 +124,8 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	public async Task ShouldHandleMin()
 	{
 		// Arrange
-		var min = LocalDate.MinIsoValue;
-		var minEntity = new Event() { Name = "Min", LdNullable = min };
+		var min = LocalTime.MinValue;
+		var minEntity = new Event() { Name = "Min", LtNullable = min };
 
 		// Act
 		int minId;
@@ -162,8 +150,8 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	public async Task ShouldHandleMax()
 	{
 		// Arrange
-		var max = LocalDate.MaxIsoValue;
-		var maxEntity = new Event() { Name = "Max", LdNullable = max };
+		var max = LocalTime.MaxValue;
+		var maxEntity = new Event() { Name = "Max", LtNullable = max };
 
 		// Act
 		int maxId;

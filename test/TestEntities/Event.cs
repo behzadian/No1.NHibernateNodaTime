@@ -21,4 +21,6 @@ public class Event
 	public virtual LocalDate? LdNullable { get; set; }
 	public virtual LocalDateTime LdtValauable { get; set; } = new LocalDateTime();
 	public virtual LocalDateTime? LdtNullable { get; set; }
+	public virtual LocalTime LtValauable { get; set; }
+	public virtual LocalTime? LtNullable { get; set; }
 }

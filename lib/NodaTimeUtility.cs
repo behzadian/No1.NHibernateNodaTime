@@ -46,4 +46,9 @@ public static class NodaTimeUtility
 	{
 		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new MismatchTypeException("Era not found");
 	}
+
+	public static bool IsUsable(this string? text)
+	{
+		return !string.IsNullOrEmpty(text);
+	}
 }
