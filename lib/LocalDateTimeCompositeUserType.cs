@@ -7,7 +7,6 @@ using NHibernate.Util;
 using NodaTime;
 using NodaTime.Calendars;
 using System.Data.Common;
-using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
@@ -19,66 +18,44 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns => ["Calendar", "Year", "Month", "Day", "Nanos", "Gregorian",];
+	internal static string[] Columns = [.. LocalDateCompositeUserType.Columns, ..LocalTimeUserType.Columns];
+	internal static int DateColumnsCount => LocalDateCompositeUserType.Columns.Length;
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
+
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.String,			// Calendar
-		NHibernateUtil.Int16,			// Year
-		NHibernateUtil.Int16,			// Month
-		NHibernateUtil.Int16,			// Day
-		NHibernateUtil.Int64,			// Time
-		NHibernateUtil.Date,			// Date
+		..LocalDateCompositeUserType.Instance.PropertyTypes,
+		LocalTimeUserType.NHType
 	];
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
-		var counter = 0;
+		// Split names between date and time parts
+		var dateNames = names[..DateColumnsCount];
+		var timeName = names[DateColumnsCount..];
 
-		if (dr[names[counter++]] is not string calendarId)
-			return null;
+		var date = (LocalDate?)LocalDateCompositeUserType.Instance.NullSafeGet(dr, dateNames, session, owner);
 
-		if (dr[names[counter++]] is not short year)
-			return null;
+		var time = (LocalTime?)LocalTimeUserType.Instance.NullSafeGet(dr, timeName, session, owner);
 
-		if (dr[names[counter++]] is not short month)
-			return null;
+		if (date is null || time is null) return null;
 
-		if (dr[names[counter++]] is not short day)
-			return null;
-
-		if (dr[names[counter++]] is not long nanos)
-			return null;
-
-		var time = LocalTime.FromNanosecondsSinceMidnight(nanos);
-
-		var calendar = CalendarSystem.ForId(calendarId);
-		return new LocalDateTime(year, month, day, time.Hour, time.Minute, time.Second, time.Millisecond, calendar);
+		return date.Value + time.Value;
 	}
 
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
 		if (value is LocalDateTime ldt)
 		{
-			var counter = index;
-			NHibernateUtil.String.NullSafeSet(cmd, ldt.Calendar.Id, counter++, session);
-			NHibernateUtil.Int16.NullSafeSet(cmd, ldt.YearOfEra, counter++, session);
-			NHibernateUtil.Int16.NullSafeSet(cmd, ldt.Month, counter++, session);
-			NHibernateUtil.Int16.NullSafeSet(cmd, ldt.Day, counter++, session);
-			NHibernateUtil.Int64.NullSafeSet(cmd, ldt.TimeOfDay.NanosecondOfDay, counter++, session);
-			NHibernateUtil.Date.NullSafeSet(cmd, TryOrDefault(ldt.ToDateTimeUnspecified), counter++, session);
+			LocalDateCompositeUserType.Instance.NullSafeSet(cmd, ldt.Date, index, settable, session);
+			LocalTimeUserType.Instance.NullSafeSet(cmd, ldt.TimeOfDay, index + DateColumnsCount, session);
 		}
 		else
 		{
-			var counter = index;
-			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Date.NullSafeSet(cmd, null, counter++, session);
+			LocalDateCompositeUserType.Instance.NullSafeSet(cmd, null, index, settable, session);
+			LocalTimeUserType.Instance.NullSafeSet(cmd, null, index + DateColumnsCount, session);
 		}
 	}
 
@@ -86,17 +63,7 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 	{
 		if (component is LocalDateTime ldt)
 		{
-			return property switch
-			{
-				0 => ldt.Calendar.Name,
-				1 => EraID(ldt.Era),
-				2 => ldt.YearOfEra,
-				3 => ldt.Month,
-				4 => ldt.Day,
-				5 => ldt.TimeOfDay.NanosecondOfDay,
-				6 => TryOrDefault(ldt.ToDateTimeUnspecified),
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
-			};
+			return property < DateColumnsCount ? LocalDateCompositeUserType.Instance.GetPropertyValue(ldt.Date, property) : ldt.TimeOfDay;
 		}
 		else
 		{

@@ -16,7 +16,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistLocalDateTimeIn1Column()
+	public async Task ShouldPersistLocalTimeTimeIn1Column()
 	{
 		// Arrange
 		var val = new LocalTime(17, 16, 15, 14);

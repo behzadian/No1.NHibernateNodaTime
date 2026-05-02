@@ -15,6 +15,10 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class LocalTimeUserType : IUserType
 {
+	public static readonly IUserType Instance = new LocalTimeUserType();
+
+	public static readonly IType NHType = NHibernateUtil.Custom(typeof(LocalTimeUserType));
+
 	internal static string[] Columns => ["Nanoseconds",];
 
 	SqlType[] IUserType.SqlTypes => [NHibernateUtil.Int64.SqlType];

@@ -15,6 +15,8 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class LocalDateCompositeUserType : ICompositeUserType
 {
+	public static readonly ICompositeUserType Instance = new LocalDateCompositeUserType();
+
 	Type ICompositeUserType.ReturnedClass => typeof(LocalDate?);
 
 	bool ICompositeUserType.IsMutable => false;

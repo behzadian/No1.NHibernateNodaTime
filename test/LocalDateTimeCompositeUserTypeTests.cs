@@ -35,7 +35,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdtValauable_Gregorian, LdtValauable_Calendar, LdtValauable_Year, LdtValauable_Month, LdtValauable_Day, LdtValauable_Nanos
+				SELECT LdtValauable_Gregorian, LdtValauable_Calendar, LdtValauable_Era, LdtValauable_Year, LdtValauable_Month, LdtValauable_Day, LdtValauable_Nanoseconds
 				FROM ""LocalDateTimeEntity""
 				WHERE id = :id";
 
@@ -45,14 +45,16 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 			var date = Convert.ToDateTime(result[0]);
 			var cal = Convert.ToString(result[1]);
-			var year = Convert.ToInt16(result[2]);
-			var month = Convert.ToInt16(result[3]);
-			var day = Convert.ToInt16(result[4]);
-			var time = Convert.ToInt64(result[5]);
+			var era = Convert.ToString(result[2]);
+			var year = Convert.ToInt16(result[3]);
+			var month = Convert.ToInt16(result[4]);
+			var day = Convert.ToInt16(result[5]);
+			var time = Convert.ToInt64(result[6]);
 
 			// Assert - Verify raw column values
 			date.Should().Be(val.ToDateTimeUnspecified().Date);
 			cal.Should().Be("Persian Simple");
+			era.Should().Be("AP");
 			year.Should().Be(1405);
 			month.Should().Be(1);
 			day.Should().Be(25);
