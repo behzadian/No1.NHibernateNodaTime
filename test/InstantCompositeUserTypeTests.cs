@@ -19,7 +19,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	{
 		// Arrange
 		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
-		var entity = new Event() { Name = "Test Event", InstantValuable = instant, InstantNullable = instant };
+		var entity = new InstantEntity() { Name = "Test Event", InstantValuable = instant, InstantNullable = instant };
 
 		// Act - Save
 		int savedId;
@@ -35,7 +35,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		{
 			var sql = @"
 				SELECT InstantValuable_Seconds, InstantValuable_Nanoseconds 
-				FROM ""Event""
+				FROM ""InstantEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -51,10 +51,10 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		InstantEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<InstantEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -70,7 +70,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
 			.PlusNanoseconds(123456789);
 
-		var entity = new Event() { Name = "Precision Test", InstantValuable = instant, InstantNullable = instant };
+		var entity = new InstantEntity() { Name = "Precision Test", InstantValuable = instant, InstantNullable = instant };
 
 		// Act
 		int savedId;
@@ -81,10 +81,10 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			await transaction.CommitAsync();
 		}
 
-		Event? retrievedEvent;
+		InstantEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<InstantEntity>(savedId);
 		}
 
 		// Assert
@@ -98,7 +98,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	{
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant();
-		var entity = new Event() { Name = "Test", InstantValuable = now, InstantNullable = null };
+		var entity = new InstantEntity() { Name = "Test", InstantValuable = now, InstantNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -114,7 +114,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		{
 			var sql = @"
 				SELECT InstantNullable_Seconds, InstantNullable_Nanoseconds 
-				FROM ""Event""
+				FROM ""InstantEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -133,7 +133,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
 		var minInstant = Instant.MinValue;
 
-		var minEntity = new Event() { Name = "Min", InstantValuable = minInstant, InstantNullable = minInstant };
+		var minEntity = new InstantEntity() { Name = "Min", InstantValuable = minInstant, InstantNullable = minInstant };
 
 		// Act
 		int minId;
@@ -145,10 +145,10 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Assert
-		Event? retrievedMin;
+		InstantEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMin = await session.GetAsync<Event>(minId);
+			retrievedMin = await session.GetAsync<InstantEntity>(minId);
 		}
 
 		retrievedMin!.InstantValuable.Should().Be(minInstant);
@@ -161,7 +161,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
 		var maxInstant = Instant.MaxValue;
 
-		var maxEntity = new Event() { Name = "Max", InstantValuable = maxInstant, InstantNullable = maxInstant };
+		var maxEntity = new InstantEntity() { Name = "Max", InstantValuable = maxInstant, InstantNullable = maxInstant };
 
 		// Act
 		int maxId;
@@ -173,10 +173,10 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Assert
-		Event? retrievedMax;
+		InstantEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMax = await session.GetAsync<Event>(maxId);
+			retrievedMax = await session.GetAsync<InstantEntity>(maxId);
 		}
 
 		retrievedMax!.InstantValuable.Should().Be(maxInstant);

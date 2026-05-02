@@ -4,6 +4,7 @@ using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using No1.NHibernateNodaTime;
+using No1.NHibernateNodaTimeTests.Overrides;
 using No1.NHibernateNodaTimeTests.TestEntities;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -35,6 +36,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
                 .Build();
 
             await _container.StartAsync();
+			Console.WriteLine($"Starting PG on port: {_container.GetMappedPublicPort(5432)}");
         }
         catch (Exception ex)
         {
@@ -57,9 +59,9 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
             .Mappings(m => m
                 .AutoMappings
                 .Add(AutoMap
-                    .AssemblyOf<Event>(new AutoMappingConfiguration())
+                    .AssemblyOf<InstantEntity>(new AutoMappingConfiguration())
 					.EnableNodaTime()
-                    .UseOverridesFromAssemblyOf<EventOverride>()
+                    .UseOverridesFromAssemblyOf<NHibernateCompositeTestFixture>()
                  )
                 //.ExportTo("hbms")
             )

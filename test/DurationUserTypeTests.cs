@@ -20,7 +20,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		// Arrange
 		var duration1 = Duration.FromHours(1.5);
 		var duration2 = Duration.FromTicks(360000001);
-		var entity = new Event() { Name = "Test Event", DurationValauable = duration1, DurationNullable = duration2 };
+		var entity = new DurationEntity() { Name = "Test Event", DurationValauable = duration1, DurationNullable = duration2 };
 
 		// Act - Save
 		int savedId;
@@ -36,7 +36,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		{
 			var sql = @"
 				SELECT DurationValauable_Seconds, DurationValauable_Nanos, DurationNullable_Seconds, DurationNullable_Nanos
-				FROM ""Event""
+				FROM ""DurationEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -51,10 +51,10 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		DurationEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<DurationEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -68,7 +68,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	{
 		// Arrange
 		var duration = Duration.FromMinutes(67);
-		var entity = new Event() { Name = "Test", DurationValauable = duration, DurationNullable = null };
+		var entity = new DurationEntity() { Name = "Test", DurationValauable = duration, DurationNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -84,7 +84,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		{
 			var sql = @"
 				SELECT DurationValauable_Seconds, DurationValauable_Nanos, DurationNullable_Seconds, DurationNullable_Nanos
-				FROM ""Event""
+				FROM ""DurationEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -103,7 +103,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	{
 		// Arrange
 		var min = Duration.MinValue;
-		var minEntity = new Event() { Name = "Min", DurationNullable = min };
+		var minEntity = new DurationEntity() { Name = "Min", DurationNullable = min };
 
 		// Act
 		int minId;
@@ -115,10 +115,10 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		}
 
 		// Assert
-		Event? retrievedMin;
+		DurationEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMin = await session.GetAsync<Event>(minId);
+			retrievedMin = await session.GetAsync<DurationEntity>(minId);
 		}
 
 		retrievedMin.DurationNullable.Should().Be(min);
@@ -129,7 +129,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	{
 		// Arrange
 		var max = Duration.MaxValue;
-		var maxEntity = new Event() { Name = "Max", DurationNullable = max };
+		var maxEntity = new DurationEntity() { Name = "Max", DurationNullable = max };
 
 		// Act
 		int maxId;
@@ -141,10 +141,10 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		}
 
 		// Assert
-		Event? retrievedMax;
+		DurationEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMax = await session.GetAsync<Event>(maxId);
+			retrievedMax = await session.GetAsync<DurationEntity>(maxId);
 		}
 
 		retrievedMax.DurationNullable.Should().Be(max);

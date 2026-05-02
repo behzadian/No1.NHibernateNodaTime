@@ -19,7 +19,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var zdt = Instant.FromUtc(2024, 12, 25, 10, 30, 45).InZone(DateTimeZoneProviders.Tzdb["Asia/Tehran"]);
-		var entity = new Event() { Name = "Test Event", ZdtValauable = zdt };
+		var entity = new ZonedDateTimeEntity() { Name = "Test Event", ZdtValauable = zdt };
 
 		// Act - Save
 		int savedId;
@@ -35,7 +35,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		{
 			var sql = @"
 				SELECT ZdtValauable_Seconds, ZdtValauable_Nanoseconds, ZdtValauable_ZoneID, ZdtValauable_UTC, ZdtValauable_Local
-				FROM ""Event""
+				FROM ""ZonedDateTimeEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -57,10 +57,10 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		ZonedDateTimeEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<ZonedDateTimeEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -76,7 +76,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			.PlusNanoseconds(123456789)
 			.InUtc();
 
-		var entity = new Event() { Name = "Precision Test", ZdtValauable = zdt };
+		var entity = new ZonedDateTimeEntity() { Name = "Precision Test", ZdtValauable = zdt };
 
 		// Act
 		int savedId;
@@ -87,10 +87,10 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			await transaction.CommitAsync();
 		}
 
-		Event? retrievedEvent;
+		ZonedDateTimeEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<ZonedDateTimeEntity>(savedId);
 		}
 
 		// Assert
@@ -104,7 +104,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
-		var entity = new Event() { Name = "Test", ZdtValauable = now, ZdtNullable = null };
+		var entity = new ZonedDateTimeEntity() { Name = "Test", ZdtValauable = now, ZdtNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -120,7 +120,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		{
 			var sql = @"
 				SELECT ZdtNullable_Seconds, ZdtNullable_Nanoseconds, ZdtNullable_ZoneID, ZdtNullable_UTC, ZdtNullable_Local
-				FROM ""Event""
+				FROM ""ZonedDateTimeEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -140,7 +140,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Arrange
 		var min = Instant.MinValue.InUtc();
 
-		var minEntity = new Event() { Name = "Min", ZdtNullable = min };
+		var minEntity = new ZonedDateTimeEntity() { Name = "Min", ZdtNullable = min };
 
 		// Act
 		int minId;
@@ -152,10 +152,10 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		}
 
 		// Assert
-		Event? retrievedMin;
+		ZonedDateTimeEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMin = await session.GetAsync<Event>(minId);
+			retrievedMin = await session.GetAsync<ZonedDateTimeEntity>(minId);
 		}
 
 		retrievedMin!.ZdtNullable.Should().Be(min);
@@ -167,7 +167,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Arrange
 		var max = Instant.MaxValue.InUtc();
 
-		var maxEntity = new Event() { Name = "Max", ZdtNullable = max };
+		var maxEntity = new ZonedDateTimeEntity() { Name = "Max", ZdtNullable = max };
 
 		// Act
 		int maxId;
@@ -179,10 +179,10 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		}
 
 		// Assert
-		Event? retrievedMax;
+		ZonedDateTimeEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMax = await session.GetAsync<Event>(maxId);
+			retrievedMax = await session.GetAsync<ZonedDateTimeEntity>(maxId);
 		}
 
 		retrievedMax.ZdtNullable.Should().Be(max);

@@ -19,7 +19,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	{
 		// Arrange
 		var val = new AnnualDate(11, 27);
-		var entity = new Event() { Name = "Test Event", AnnualDateValauable = val };
+		var entity = new AnnualDateEntity() { Name = "Test Event", AnnualDateValauable = val };
 
 		// Act - Save
 		int savedId;
@@ -35,7 +35,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		{
 			var sql = @"
 				SELECT AnnualDateValauable_Month, AnnualDateValauable_Day
-				FROM ""Event""
+				FROM ""AnnualDateEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -51,10 +51,10 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		AnnualDateEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<AnnualDateEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -66,7 +66,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var entity = new Event() { Name = "Test Event", AnnualDateNullable = null };
+		var entity = new AnnualDateEntity() { Name = "Test Event", AnnualDateNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -82,7 +82,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		{
 			var sql = @"
 				SELECT AnnualDateNullable_Month, AnnualDateNullable_Day
-				FROM ""Event""
+				FROM ""AnnualDateEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -96,10 +96,10 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		AnnualDateEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<AnnualDateEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction

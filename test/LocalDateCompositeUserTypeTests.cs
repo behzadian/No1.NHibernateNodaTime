@@ -20,7 +20,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	{
 		// Arrange
 		var val = new LocalDate(1405, 1, 25, CalendarSystem.PersianSimple);
-		var entity = new Event() { Name = "Test Event", LdValauable = val };
+		var entity = new LocalDateEntity() { Name = "Test Event", LdValauable = val };
 
 		// Act - Save
 		int savedId;
@@ -36,7 +36,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		{
 			var sql = @"
 				SELECT LdValauable_Gregorian, LdValauable_Calendar, LdValauable_Era, LdValauable_Year, LdValauable_Month, LdValauable_Day
-				FROM ""Event""
+				FROM ""LocalDateEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -60,10 +60,10 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		LocalDateEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<LocalDateEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -75,7 +75,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	public async Task ShouldPreserveEra()
 	{
 		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new Event() { Name = "Precision Test", LdValauable = val };
+		var entity = new LocalDateEntity() { Name = "Precision Test", LdValauable = val };
 
 		// Act
 		int savedId;
@@ -86,10 +86,10 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 			await transaction.CommitAsync();
 		}
 
-		Event? retrievedEvent;
+		LocalDateEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<LocalDateEntity>(savedId);
 		}
 
 		// Assert
@@ -102,7 +102,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	{
 		// Arrange
 		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new Event() { Name = "Test", LdNullable = null };
+		var entity = new LocalDateEntity() { Name = "Test", LdNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -118,7 +118,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		{
 			var sql = @"
 				SELECT LdNullable_Gregorian, LdNullable_Calendar, LdNullable_Era, LdNullable_Year, LdNullable_Month, LdNullable_Day
-				FROM ""Event""
+				FROM ""LocalDateEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -137,7 +137,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	{
 		// Arrange
 		var min = LocalDate.MinIsoValue;
-		var minEntity = new Event() { Name = "Min", LdNullable = min };
+		var minEntity = new LocalDateEntity() { Name = "Min", LdNullable = min };
 
 		// Act
 		int minId;
@@ -149,10 +149,10 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		}
 
 		// Assert
-		Event? retrievedMin;
+		LocalDateEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMin = await session.GetAsync<Event>(minId);
+			retrievedMin = await session.GetAsync<LocalDateEntity>(minId);
 		}
 
 		retrievedMin.LdNullable.Should().Be(min);
@@ -163,7 +163,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	{
 		// Arrange
 		var max = LocalDate.MaxIsoValue;
-		var maxEntity = new Event() { Name = "Max", LdNullable = max };
+		var maxEntity = new LocalDateEntity() { Name = "Max", LdNullable = max };
 
 		// Act
 		int maxId;
@@ -175,10 +175,10 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		}
 
 		// Assert
-		Event? retrievedMax;
+		LocalDateEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMax = await session.GetAsync<Event>(maxId);
+			retrievedMax = await session.GetAsync<LocalDateEntity>(maxId);
 		}
 
 		retrievedMax.LdNullable.Should().Be(max);

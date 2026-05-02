@@ -20,7 +20,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	{
 		// Arrange
 		var val = new LocalTime(17, 16, 15, 14);
-		var entity = new Event() { Name = "Test Event", LtValauable = val };
+		var entity = new LocalTimeEntity() { Name = "Test Event", LtValauable = val };
 
 		// Act - Save
 		int savedId;
@@ -36,7 +36,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		{
 			var sql = @"
 				SELECT LtValauable, id
-				FROM ""Event""
+				FROM ""LocalTimeEntity""
 				WHERE id = :id";
 
 			var result = await session
@@ -51,10 +51,10 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		}
 
 		// Act - Retrieve via NHibernate
-		Event? retrievedEvent;
+		LocalTimeEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -66,7 +66,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	public async Task ShouldPreserveNanoseconds()
 	{
 		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new Event() { Name = "Precision Test", LtValauable = val };
+		var entity = new LocalTimeEntity() { Name = "Precision Test", LtValauable = val };
 
 		// Act
 		int savedId;
@@ -77,10 +77,10 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 			await transaction.CommitAsync();
 		}
 
-		Event? retrievedEvent;
+		LocalTimeEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedEvent = await session.GetAsync<Event>(savedId);
+			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
 		}
 
 		// Assert
@@ -93,7 +93,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	{
 		// Arrange
 		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new Event() { Name = "Test", LtNullable = null };
+		var entity = new LocalTimeEntity() { Name = "Test", LtNullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -109,7 +109,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		{
 			var sql = @"
 				SELECT LtNullable, Id
-				FROM ""Event""
+				FROM ""LocalTimeEntity""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -125,7 +125,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	{
 		// Arrange
 		var min = LocalTime.MinValue;
-		var minEntity = new Event() { Name = "Min", LtNullable = min };
+		var minEntity = new LocalTimeEntity() { Name = "Min", LtNullable = min };
 
 		// Act
 		int minId;
@@ -137,13 +137,13 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		}
 
 		// Assert
-		Event? retrievedMin;
+		LocalTimeEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMin = await session.GetAsync<Event>(minId);
+			retrievedMin = await session.GetAsync<LocalTimeEntity>(minId);
 		}
 
-		retrievedMin.LdNullable.Should().Be(min);
+		retrievedMin.LtNullable.Should().Be(min);
 	}
 
 	[Fact]
@@ -151,7 +151,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	{
 		// Arrange
 		var max = LocalTime.MaxValue;
-		var maxEntity = new Event() { Name = "Max", LtNullable = max };
+		var maxEntity = new LocalTimeEntity() { Name = "Max", LtNullable = max };
 
 		// Act
 		int maxId;
@@ -163,12 +163,12 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		}
 
 		// Assert
-		Event? retrievedMax;
+		LocalTimeEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession())
 		{
-			retrievedMax = await session.GetAsync<Event>(maxId);
+			retrievedMax = await session.GetAsync<LocalTimeEntity>(maxId);
 		}
 
-		retrievedMax.LdNullable.Should().Be(max);
+		retrievedMax.LtNullable.Should().Be(max);
 	}
 }
