@@ -1,125 +1,80 @@
 using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
+using NHibernate.Mapping;
+using NHibernate.SqlTypes;
 using NHibernate.Type;
 using NHibernate.UserTypes;
 using NHibernate.Util;
 using NodaTime;
-using static No1.NHibernateNodaTime.NodaTimeUtility;
 using System.Data.Common;
+using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// </summary>
-public sealed class OffsetCompositeUserType : ICompositeUserType
+public sealed class OffsetUserType : IUserType
 {
-	Type ICompositeUserType.ReturnedClass => typeof(ZonedDateTime?);
+	SqlType[] IUserType.SqlTypes => [NHibernateUtil.Int64.SqlType];
 
-	bool ICompositeUserType.IsMutable => false;
+	Type IUserType.ReturnedType => typeof(Offset?);
 
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+	bool IUserType.IsMutable => false;
 
-	string[] ICompositeUserType.PropertyNames => Columns;
+	bool IUserType.Equals(object x, object y)
+	{
+		if (ReferenceEquals(x, y)) return true;
+		if (x == null || y == null) return false;
+		return ((Offset)x).Equals((Offset)y);
+	}
 
-	IType[] ICompositeUserType.PropertyTypes =>
-	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
-	];
+	int IUserType.GetHashCode(object x)
+	{
+		return x?.GetHashCode() ?? 0;
+	}
 
-	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
+	object? IUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		var counter = 0;
-
-		if (dr[names[counter++]] is not long secs)
-			return null;
 
 		if (dr[names[counter++]] is not int nanos)
 			return null;
 
-		if (dr[names[counter++]] is not string zoneId)
-			return null;
-
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new MismatchTypeException($"Zone {zoneId} not found");
-		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
-		var zdt = instant.InZone(DateTimeZone.Utc);
-		return zdt.WithZone(zone);
+		return Offset.FromNanoseconds(nanos);
 	}
 
-	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
+	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session)
 	{
-		if (value is ZonedDateTime zdt)
+		if (value is Offset offset)
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUtc), counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUnspecified), counter++, session);
+			NHibernateUtil.Int64.NullSafeSet(cmd, offset.Nanoseconds, counter++, session);
 		}
 		else
 		{
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
-	object? ICompositeUserType.GetPropertyValue(object component, int property)
-	{
-		var val = (ZonedDateTime)component;
-		return property switch
-		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => TryOrDefault(val.ToDateTimeUtc),
-			4 => TryOrDefault(val.ToDateTimeUnspecified),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
-	}
-
-	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
-	{
-		throw new InvalidOperationException("immutable");
-	}
-
-	object ICompositeUserType.DeepCopy(object value)
+	object IUserType.DeepCopy(object value)
 	{
 		return value;
 	}
 
-	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
-	{
-		return value;
-	}
-
-	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
-	{
-		return cached;
-	}
-
-	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
+	object IUserType.Replace(object original, object target, object owner)
 	{
 		return original;
 	}
 
-	bool ICompositeUserType.Equals(object? x, object? y)
+	object IUserType.Assemble(object cached, object owner)
 	{
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
-		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
+		return cached;
 	}
 
-	int ICompositeUserType.GetHashCode(object? x)
+	object IUserType.Disassemble(object value)
 	{
-		return x?.GetHashCode() ?? 0;
+		return value;
 	}
 }

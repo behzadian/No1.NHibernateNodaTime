@@ -44,6 +44,10 @@ public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(LocalTime) || instance.Type == typeof(LocalTime?):
 				instance.CustomType<LocalTimeUserType>();
 				break;
+
+			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Offset) || instance.Type == typeof(Offset?):
+				instance.CustomType<OffsetUserType>();
+				break;
 		}
     }
 }

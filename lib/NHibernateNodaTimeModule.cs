@@ -72,6 +72,12 @@ public static class NHibernateNodaTimeModule
 		MapColumns<LocalTimeUserType>(propertyPart);
 	}
 
+	public static void MapOffsetProperty(PropertyPart propertyPart, string propertyName)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		MapColumns<OffsetUserType>(propertyPart);
+	}
+
 	private static void MapColumns<T>(PropertyPart propertyPart, string? prefix = null, params string[] columns)
 	{
 		propertyPart.CustomType<T>();
