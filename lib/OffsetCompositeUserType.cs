@@ -38,7 +38,7 @@ public sealed class OffsetUserType : IUserType
 	{
 		var counter = 0;
 
-		if (dr[names[counter++]] is not int nanos)
+		if (dr[names[counter++]] is not long nanos)
 			return null;
 
 		return Offset.FromNanoseconds(nanos);
