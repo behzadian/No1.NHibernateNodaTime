@@ -16,6 +16,12 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class OffsetUserType : IUserType
 {
+	public static readonly IUserType Instance = new OffsetUserType();
+
+	public static readonly IType NHType = NHibernateUtil.Custom(typeof(OffsetUserType));
+
+	public static readonly string Column = "OffsetNanos";
+
 	SqlType[] IUserType.SqlTypes => [NHibernateUtil.Int64.SqlType];
 
 	Type IUserType.ReturnedType => typeof(Offset?);

@@ -6,7 +6,6 @@ using NHibernate.UserTypes;
 using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
-using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
@@ -18,72 +17,90 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+	internal static string[] Columns => ["Years", "Months", "Weeks", "Days", "Nanos",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.Int16,		// Years
+		NHibernateUtil.Int16,		// Months
+		NHibernateUtil.Int16,		// Weeks
+		NHibernateUtil.Int16,		// Days
+		NHibernateUtil.Int64,		// Nanos
 	];
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long secs)
+		if (dr[names[counter++]] is not int years)
 			return null;
 
-		if (dr[names[counter++]] is not int nanos)
+		if (dr[names[counter++]] is not int months)
 			return null;
 
-		if (dr[names[counter++]] is not string zoneId)
+		if (dr[names[counter++]] is not int weeks)
 			return null;
 
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new MismatchTypeException($"Zone {zoneId} not found");
-		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
-		var zdt = instant.InZone(DateTimeZone.Utc);
-		return zdt.WithZone(zone);
+		if (dr[names[counter++]] is not int days)
+			return null;
+
+		if (dr[names[counter++]] is not long nanos)
+			return null;
+
+		var periodBuilder = new PeriodBuilder()
+		{
+			Years = years,
+			Months = months,
+			Weeks = weeks,
+			Days = days,
+			Nanoseconds = nanos,
+		};
+
+		return periodBuilder.Build();
 	}
 
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is ZonedDateTime zdt)
+		if (value is Period val)
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUtc), counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUnspecified), counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, val.Years, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, val.Months, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, val.Weeks, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, val.Days, counter++, session);
+			NHibernateUtil.Int64.NullSafeSet(cmd, val.Nanoseconds, counter++, session);
 		}
 		else
 		{
 			var counter = index;
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var val = (ZonedDateTime)component;
-		return property switch
+		if (component is Period period)
 		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => TryOrDefault(val.ToDateTimeUtc),
-			4 => TryOrDefault(val.ToDateTimeUnspecified),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property switch
+			{
+				0 => period.Years,
+				1 => period.Months,
+				2 => period.Weeks,
+				3 => period.Days,
+				4 => period.Nanoseconds,
+				_ => throw new ArgumentOutOfRangeException(nameof(property))
+			};
+		}
+		else
+		{
+			throw new MismatchTypeException($"Object is not Period, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
@@ -115,7 +132,7 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
-		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
+		return ((Period)x).Equals((Period)y);
 	}
 
 	int ICompositeUserType.GetHashCode(object? x)

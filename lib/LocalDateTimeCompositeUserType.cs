@@ -14,11 +14,13 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 {
+	public static readonly ICompositeUserType Instance = new LocalDateTimeCompositeUserType();
+
 	Type ICompositeUserType.ReturnedClass => typeof(LocalDateTime?);
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns = [.. LocalDateCompositeUserType.Columns, ..LocalTimeUserType.Columns];
+	internal static string[] Columns = [.. LocalDateCompositeUserType.Columns, .. LocalTimeUserType.Columns];
 	internal static int DateColumnsCount => LocalDateCompositeUserType.Columns.Length;
 
 	string[] ICompositeUserType.PropertyNames => Columns;

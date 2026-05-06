@@ -78,6 +78,18 @@ public static class NHibernateNodaTimeModule
 		MapColumns<OffsetUserType>(propertyPart);
 	}
 
+	public static void MapOffsetDateProperty(PropertyPart propertyPart, string propertyName)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		MapColumns<OffsetDateCompositeUserType>(propertyPart, propertyName, OffsetDateCompositeUserType.Columns);
+	}
+
+	public static void MapOffsetDateTimeProperty(PropertyPart propertyPart, string propertyName)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		MapColumns<OffsetDateTimeCompositeUserType>(propertyPart, propertyName, OffsetDateTimeCompositeUserType.Columns);
+	}
+
 	private static void MapColumns<T>(PropertyPart propertyPart, string? prefix = null, params string[] columns)
 	{
 		propertyPart.CustomType<T>();
