@@ -14,76 +14,61 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class OffsetTimeCompositeUserType : ICompositeUserType
 {
-	Type ICompositeUserType.ReturnedClass => typeof(ZonedDateTime?);
+	Type ICompositeUserType.ReturnedClass => typeof(OffsetTime?);
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+	internal static readonly string[] Columns = [.. LocalTimeUserType.Columns, .. OffsetUserType.Columns];
+
+	internal static readonly int TimeColumnsCount = LocalTimeUserType.Columns.Length;
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
+
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		LocalTimeUserType.NHType,
+		OffsetUserType.NHType
 	];
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
-		var counter = 0;
+		var timeNames = names[..1];
+		var offsetNames = names[1..];
 
-		if (dr[names[counter++]] is not long secs)
-			return null;
+		var time = (LocalTime?)LocalTimeUserType.Instance.NullSafeGet(dr, timeNames, session, owner);
 
-		if (dr[names[counter++]] is not int nanos)
-			return null;
+		var offset = (Offset?)OffsetUserType.Instance.NullSafeGet(dr, offsetNames, session, owner);
 
-		if (dr[names[counter++]] is not string zoneId)
-			return null;
+		if (time is null || offset is null) return null;
 
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new MismatchTypeException($"Zone {zoneId} not found");
-		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
-		var zdt = instant.InZone(DateTimeZone.Utc);
-		return zdt.WithZone(zone);
+		return new OffsetTime(time.Value, offset.Value);
 	}
 
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is ZonedDateTime zdt)
+		if (value is OffsetTime val)
 		{
-			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUtc), counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUnspecified), counter++, session);
+			LocalTimeUserType.Instance.NullSafeSet(cmd, val.TimeOfDay, index, session);
+			OffsetUserType.Instance.NullSafeSet(cmd, val.Offset, index + TimeColumnsCount, session);
 		}
 		else
 		{
-			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			LocalTimeUserType.Instance.NullSafeSet(cmd, null, index, session);
+			OffsetUserType.Instance.NullSafeSet(cmd, null, index + TimeColumnsCount, session);
 		}
 	}
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var val = (ZonedDateTime)component;
-		return property switch
+		if (component is OffsetTime val)
 		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => TryOrDefault(val.ToDateTimeUtc),
-			4 => TryOrDefault(val.ToDateTimeUnspecified),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property < TimeColumnsCount ? val.TimeOfDay : val.Offset;
+		}
+		else
+		{
+			throw new MismatchTypeException($"Object is not OffsetTime, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
@@ -115,7 +100,7 @@ public sealed class OffsetTimeCompositeUserType : ICompositeUserType
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
-		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
+		return ((OffsetTime)x).Equals((OffsetTime)y);
 	}
 
 	int ICompositeUserType.GetHashCode(object? x)

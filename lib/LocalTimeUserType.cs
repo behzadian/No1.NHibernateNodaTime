@@ -19,7 +19,7 @@ public sealed class LocalTimeUserType : IUserType
 
 	public static readonly IType NHType = NHibernateUtil.Custom(typeof(LocalTimeUserType));
 
-	internal static string[] Columns => ["Nanoseconds",];
+	internal static string[] Columns => ["TimeNanos",];
 
 	SqlType[] IUserType.SqlTypes => [NHibernateUtil.Int64.SqlType];
 

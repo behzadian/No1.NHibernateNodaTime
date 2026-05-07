@@ -35,7 +35,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdtValauable_Gregorian, LdtValauable_Calendar, LdtValauable_Era, LdtValauable_Year, LdtValauable_Month, LdtValauable_Day, LdtValauable_Nanoseconds
+				SELECT LdtValauable_Gregorian, LdtValauable_Calendar, LdtValauable_Era, LdtValauable_Year, LdtValauable_Month, LdtValauable_Day, LdtValauable_TimeNanos
 				FROM ""LocalDateTimeEntity""
 				WHERE id = :id";
 

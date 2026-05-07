@@ -18,9 +18,9 @@ public sealed class OffsetDateCompositeUserType : ICompositeUserType
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns = [.. LocalDateCompositeUserType.Columns, OffsetUserType.Column];
+	internal static readonly string[] Columns = [.. LocalDateCompositeUserType.Columns, ..OffsetUserType.Columns];
 
-	internal static int DateColumnsCount => LocalDateCompositeUserType.Columns.Length;
+	internal static readonly int DateColumnsCount = LocalDateCompositeUserType.Columns.Length;
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
