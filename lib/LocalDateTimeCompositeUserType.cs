@@ -14,14 +14,14 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 {
-	public static readonly ICompositeUserType Instance = new LocalDateTimeCompositeUserType();
+	internal static readonly ICompositeUserType Instance= new LocalDateTimeCompositeUserType();
 
 	Type ICompositeUserType.ReturnedClass => typeof(LocalDateTime?);
 
 	bool ICompositeUserType.IsMutable => false;
 
 	internal static string[] Columns = [.. LocalDateCompositeUserType.Columns, .. LocalTimeUserType.Columns];
-	internal static int DateColumnsCount => LocalDateCompositeUserType.Columns.Length;
+	internal static int DateTimeColumnsCount => LocalDateCompositeUserType.Columns.Length;
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
@@ -35,8 +35,8 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 		// Split names between date and time parts
-		var dateNames = names[..DateColumnsCount];
-		var timeName = names[DateColumnsCount..];
+		var dateNames = names[..DateTimeColumnsCount];
+		var timeName = names[DateTimeColumnsCount..];
 
 		var date = (LocalDate?)LocalDateCompositeUserType.Instance.NullSafeGet(dr, dateNames, session, owner);
 
@@ -49,23 +49,23 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is LocalDateTime ldt)
+		if (value is LocalDateTime val)
 		{
-			LocalDateCompositeUserType.Instance.NullSafeSet(cmd, ldt.Date, index, settable, session);
-			LocalTimeUserType.Instance.NullSafeSet(cmd, ldt.TimeOfDay, index + DateColumnsCount, session);
+			LocalDateCompositeUserType.Instance.NullSafeSet(cmd, val.Date, index, settable, session);
+			LocalTimeUserType.Instance.NullSafeSet(cmd, val.TimeOfDay, index + DateTimeColumnsCount, session);
 		}
 		else
 		{
 			LocalDateCompositeUserType.Instance.NullSafeSet(cmd, null, index, settable, session);
-			LocalTimeUserType.Instance.NullSafeSet(cmd, null, index + DateColumnsCount, session);
+			LocalTimeUserType.Instance.NullSafeSet(cmd, null, index + DateTimeColumnsCount, session);
 		}
 	}
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		if (component is LocalDateTime ldt)
+		if (component is LocalDateTime val)
 		{
-			return property < DateColumnsCount ? LocalDateCompositeUserType.Instance.GetPropertyValue(ldt.Date, property) : ldt.TimeOfDay;
+			return property < DateTimeColumnsCount ? LocalDateCompositeUserType.Instance.GetPropertyValue(val.Date, property) : val.TimeOfDay;
 		}
 		else
 		{
