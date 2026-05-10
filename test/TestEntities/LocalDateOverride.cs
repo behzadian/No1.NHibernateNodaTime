@@ -13,6 +13,6 @@ public class LocalDateOverride : IAutoMappingOverride<LocalDateEntity>
 {
     void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping)
     {
-		NHibernateNodaTimeModule.MapLocalDateProperty(mapping.Map(x => x.LdValauable), nameof(LocalDateEntity.LdValauable));
+		NHibernateNodaTimeModule.MapLocalDateProperty(mapping.Map(x => x.Valauable), nameof(LocalDateEntity.Valauable));
 	}
 }

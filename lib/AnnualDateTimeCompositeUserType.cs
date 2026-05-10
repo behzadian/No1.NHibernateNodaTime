@@ -58,13 +58,19 @@ public sealed class AnnualDateCompositeUserType : ICompositeUserType
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var val = (AnnualDate)component;
-		return property switch
+		if (component is AnnualDate val)
 		{
-			0 => val.Month,
-			1 => val.Day,
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property switch
+			{
+				0 => val.Month,
+				1 => val.Day,
+				_ => throw new ArgumentOutOfRangeException(nameof(property))
+			};
+		}
+		else
+		{
+			throw new MismatchTypeException($"Object is not AnnualDate, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value)

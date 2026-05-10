@@ -74,16 +74,22 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var val = (ZonedDateTime)component;
-		return property switch
+		if (component is ZonedDateTime val)
 		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => TryOrDefault(val.ToDateTimeUtc),
-			4 => TryOrDefault(val.ToDateTimeUnspecified),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property switch
+			{
+				0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
+				1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
+				2 => val.Zone.Id,
+				3 => TryOrDefault(val.ToDateTimeUtc),
+				4 => TryOrDefault(val.ToDateTimeUnspecified),
+				_ => throw new ArgumentOutOfRangeException(nameof(property))
+			};
+		}
+		else
+		{
+			throw new MismatchTypeException($"Object is not YearMonth, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value)

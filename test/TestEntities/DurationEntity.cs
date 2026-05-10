@@ -9,6 +9,6 @@ public class DurationEntity
 {
 	public virtual int Id { get; set; }
 	public virtual string Name { get; set; } = string.Empty;
-	public virtual Duration DurationValauable { get; set; } = Duration.Epsilon;
-	public virtual Duration? DurationNullable { get; set; }
+	public virtual Duration Valauable { get; set; } = Duration.Epsilon;
+	public virtual Duration? Nullable { get; set; }
 }

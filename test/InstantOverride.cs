@@ -13,6 +13,6 @@ public class InstantOverride : IAutoMappingOverride<InstantEntity>
 {
     void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping)
     {
-		NHibernateNodaTimeModule.MapInstantProperty(mapping.Map(x => x.InstantValuable), nameof(InstantEntity.InstantValuable));
+		NHibernateNodaTimeModule.MapInstantProperty(mapping.Map(x => x.Valuable), nameof(InstantEntity.Valuable));
 	}
 }

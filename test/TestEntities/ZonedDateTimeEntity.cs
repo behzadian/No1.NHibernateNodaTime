@@ -9,6 +9,6 @@ public class ZonedDateTimeEntity
 {
 	public virtual int Id { get; set; }
 	public virtual string Name { get; set; } = string.Empty;
-	public virtual ZonedDateTime ZdtValauable { get; set; } = SystemClock.Instance.GetCurrentInstant().InUtc();
-	public virtual ZonedDateTime? ZdtNullable { get; set; }
+	public virtual ZonedDateTime Valauable { get; set; } = SystemClock.Instance.GetCurrentInstant().InUtc();
+	public virtual ZonedDateTime? Nullable { get; set; }
 }

@@ -13,6 +13,6 @@ public class AnnualDateOverride : IAutoMappingOverride<AnnualDateEntity>
 {
     void IAutoMappingOverride<AnnualDateEntity>.Override(AutoMapping<AnnualDateEntity> mapping)
     {
-		NHibernateNodaTimeModule.MapAnnualDateProperty(mapping.Map(x => x.AnnualDateValauable), nameof(AnnualDateEntity.AnnualDateValauable));
+		NHibernateNodaTimeModule.MapAnnualDateProperty(mapping.Map(x => x.Valauable), nameof(AnnualDateEntity.Valauable));
 	}
 }

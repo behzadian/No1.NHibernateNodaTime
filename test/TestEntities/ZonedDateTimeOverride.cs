@@ -13,6 +13,6 @@ public class ZonedDateTimeOverride : IAutoMappingOverride<ZonedDateTimeEntity>
 {
     void IAutoMappingOverride<ZonedDateTimeEntity>.Override(AutoMapping<ZonedDateTimeEntity> mapping)
     {
-		NHibernateNodaTimeModule.MapZonedDateTimeProperty(mapping.Map(x => x.ZdtValauable), nameof(ZonedDateTimeEntity.ZdtValauable));
+		NHibernateNodaTimeModule.MapZonedDateTimeProperty(mapping.Map(x => x.Valauable), nameof(ZonedDateTimeEntity.Valauable));
 	}
 }

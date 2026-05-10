@@ -9,6 +9,6 @@ public class InstantEntity
 {
 	public virtual int Id { get; set; }
 	public virtual string Name { get; set; } = string.Empty;
-	public virtual Instant InstantValuable { get; set; }
-	public virtual Instant? InstantNullable { get; set; }
+	public virtual Instant Valuable { get; set; }
+	public virtual Instant? Nullable { get; set; }
 }

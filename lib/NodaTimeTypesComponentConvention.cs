@@ -60,6 +60,10 @@ public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(OffsetTime) || instance.Type == typeof(OffsetTime?):
 				instance.CustomType<OffsetTimeCompositeUserType>();
 				break;
+
+			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(YearMonth) || instance.Type == typeof(YearMonth?):
+				instance.CustomType<YearMonthCompositeUserType>();
+				break;
 		}
     }
 }

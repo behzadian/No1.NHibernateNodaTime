@@ -66,14 +66,20 @@ public sealed class InstantCompositeUserType : ICompositeUserType
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var instant = (Instant)component;
-		return property switch
+		if (component is Instant val)
 		{
-			0 => instant.ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => TryOrDefault(instant.ToDateTimeUtc),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property switch
+			{
+				0 => val.ToUnixTimeSecondsAndNanoseconds().seconds,
+				1 => val.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
+				2 => TryOrDefault(val.ToDateTimeUtc),
+				_ => throw new ArgumentOutOfRangeException(nameof(property))
+			};
+		}
+		else
+		{
+			throw new MismatchTypeException($"Object is not Instant, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value)

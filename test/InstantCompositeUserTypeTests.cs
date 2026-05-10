@@ -19,7 +19,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	{
 		// Arrange
 		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
-		var entity = new InstantEntity() { Name = "Test Event", InstantValuable = instant, InstantNullable = instant };
+		var entity = new InstantEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
 
 		// Act - Save
 		int savedId;
@@ -34,7 +34,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT InstantValuable_Seconds, InstantValuable_Nanoseconds 
+				SELECT Valuable_Seconds, Valuable_Nanoseconds 
 				FROM ""InstantEntity""
 				WHERE id = :id";
 
@@ -59,7 +59,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.InstantValuable.Should().Be(instant);
+		retrievedEvent!.Valuable.Should().Be(instant);
 	}
 
 	[Fact]
@@ -70,7 +70,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
 			.PlusNanoseconds(123456789);
 
-		var entity = new InstantEntity() { Name = "Precision Test", InstantValuable = instant, InstantNullable = instant };
+		var entity = new InstantEntity() { Name = "Precision Test", Valuable = instant, Nullable = instant };
 
 		// Act
 		int savedId;
@@ -89,8 +89,8 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 
 		// Assert
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.InstantValuable.Should().Be(instant);
-		retrievedEvent.InstantValuable.OnlyNanoseconds().Should().Be(123456789);
+		retrievedEvent!.Valuable.Should().Be(instant);
+		retrievedEvent.Valuable.OnlyNanoseconds().Should().Be(123456789);
 	}
 
 	[Fact]
@@ -98,7 +98,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	{
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant();
-		var entity = new InstantEntity() { Name = "Test", InstantValuable = now, InstantNullable = null };
+		var entity = new InstantEntity() { Name = "Test", Valuable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -113,7 +113,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT InstantNullable_Seconds, InstantNullable_Nanoseconds 
+				SELECT Nullable_Seconds, Nullable_Nanoseconds 
 				FROM ""InstantEntity""
 				WHERE id = :id";
 
@@ -133,7 +133,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
 		var minInstant = Instant.MinValue;
 
-		var minEntity = new InstantEntity() { Name = "Min", InstantValuable = minInstant, InstantNullable = minInstant };
+		var minEntity = new InstantEntity() { Name = "Min", Valuable = minInstant, Nullable = minInstant };
 
 		// Act
 		int minId;
@@ -151,7 +151,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			retrievedMin = await session.GetAsync<InstantEntity>(minId);
 		}
 
-		retrievedMin!.InstantValuable.Should().Be(minInstant);
+		retrievedMin!.Valuable.Should().Be(minInstant);
 	}
 
 	[Fact]
@@ -161,7 +161,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
 		var maxInstant = Instant.MaxValue;
 
-		var maxEntity = new InstantEntity() { Name = "Max", InstantValuable = maxInstant, InstantNullable = maxInstant };
+		var maxEntity = new InstantEntity() { Name = "Max", Valuable = maxInstant, Nullable = maxInstant };
 
 		// Act
 		int maxId;
@@ -179,6 +179,6 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			retrievedMax = await session.GetAsync<InstantEntity>(maxId);
 		}
 
-		retrievedMax!.InstantValuable.Should().Be(maxInstant);
+		retrievedMax!.Valuable.Should().Be(maxInstant);
 	}
 }

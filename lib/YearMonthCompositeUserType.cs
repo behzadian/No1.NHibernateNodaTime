@@ -6,6 +6,7 @@ using NHibernate.UserTypes;
 using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
+using System.Globalization;
 using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
@@ -14,76 +15,82 @@ namespace No1.NHibernateNodaTime;
 /// </summary>
 public sealed class YearMonthCompositeUserType : ICompositeUserType
 {
-	Type ICompositeUserType.ReturnedClass => typeof(ZonedDateTime?);
+	Type ICompositeUserType.ReturnedClass => typeof(YearMonth?);
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+	internal static readonly string[] Columns = ["EraID", "CalendarID", "Year", "Month",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.String,		// Era
+		NHibernateUtil.String,		// Calendar
+		NHibernateUtil.Int16,		// Year
+		NHibernateUtil.Int16,		// Month
 	];
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
+
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long secs)
+		if (dr[names[counter++]] is not string eraId)
 			return null;
 
-		if (dr[names[counter++]] is not int nanos)
+		if (dr[names[counter++]] is not string calId)
 			return null;
 
-		if (dr[names[counter++]] is not string zoneId)
+		if (dr[names[counter++]] is not short year)
 			return null;
 
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new MismatchTypeException($"Zone {zoneId} not found");
-		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
-		var zdt = instant.InZone(DateTimeZone.Utc);
-		return zdt.WithZone(zone);
+		if (dr[names[counter++]] is not short month)
+			return null;
+
+		var era = EraByID(eraId);
+		var calendar = CalendarSystem.ForId(calId);
+
+		return new YearMonth(era, year, month, calendar);
 	}
 
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
 	{
-		if (value is ZonedDateTime zdt)
+		if (value is YearMonth val)
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUtc), counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUnspecified), counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, EraID(val.Era), counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, val.Calendar.Id, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, val.YearOfEra, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, val.Month, counter++, session);
 		}
 		else
 		{
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property)
 	{
-		var val = (ZonedDateTime)component;
-		return property switch
+		if (component is YearMonth val)
 		{
-			0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
-			1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-			2 => val.Zone.Id,
-			3 => TryOrDefault(val.ToDateTimeUtc),
-			4 => TryOrDefault(val.ToDateTimeUnspecified),
-			_ => throw new ArgumentOutOfRangeException(nameof(property))
-		};
+			return property switch
+			{
+				0 => EraID(val.Era),
+				1 => val.Calendar.Id,
+				2 => val.YearOfEra,
+				3 => val.Month,
+				_ => throw new ArgumentOutOfRangeException(nameof(property))
+			};
+		}
+		else
+		{
+			throw new MismatchTypeException($"Object is not YearMonth, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
@@ -115,7 +122,7 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 	{
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
-		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
+		return ((YearMonth)x).Equals((YearMonth)y);
 	}
 
 	int ICompositeUserType.GetHashCode(object? x)

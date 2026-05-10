@@ -9,10 +9,10 @@ using System.Text;
 
 namespace No1.NHibernateNodaTimeTests.Overrides;
 
-public class DurationOverride : IAutoMappingOverride<DurationEntity>
+public class YearMonthOverride : IAutoMappingOverride<YearMonthEntity>
 {
-    void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping)
+    void IAutoMappingOverride<YearMonthEntity>.Override(AutoMapping<YearMonthEntity> mapping)
     {
-		NHibernateNodaTimeModule.MapDurationProperty(mapping.Map(x => x.Valauable), nameof(DurationEntity.Valauable));
+		NHibernateNodaTimeModule.MapYearMonthProperty(mapping.Map(x => x.Valauable), nameof(YearMonthEntity.Valauable));
 	}
 }

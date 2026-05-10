@@ -54,7 +54,6 @@ public sealed class DurationCompositeUserType : ICompositeUserType
 	{
 		if (component is Duration duration)
 		{
-
 			return property switch
 			{
 				0 => duration.TotalSeconds,
@@ -62,7 +61,10 @@ public sealed class DurationCompositeUserType : ICompositeUserType
 				_ => throw new NotImplementedException()
 			};
 		}
-		return null;
+		else
+		{
+			throw new MismatchTypeException($"Object is not Duration, is {component?.GetType()?.Name ?? "NULL"}");
+		}
 	}
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)

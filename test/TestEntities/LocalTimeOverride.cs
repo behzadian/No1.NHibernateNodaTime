@@ -13,6 +13,6 @@ public class LocalTimeOverride : IAutoMappingOverride<LocalTimeEntity>
 {
     void IAutoMappingOverride<LocalTimeEntity>.Override(AutoMapping<LocalTimeEntity> mapping)
     {
-		NHibernateNodaTimeModule.MapLocalTimeProperty(mapping.Map(x => x.LtValauable), nameof(LocalTimeEntity.LtValauable));
+		NHibernateNodaTimeModule.MapLocalTimeProperty(mapping.Map(x => x.Valauable), nameof(LocalTimeEntity.Valauable));
 	}
 }

@@ -19,7 +19,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var zdt = Instant.FromUtc(2024, 12, 25, 10, 30, 45).InZone(DateTimeZoneProviders.Tzdb["Asia/Tehran"]);
-		var entity = new ZonedDateTimeEntity() { Name = "Test Event", ZdtValauable = zdt };
+		var entity = new ZonedDateTimeEntity() { Name = "Test Event", Valauable = zdt };
 
 		// Act - Save
 		int savedId;
@@ -34,7 +34,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ZdtValauable_Seconds, ZdtValauable_Nanoseconds, ZdtValauable_ZoneID, ZdtValauable_UTC, ZdtValauable_Local
+				SELECT Valauable_Seconds, Valauable_Nanoseconds, Valauable_ZoneID, Valauable_UTC, Valauable_Local
 				FROM ""ZonedDateTimeEntity""
 				WHERE id = :id";
 
@@ -42,11 +42,13 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var seconds = Convert.ToInt64(result[0]);
-			var nanos = Convert.ToInt32(result[1]);
-			var zone = Convert.ToString(result[2]);
-			var utc = Convert.ToDateTime(result[3]);
-			var local = Convert.ToDateTime(result[4]);
+
+			var counter = 0;
+			var seconds = Convert.ToInt64(result[counter++]);
+			var nanos = Convert.ToInt32(result[counter++]);
+			var zone = Convert.ToString(result[counter++]);
+			var utc = Convert.ToDateTime(result[counter++]);
+			var local = Convert.ToDateTime(result[counter++]);
 
 			// Assert - Verify raw column values
 			seconds.Should().Be(zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds);
@@ -65,7 +67,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.ZdtValauable.Should().Be(zdt);
+		retrievedEvent!.Valauable.Should().Be(zdt);
 	}
 
 	[Fact]
@@ -76,7 +78,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			.PlusNanoseconds(123456789)
 			.InUtc();
 
-		var entity = new ZonedDateTimeEntity() { Name = "Precision Test", ZdtValauable = zdt };
+		var entity = new ZonedDateTimeEntity() { Name = "Precision Test", Valauable = zdt };
 
 		// Act
 		int savedId;
@@ -95,8 +97,8 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 		// Assert
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.ZdtValauable.Should().Be(zdt);
-		retrievedEvent.ZdtValauable.ToInstant().OnlyNanoseconds().Should().Be(123456789);
+		retrievedEvent!.Valauable.Should().Be(zdt);
+		retrievedEvent.Valauable.ToInstant().OnlyNanoseconds().Should().Be(123456789);
 	}
 
 	[Fact]
@@ -104,7 +106,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
-		var entity = new ZonedDateTimeEntity() { Name = "Test", ZdtValauable = now, ZdtNullable = null };
+		var entity = new ZonedDateTimeEntity() { Name = "Test", Valauable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -119,7 +121,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ZdtNullable_Seconds, ZdtNullable_Nanoseconds, ZdtNullable_ZoneID, ZdtNullable_UTC, ZdtNullable_Local
+				SELECT Nullable_Seconds, Nullable_Nanoseconds, Nullable_ZoneID, Nullable_UTC, Nullable_Local
 				FROM ""ZonedDateTimeEntity""
 				WHERE id = :id";
 
@@ -140,7 +142,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Arrange
 		var min = Instant.MinValue.InUtc();
 
-		var minEntity = new ZonedDateTimeEntity() { Name = "Min", ZdtNullable = min };
+		var minEntity = new ZonedDateTimeEntity() { Name = "Min", Nullable = min };
 
 		// Act
 		int minId;
@@ -158,7 +160,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			retrievedMin = await session.GetAsync<ZonedDateTimeEntity>(minId);
 		}
 
-		retrievedMin!.ZdtNullable.Should().Be(min);
+		retrievedMin!.Nullable.Should().Be(min);
 	}
 
 	[Fact]
@@ -167,7 +169,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Arrange
 		var max = Instant.MaxValue.InUtc();
 
-		var maxEntity = new ZonedDateTimeEntity() { Name = "Max", ZdtNullable = max };
+		var maxEntity = new ZonedDateTimeEntity() { Name = "Max", Nullable = max };
 
 		// Act
 		int maxId;
@@ -185,6 +187,6 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			retrievedMax = await session.GetAsync<ZonedDateTimeEntity>(maxId);
 		}
 
-		retrievedMax.ZdtNullable.Should().Be(max);
+		retrievedMax.Nullable.Should().Be(max);
 	}
 }

@@ -20,7 +20,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var val = new LocalDateTime(1405, 1, 25, 17, 16, 15, 14, CalendarSystem.PersianSimple);
-		var entity = new LocalDateTimeEntity() { Name = "Test Event", LdtValauable = val };
+		var entity = new LocalDateTimeEntity() { Name = "Test Event", Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -35,7 +35,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdtValauable_Gregorian, LdtValauable_Calendar, LdtValauable_Era, LdtValauable_Year, LdtValauable_Month, LdtValauable_Day, LdtValauable_TimeNanos
+				SELECT Valauable_Gregorian, Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day, Valauable_TimeNanos
 				FROM ""LocalDateTimeEntity""
 				WHERE id = :id";
 
@@ -43,13 +43,15 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var date = Convert.ToDateTime(result[0]);
-			var cal = Convert.ToString(result[1]);
-			var era = Convert.ToString(result[2]);
-			var year = Convert.ToInt16(result[3]);
-			var month = Convert.ToInt16(result[4]);
-			var day = Convert.ToInt16(result[5]);
-			var time = Convert.ToInt64(result[6]);
+
+			var counter = 0;
+			var date = Convert.ToDateTime(result[counter++]);
+			var cal = Convert.ToString(result[counter++]);
+			var era = Convert.ToString(result[counter++]);
+			var year = Convert.ToInt16(result[counter++]);
+			var month = Convert.ToInt16(result[counter++]);
+			var day = Convert.ToInt16(result[counter++]);
+			var time = Convert.ToInt64(result[counter++]);
 
 			// Assert - Verify raw column values
 			date.Should().Be(val.ToDateTimeUnspecified().Date);
@@ -70,14 +72,14 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.LdtValauable.Should().Be(val);
+		retrievedEvent!.Valauable.Should().Be(val);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var entity = new LocalDateTimeEntity() { Name = "Test", LdtNullable = null };
+		var entity = new LocalDateTimeEntity() { Name = "Test", Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -92,7 +94,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT LdtNullable_Gregorian, LdtNullable_Calendar, LdtNullable_Era, LdtNullable_Year, LdtNullable_Month, LdtNullable_Day
+				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
 				FROM ""LocalDateTimeEntity""
 				WHERE id = :id";
 
@@ -112,7 +114,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var min = LocalDateTime.MinIsoValue;
-		var minEntity = new LocalDateTimeEntity() { Name = "Min", LdtNullable = min };
+		var minEntity = new LocalDateTimeEntity() { Name = "Min", Nullable = min };
 
 		// Act
 		int minId;
@@ -130,7 +132,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			retrievedMin = await session.GetAsync<LocalDateTimeEntity>(minId);
 		}
 
-		retrievedMin.LdtNullable.Should().Be(min);
+		retrievedMin.Nullable.Should().Be(min);
 	}
 
 	[Fact]
@@ -138,7 +140,7 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	{
 		// Arrange
 		var max = LocalDateTime.MaxIsoValue;
-		var maxEntity = new LocalDateTimeEntity() { Name = "Max", LdtNullable = max };
+		var maxEntity = new LocalDateTimeEntity() { Name = "Max", Nullable = max };
 
 		// Act
 		int maxId;
@@ -156,6 +158,6 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 			retrievedMax = await session.GetAsync<LocalDateTimeEntity>(maxId);
 		}
 
-		retrievedMax.LdtNullable.Should().Be(max);
+		retrievedMax.Nullable.Should().Be(max);
 	}
 }

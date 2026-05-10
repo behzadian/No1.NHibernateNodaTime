@@ -19,7 +19,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	{
 		// Arrange
 		var val = new AnnualDate(11, 27);
-		var entity = new AnnualDateEntity() { Name = "Test Event", AnnualDateValauable = val };
+		var entity = new AnnualDateEntity() { Name = "Test Event", Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -34,7 +34,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT AnnualDateValauable_Month, AnnualDateValauable_Day
+				SELECT Valauable_Month, Valauable_Day
 				FROM ""AnnualDateEntity""
 				WHERE id = :id";
 
@@ -59,14 +59,14 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.AnnualDateValauable.Should().Be(val);
+		retrievedEvent!.Valauable.Should().Be(val);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var entity = new AnnualDateEntity() { Name = "Test Event", AnnualDateNullable = null };
+		var entity = new AnnualDateEntity() { Name = "Test Event", Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -81,7 +81,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT AnnualDateNullable_Month, AnnualDateNullable_Day
+				SELECT Nullable_Month, Nullable_Day
 				FROM ""AnnualDateEntity""
 				WHERE id = :id";
 
@@ -104,6 +104,6 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.AnnualDateNullable.Should().BeNull();
+		retrievedEvent!.Nullable.Should().BeNull();
 	}
 }
