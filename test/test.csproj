@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+		<RootNamespace>No1.NHibernateNodaTimeTests</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+		<PackageReference Include="xunit" Version="2.8.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="FluentAssertions" Version="6.12.0" />
+
+		<!-- NHibernate & PostgreSQL -->
+		<PackageReference Include="NHibernate" Version="5.6.0" />
+		<PackageReference Include="FluentNHibernate" Version="3.4.1" />
+		<PackageReference Include="Npgsql" Version="8.0.3" />
+
+		<!-- NodaTime -->
+		<PackageReference Include="NodaTime" Version="3.2.2" />
+
+		<!-- Testcontainers -->
+		<PackageReference Include="Testcontainers.PostgreSql" Version="3.9.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Reference your actual library project -->
+		<ProjectReference Include="..\lib\lib.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EditorConfigFiles Remove=".editorconfig" />
+	</ItemGroup>
+
+</Project>

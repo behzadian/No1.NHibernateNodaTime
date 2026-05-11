@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageOutputPath>$(NUGET_HOME)</PackageOutputPath>
+		<IsPackable>true</IsPackable>
+		<AssemblyName>No1.NHibernateNodaTime</AssemblyName>
+		<RootNamespace>No1.NHibernateNodaTime</RootNamespace>
+		<PackageId>No1.NHibernateNodaTime</PackageId>
+		<Authors>Hank Ben</Authors>
+		<Company>No1</Company>
+		<Product>No1.NHibernateNodaTime</Product>
+		<Version>1.0.0.1</Version>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	</PropertyGroup>
+	<PropertyGroup>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="FluentNHibernate" Version="3.4.1" />
+		<PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+		<PackageReference Include="NHibernate" Version="5.6.0" />
+		<PackageReference Include="System.Data.SQLite" Version="2.0.2" />
+		<PackageReference Include="NodaTime" Version="3.2.2" />
+	</ItemGroup>
+	<Target Name="InstallHusky" AfterTargets="Restore" Condition="'$(HUSKY)' != '0'">
+		<Exec Command="dotnet tool restore" StandardOutputImportance="Low" />
+		<Exec Command="dotnet husky install" StandardOutputImportance="Low" />
+	</Target>
+</Project>
