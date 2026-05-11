@@ -34,7 +34,7 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
 	{
 
-		var counter = 0;
+		var counter = 1;
 
 		if (dr[names[counter++]] is not string eraId)
 			return null;
