@@ -32,4 +32,8 @@
 		<PackageReference Include="System.Data.SQLite" Version="2.0.2" />
 		<PackageReference Include="NodaTime" Version="3.2.2" />
 	</ItemGroup>
+	<Target Name="InstallHusky" AfterTargets="Restore" Condition="'$(HUSKY)' != '0'">
+		<Exec Command="dotnet tool restore" StandardOutputImportance="Low" />
+		<Exec Command="dotnet husky install" StandardOutputImportance="Low" />
+	</Target>
 </Project>

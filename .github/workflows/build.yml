@@ -20,6 +20,8 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
+      env:
+        HUSKY: 0
 
     - name: Check code style
       run: dotnet format --verify-no-changes --verbosity diagnostic --severity error
