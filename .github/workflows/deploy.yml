@@ -2,9 +2,9 @@ name: Deploy NuGet Package
 
 on:
   push:
-    branches:
-      - init
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   deploy:
