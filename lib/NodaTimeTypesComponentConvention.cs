@@ -13,9 +13,9 @@ namespace No1.NHibernateNodaTime;
 
 public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 {
-    void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
-    {
-		switch (instance.Type) 
+	void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
+	{
+		switch (instance.Type)
 		{
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Instant) || instance.Type == typeof(Instant?):
 				instance.CustomType<InstantCompositeUserType>(instance.Name + "_");
@@ -65,5 +65,5 @@ public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 				instance.CustomType<YearMonthCompositeUserType>();
 				break;
 		}
-    }
+	}
 }

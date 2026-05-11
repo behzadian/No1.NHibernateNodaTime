@@ -11,8 +11,8 @@ namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class LocalDateOverride : IAutoMappingOverride<LocalDateEntity>
 {
-    void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping)
-    {
+	void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping)
+	{
 		NHibernateNodaTimeModule.MapLocalDateProperty(mapping.Map(x => x.Valauable), nameof(LocalDateEntity.Valauable));
 	}
 }

@@ -19,7 +19,7 @@ public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns = [.. LocalDateTimeCompositeUserType.Columns, ..OffsetUserType.Columns];
+	internal static string[] Columns = [.. LocalDateTimeCompositeUserType.Columns, .. OffsetUserType.Columns];
 	internal static int DateTimeColumnsCount => LocalDateTimeCompositeUserType.Columns.Length;
 
 	string[] ICompositeUserType.PropertyNames => Columns;

@@ -11,8 +11,8 @@ namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class OffsetDateOverride : IAutoMappingOverride<OffsetDateEntity>
 {
-    void IAutoMappingOverride<OffsetDateEntity>.Override(AutoMapping<OffsetDateEntity> mapping)
-    {
+	void IAutoMappingOverride<OffsetDateEntity>.Override(AutoMapping<OffsetDateEntity> mapping)
+	{
 		NHibernateNodaTimeModule.MapOffsetDateProperty(mapping.Map(x => x.Valauable), nameof(OffsetDateEntity.Valauable));
 	}
 }

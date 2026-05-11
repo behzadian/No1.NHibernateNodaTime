@@ -11,8 +11,8 @@ namespace No1.NHibernateNodaTimeTests;
 
 public class InstantOverride : IAutoMappingOverride<InstantEntity>
 {
-    void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping)
-    {
+	void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping)
+	{
 		NHibernateNodaTimeModule.MapInstantProperty(mapping.Map(x => x.Valuable), nameof(InstantEntity.Valuable));
 	}
 }

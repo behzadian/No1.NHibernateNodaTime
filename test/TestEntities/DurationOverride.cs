@@ -11,8 +11,8 @@ namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class DurationOverride : IAutoMappingOverride<DurationEntity>
 {
-    void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping)
-    {
+	void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping)
+	{
 		NHibernateNodaTimeModule.MapDurationProperty(mapping.Map(x => x.Valauable), nameof(DurationEntity.Valauable));
 	}
 }

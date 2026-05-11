@@ -11,8 +11,8 @@ namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class ZonedDateTimeOverride : IAutoMappingOverride<ZonedDateTimeEntity>
 {
-    void IAutoMappingOverride<ZonedDateTimeEntity>.Override(AutoMapping<ZonedDateTimeEntity> mapping)
-    {
+	void IAutoMappingOverride<ZonedDateTimeEntity>.Override(AutoMapping<ZonedDateTimeEntity> mapping)
+	{
 		NHibernateNodaTimeModule.MapZonedDateTimeProperty(mapping.Map(x => x.Valauable), nameof(ZonedDateTimeEntity.Valauable));
 	}
 }

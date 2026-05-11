@@ -11,8 +11,8 @@ namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class YearMonthOverride : IAutoMappingOverride<YearMonthEntity>
 {
-    void IAutoMappingOverride<YearMonthEntity>.Override(AutoMapping<YearMonthEntity> mapping)
-    {
+	void IAutoMappingOverride<YearMonthEntity>.Override(AutoMapping<YearMonthEntity> mapping)
+	{
 		NHibernateNodaTimeModule.MapYearMonthProperty(mapping.Map(x => x.Valauable), nameof(YearMonthEntity.Valauable));
 	}
 }
