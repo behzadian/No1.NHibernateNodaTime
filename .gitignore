@@ -3,5 +3,6 @@
 !.gitattributes
 !.editorconfig
 !.github/
+!.husky/
 bin
 obj
