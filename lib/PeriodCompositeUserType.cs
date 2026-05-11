@@ -99,7 +99,7 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not Period, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<Period>(component);
 		}
 	}
 

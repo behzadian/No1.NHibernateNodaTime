@@ -78,7 +78,7 @@ public sealed class InstantCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not Instant, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<Instant>(component);
 		}
 	}
 

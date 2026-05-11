@@ -63,7 +63,7 @@ public sealed class DurationCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not Duration, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<Duration>(component);
 		}
 	}
 

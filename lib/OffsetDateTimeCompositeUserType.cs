@@ -68,7 +68,7 @@ public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not OffsetDateTime, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<OffsetDateTime>(component);
 		}
 	}
 

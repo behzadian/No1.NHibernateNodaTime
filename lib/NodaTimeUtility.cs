@@ -39,12 +39,12 @@ public static class NodaTimeUtility
 
 	internal static Era EraByID(string eraId)
 	{
-		return Eras[eraId] ?? throw new MismatchTypeException($"Unable to find Era with name {eraId}");
+		return Eras[eraId] ?? throw new UnsupportedValueException(eraId);
 	}
 
 	internal static string EraID(Era era)
 	{
-		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new MismatchTypeException("Era not found");
+		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new UnsupportedValueException(era);
 	}
 
 	public static bool IsUsable(this string? text)

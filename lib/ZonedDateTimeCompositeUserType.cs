@@ -44,7 +44,7 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 		if (dr[names[counter++]] is not string zoneId)
 			return null;
 
-		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new MismatchTypeException($"Zone {zoneId} not found");
+		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new UnsupportedValueException(zoneId);
 		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
 		var zdt = instant.InZone(DateTimeZone.Utc);
 		return zdt.WithZone(zone);
@@ -88,7 +88,7 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not YearMonth, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<ZonedDateTime>(component);
 		}
 	}
 

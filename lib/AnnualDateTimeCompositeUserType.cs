@@ -69,7 +69,7 @@ public sealed class AnnualDateCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not AnnualDate, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<AnnualDate>(component);
 		}
 	}
 

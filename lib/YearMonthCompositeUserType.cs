@@ -89,7 +89,7 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not YearMonth, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<YearMonth>(component);
 		}
 	}
 

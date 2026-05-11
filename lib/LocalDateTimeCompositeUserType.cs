@@ -69,7 +69,7 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 		}
 		else
 		{
-			throw new MismatchTypeException($"Object is not LocalDateTime, is {component?.GetType()?.Name ?? "NULL"}");
+			throw new UnexpectedTypeException<LocalDateTime>(component);
 		}
 	}
 
