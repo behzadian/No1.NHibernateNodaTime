@@ -47,7 +47,7 @@ public class [Your Entity]Override : IAutoMappingOverride<[Your Entity]>
 {
 	void IAutoMappingOverride<[Your Entity]>.Override(AutoMapping<[Your Entity]> mapping)
 	{
-		MapAnnualDateProperty(mapping.Map(x => x.Valauable), nameof(AnnualDateEntity.Valauable));
+		Map[Unnullable Type]Property(mapping.Map(x => x.Valauable), nameof([Your Entity].Valauable));
 	}
 }
 ```

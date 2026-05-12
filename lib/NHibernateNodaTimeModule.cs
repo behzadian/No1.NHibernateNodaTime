@@ -19,17 +19,6 @@ public static class NHibernateNodaTimeModule
 		return convention.Add<NodaTimeTypesComponentConvention>();
 	}
 
-	/*public static void MapNodaProperties<T>(AutoMapping<T> mapping)
-	{
-		var t = typeof(T);
-		foreach (var property in t.GetProperties())
-		{
-			if(property.PropertyType == typeof(Instant)){
-				//mapping.Map()
-			}
-		}
-	}*/
-
 	public static void MapInstantProperty(PropertyPart propertyPart, string propertyName)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
