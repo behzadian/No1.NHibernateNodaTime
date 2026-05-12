@@ -8,13 +8,15 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// AutoMapping configuration for test entities
 /// </summary>
-public class AutoMappingConfiguration : DefaultAutomappingConfiguration
+public class TestAutoMappingConfiguration : DefaultAutomappingConfiguration
 {
 	public override bool ShouldMap(Type type)
 	{
 		// Only map classes in TestEntities namespace
 		return type.Namespace != null &&
-			   type.Namespace.Contains("TestEntities");
+			   type.Namespace.Contains("TestEntities") &&
+			   type.Name.EndsWith("Entity")
+			   ;
 	}
 
 	public override bool IsId(FluentNHibernate.Member member)

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace No1.NHibernateNodaTimeTests.Overrides;
+namespace No1.NHibernateNodaTimeTests.TestEntities;
 
 public class OffsetOverride : IAutoMappingOverride<OffsetEntity>
 {

@@ -4,8 +4,6 @@ using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.Overrides;
-using No1.NHibernateNodaTimeTests.TestEntities;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -59,7 +57,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 			.Mappings(m => m
 				.AutoMappings
 				.Add(AutoMap
-					.AssemblyOf<NHibernateCompositeTestFixture>(new AutoMappingConfiguration())
+					.AssemblyOf<NHibernateCompositeTestFixture>(new TestAutoMappingConfiguration())
 					.EnableNodaTime()
 					.UseOverridesFromAssemblyOf<NHibernateCompositeTestFixture>()
 				 )
