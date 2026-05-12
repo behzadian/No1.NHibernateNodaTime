@@ -3,8 +3,6 @@ name: Deploy NuGet Package
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   deploy:
@@ -39,7 +37,7 @@ jobs:
     - name: Build
       run: dotnet build -c Release --no-restore
 
-    - name: Build
+    - name: Test
       run: dotnet test
 
     - name: Pack
