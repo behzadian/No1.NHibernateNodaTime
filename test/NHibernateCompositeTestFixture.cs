@@ -59,7 +59,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 			.Mappings(m => m
 				.AutoMappings
 				.Add(AutoMap
-					.AssemblyOf<InstantEntity>(new AutoMappingConfiguration())
+					.AssemblyOf<NHibernateCompositeTestFixture>(new AutoMappingConfiguration())
 					.EnableNodaTime()
 					.UseOverridesFromAssemblyOf<NHibernateCompositeTestFixture>()
 				 )
