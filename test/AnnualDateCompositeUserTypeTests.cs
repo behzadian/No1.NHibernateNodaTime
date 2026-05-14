@@ -34,7 +34,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_Month, Valauable_Day
+				SELECT ValauableMonth, ValauableDay
 				FROM ""AnnualDateEntity""
 				WHERE id = :id";
 
@@ -81,7 +81,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_Month, Nullable_Day
+				SELECT NullableMonth, NullableDay
 				FROM ""AnnualDateEntity""
 				WHERE id = :id";
 

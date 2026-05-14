@@ -35,7 +35,7 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_EraID, Valauable_CalendarID, Valauable_Year, Valauable_Month, ID
+				SELECT ValauableEraID, ValauableCalendarID, ValauableYear, ValauableMonth, ID
 				FROM ""YearMonthEntity""
 				WHERE id = :id";
 
@@ -114,7 +114,7 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_EraID, Nullable_CalendarID, Nullable_Year, Nullable_Month, ID
+				SELECT NullableEraID, NullableCalendarID, NullableYear, NullableMonth, ID
 				FROM ""YearMonthEntity""
 				WHERE id = :id";
 

@@ -38,5 +38,9 @@
 	<ItemGroup>
 	  <EditorConfigFiles Remove=".editorconfig" />
 	</ItemGroup>
+	<Target Name="InstallHusky" AfterTargets="Restore" Condition="'$(HUSKY)' != '0'">
+		<Exec Command="dotnet tool restore" StandardOutputImportance="Low" />
+		<Exec Command="dotnet husky install" StandardOutputImportance="Low" />
+	</Target>
 
 </Project>

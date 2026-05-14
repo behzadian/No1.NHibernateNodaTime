@@ -35,7 +35,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_Seconds, Valauable_Nanos, Nullable_Seconds, Nullable_Nanos
+				SELECT ValauableSeconds, ValauableNanos, NullableSeconds, NullableNanos
 				FROM ""DurationEntity""
 				WHERE id = :id";
 
@@ -83,7 +83,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_Seconds, Valauable_Nanos, Nullable_Seconds, Nullable_Nanos
+				SELECT ValauableSeconds, ValauableNanos, NullableSeconds, NullableNanos
 				FROM ""DurationEntity""
 				WHERE id = :id";
 

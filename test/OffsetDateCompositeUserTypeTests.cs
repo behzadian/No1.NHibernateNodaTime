@@ -35,7 +35,7 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day, Valauable_Gregorian, Valauable_OffsetNanos
+				SELECT ValauableCalendar, ValauableEra, ValauableYear, ValauableMonth, ValauableDay, ValauableGregorian, ValauableOffsetNanos
 				FROM ""OffsetDateEntity""
 				WHERE id = :id";
 
@@ -93,7 +93,7 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
+				SELECT NullableGregorian, NullableCalendar, NullableEra, NullableYear, NullableMonth, NullableDay
 				FROM ""OffsetDateEntity""
 				WHERE id = :id";
 

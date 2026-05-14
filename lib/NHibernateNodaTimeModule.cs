@@ -7,6 +7,9 @@ namespace No1.NHibernateNodaTime;
 
 public static class NHibernateNodaTimeModule
 {
+
+	private const string SEPARATOR = "";
+
 	public static AutoPersistenceModel EnableNodaTime(this AutoPersistenceModel convention)
 	{
 		ArgumentNullException.ThrowIfNull(convention);
@@ -99,7 +102,7 @@ public static class NHibernateNodaTimeModule
 		{
 			foreach (var property in columns)
 			{
-				propertyPart.Columns.Add($"{prefix}_{property}");
+				propertyPart.Columns.Add($"{prefix}{SEPARATOR}{property}");
 			}
 		}
 	}
