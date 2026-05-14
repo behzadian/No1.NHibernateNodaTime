@@ -15,55 +15,56 @@ public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 {
 	void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
 	{
-		var separator = "";
+		var prefix = instance.Name;
+
 		switch (instance.Type)
 		{
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Instant) || instance.Type == typeof(Instant?):
-				instance.CustomType<InstantCompositeUserType>(instance.Name + separator);
+				instance.CustomType<InstantCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(ZonedDateTime) || instance.Type == typeof(ZonedDateTime?):
-				instance.CustomType<ZonedDateTimeCompositeUserType>(instance.Name + separator);
+				instance.CustomType<ZonedDateTimeCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Duration) || instance.Type == typeof(Duration?):
-				instance.CustomType<DurationCompositeUserType>(instance.Name + separator);
+				instance.CustomType<DurationCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(AnnualDate) || instance.Type == typeof(AnnualDate?):
-				instance.CustomType<AnnualDateCompositeUserType>(instance.Name + separator);
+				instance.CustomType<AnnualDateCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(LocalDate) || instance.Type == typeof(LocalDate?):
-				instance.CustomType<LocalDateCompositeUserType>(instance.Name + separator);
+				instance.CustomType<LocalDateCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(LocalDateTime) || instance.Type == typeof(LocalDateTime?):
-				instance.CustomType<LocalDateTimeCompositeUserType>(instance.Name + separator);
+				instance.CustomType<LocalDateTimeCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(LocalTime) || instance.Type == typeof(LocalTime?):
-				instance.CustomType<LocalTimeUserType>(instance.Name + separator);
+				instance.CustomType<LocalTimeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Offset) || instance.Type == typeof(Offset?):
-				instance.CustomType<OffsetUserType>(instance.Name + separator);
+				instance.CustomType<OffsetUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(OffsetDate) || instance.Type == typeof(OffsetDate?):
-				instance.CustomType<OffsetDateCompositeUserType>(instance.Name + separator);
+				instance.CustomType<OffsetDateCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(OffsetDateTime) || instance.Type == typeof(OffsetDateTime?):
-				instance.CustomType<OffsetDateTimeCompositeUserType>(instance.Name + separator);
+				instance.CustomType<OffsetDateTimeCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(OffsetTime) || instance.Type == typeof(OffsetTime?):
-				instance.CustomType<OffsetTimeCompositeUserType>(instance.Name + separator);
+				instance.CustomType<OffsetTimeCompositeUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(YearMonth) || instance.Type == typeof(YearMonth?):
-				instance.CustomType<YearMonthCompositeUserType>(instance.Name + separator);
+				instance.CustomType<YearMonthCompositeUserType>(prefix);
 				break;
 		}
 	}
