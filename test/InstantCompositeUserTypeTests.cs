@@ -34,7 +34,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valuable_Seconds, Valuable_Nanoseconds 
+				SELECT ValuableSeconds, ValuableNanoseconds 
 				FROM ""InstantEntity""
 				WHERE id = :id";
 
@@ -113,7 +113,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_Seconds, Nullable_Nanoseconds 
+				SELECT NullableSeconds, NullableNanoseconds 
 				FROM ""InstantEntity""
 				WHERE id = :id";
 

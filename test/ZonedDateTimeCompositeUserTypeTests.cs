@@ -34,7 +34,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_Seconds, Valauable_Nanoseconds, Valauable_ZoneID, Valauable_UTC, Valauable_Local
+				SELECT ValauableSeconds, ValauableNanoseconds, ValauableZoneID, ValauableUTC, ValauableLocal
 				FROM ""ZonedDateTimeEntity""
 				WHERE id = :id";
 
@@ -121,7 +121,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_Seconds, Nullable_Nanoseconds, Nullable_ZoneID, Nullable_UTC, Nullable_Local
+				SELECT NullableSeconds, NullableNanoseconds, NullableZoneID, NullableUTC, NullableLocal
 				FROM ""ZonedDateTimeEntity""
 				WHERE id = :id";
 

@@ -35,7 +35,7 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_TimeNanos, Valauable_OffsetNanos
+				SELECT ValauableTimeNanos, ValauableOffsetNanos
 				FROM ""OffsetTimeEntity""
 				WHERE id = :id";
 
@@ -83,7 +83,7 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_TimeNanos, Nullable_OffsetNanos
+				SELECT NullableTimeNanos, NullableOffsetNanos
 				FROM ""OffsetTimeEntity""
 				WHERE id = :id";
 

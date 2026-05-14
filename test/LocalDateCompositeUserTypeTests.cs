@@ -35,7 +35,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Valauable_Gregorian, Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day
+				SELECT ValauableGregorian, ValauableCalendar, ValauableEra, ValauableYear, ValauableMonth, ValauableDay
 				FROM ""LocalDateEntity""
 				WHERE id = :id";
 
@@ -118,7 +118,7 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
+				SELECT NullableGregorian, NullableCalendar, NullableEra, NullableYear, NullableMonth, NullableDay
 				FROM ""LocalDateEntity""
 				WHERE id = :id";
 
