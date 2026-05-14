@@ -14,7 +14,7 @@ public class TestAutoMappingConfiguration : DefaultAutomappingConfiguration
 	{
 		// Only map classes in TestEntities namespace
 		return type.Namespace != null &&
-			   type.Namespace.Contains("TestEntities") &&
+			   type.Namespace.Contains("Model") &&
 			   type.Name.EndsWith("Entity")
 			   ;
 	}

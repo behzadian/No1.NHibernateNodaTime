@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
 
@@ -19,7 +19,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	{
 		// Arrange
 		var val = new AnnualDate(11, 27);
-		var entity = new AnnualDateEntity() { Name = "Test Event", Valauable = val };
+		var entity = new AnnualDateEntity() { Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -34,8 +34,8 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableMonth, ValauableDay
-				FROM ""AnnualDateEntity""
+				SELECT valauable_month, valauable_day
+				FROM ""annual_dates""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -66,7 +66,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	public async Task ShouldHandleNullable()
 	{
 		// Arrange
-		var entity = new AnnualDateEntity() { Name = "Test Event", Nullable = null };
+		var entity = new AnnualDateEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -81,8 +81,8 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT NullableMonth, NullableDay
-				FROM ""AnnualDateEntity""
+				SELECT nullable_month, nullable_day
+				FROM ""annual_dates""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

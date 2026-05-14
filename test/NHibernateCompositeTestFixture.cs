@@ -4,6 +4,7 @@ using FluentNHibernate.Cfg.Db;
 using NHibernate;
 using NHibernate.Tool.hbm2ddl;
 using No1.NHibernateNodaTime;
+using No1.NHibernateNodaTimeTests.Conventions;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -49,7 +50,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 
 		Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/hbms");
 		// Configure NHibernate with AutoMapping and InstantCompositeUserType
-		var configuration = Fluently.Configure()
+		var nhibernateConfig = Fluently.Configure()
 			.Database(PostgreSQLConfiguration.Standard
 				.ConnectionString(_container.GetConnectionString())
 				.ShowSql()
@@ -58,6 +59,10 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 				.AutoMappings
 				.Add(AutoMap
 					.AssemblyOf<NHibernateCompositeTestFixture>(new TestAutoMappingConfiguration())
+					.Conventions.Add<TableNameConvention>()
+					.Conventions.Add<SnakeCaseColumnNameConvention>()
+					.Conventions.Add<SnakeCaseForeignKeyConvention>()
+					.Conventions.Add<SnakeCaseIdConvention>()
 					.EnableNodaTime()
 					.UseOverridesFromAssemblyOf<NHibernateCompositeTestFixture>()
 				 )
@@ -72,7 +77,11 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 			})
 			.BuildConfiguration();
 
-		_sessionFactory = configuration.BuildSessionFactory();
+		//var schemaExport = new SchemaExport(nhibernateConfig);
+		//schemaExport.SetDelimiter(";");
+		//schemaExport.Execute(useStdOut: true, execute: false, justDrop: false);
+
+		_sessionFactory = nhibernateConfig.BuildSessionFactory();
 	}
 
 	public async Task DisposeAsync()

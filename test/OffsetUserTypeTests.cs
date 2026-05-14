@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using NodaTime.Calendars;
 using Xunit;
@@ -36,7 +36,7 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		{
 			var sql = @"
 				SELECT Valauable, ID
-				FROM ""OffsetEntity""
+				FROM ""offsets""
 				WHERE id = :id";
 
 			var result = await session
@@ -108,7 +108,7 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		{
 			var sql = @"
 				SELECT Nullable, Id
-				FROM ""OffsetEntity""
+				FROM ""offsets""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

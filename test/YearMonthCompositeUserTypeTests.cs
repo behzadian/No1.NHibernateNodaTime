@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using NodaTime.Calendars;
 using Xunit;
@@ -16,7 +16,7 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistIn1Column()
+	public async Task ShouldPersistInMultipleColumn()
 	{
 		// Arrange
 		var val = new YearMonth(Era.AnnoPersico, 1405, 1, CalendarSystem.PersianSimple);
@@ -35,8 +35,8 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableEraID, ValauableCalendarID, ValauableYear, ValauableMonth, ID
-				FROM ""YearMonthEntity""
+				SELECT Valauable_Era_ID, Valauable_Calendar_ID, Valauable_Year, Valauable_Month, ID
+				FROM ""year_months""
 				WHERE id = :id";
 
 			var result = await session
@@ -114,8 +114,8 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT NullableEraID, NullableCalendarID, NullableYear, NullableMonth, ID
-				FROM ""YearMonthEntity""
+				SELECT Nullable_Era_ID, Nullable_Calendar_ID, Nullable_Year, Nullable_Month, ID
+				FROM ""year_months""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

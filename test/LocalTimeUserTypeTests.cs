@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using NodaTime.Calendars;
 using Xunit;
@@ -36,7 +36,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		{
 			var sql = @"
 				SELECT Valauable, id
-				FROM ""LocalTimeEntity""
+				FROM ""local_times""
 				WHERE id = :id";
 
 			var result = await session
@@ -109,7 +109,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		{
 			var sql = @"
 				SELECT Nullable, Id
-				FROM ""LocalTimeEntity""
+				FROM ""local_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

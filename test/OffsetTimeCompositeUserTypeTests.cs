@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using NodaTime.Calendars;
 using Xunit;
@@ -35,8 +35,8 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableTimeNanos, ValauableOffsetNanos
-				FROM ""OffsetTimeEntity""
+				SELECT Valauable_Time_Nanos, Valauable_Offset_Nanos
+				FROM ""offset_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -83,8 +83,8 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT NullableTimeNanos, NullableOffsetNanos
-				FROM ""OffsetTimeEntity""
+				SELECT Nullable_Time_Nanos, Nullable_Offset_Nanos
+				FROM ""offset_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

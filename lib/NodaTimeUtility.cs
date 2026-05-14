@@ -1,13 +1,17 @@
+using FluentNHibernate.Automapping;
+using FluentNHibernate.Conventions.Inspections;
 using FluentNHibernate.Mapping;
 using NHibernate.Mapping;
 using NodaTime;
 using NodaTime.Calendars;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using static No1.NHibernateNodaTime.NHibernateNodaTimeModule;
 
 namespace No1.NHibernateNodaTime;
 
-public static class NodaTimeUtility
+public static partial class NodaTimeUtility
 {
-
 	public static int OnlyNanoseconds(this Instant instant)
 	{
 		return instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds;
@@ -50,5 +54,85 @@ public static class NodaTimeUtility
 	public static bool IsUsable(this string? text)
 	{
 		return !string.IsNullOrEmpty(text);
+	}
+
+	public static string SnakeCase(this string name)
+	{
+		return WordPattern().Replace(name, "$1_$2").ToLowerInvariant();
+	}
+
+	[GeneratedRegex(@"([a-z\d])([A-Z])")]
+	private static partial Regex WordPattern();
+
+	public static bool Is<T>(this Type type)
+		where T : struct
+	{
+		if (type == typeof(T))
+			return true;
+
+		return type == typeof(T?);
+	}
+
+	public static void OverrideEntity<TEntity>(AutoMapping<TEntity> mapping, Func<string, string>? columnNameBuilder = null)
+	{
+		ArgumentNullException.ThrowIfNull(mapping);
+
+		foreach (var property in typeof(TEntity).GetProperties())
+		{
+			switch (property)
+			{
+				case PropertyInfo when property.PropertyType.Is<AnnualDate>():
+					MapAnnualDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<Duration>():
+					MapDurationProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<Instant>():
+					MapInstantProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<LocalDate>():
+					MapLocalDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<LocalDateTime>():
+					MapLocalDateTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<LocalTime>():
+					MapLocalTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<OffsetDate>():
+					MapOffsetDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<OffsetDateTime>():
+					MapOffsetDateTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<OffsetTime>():
+					MapOffsetTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<Offset>():
+					MapOffsetProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType == typeof(Period):
+					MapPeriodProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<YearMonth>():
+					MapYearMonthProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<ZonedDateTime>():
+					MapZonedDateTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+			}
+		}
 	}
 }
