@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
 
@@ -34,8 +34,8 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableSeconds, ValauableNanoseconds, ValauableZoneID, ValauableUTC, ValauableLocal
-				FROM ""ZonedDateTimeEntity""
+				SELECT Valauable_Seconds, Valauable_Nanoseconds, Valauable_Zone_ID, Valauable_UTC, Valauable_Local
+				FROM ""zoned_date_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -121,8 +121,8 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT NullableSeconds, NullableNanoseconds, NullableZoneID, NullableUTC, NullableLocal
-				FROM ""ZonedDateTimeEntity""
+				SELECT Nullable_Seconds, Nullable_Nanoseconds, Nullable_Zone_ID, Nullable_UTC, Nullable_Local
+				FROM ""zoned_date_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

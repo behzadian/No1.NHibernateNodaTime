@@ -1,6 +1,6 @@
 using NodaTime;
 
-namespace No1.NHibernateNodaTimeTests.TestEntities;
+namespace No1.NHibernateNodaTimeTests.Model;
 
 /// <summary>
 /// Sample entity for testing NodaTime Instant persistence

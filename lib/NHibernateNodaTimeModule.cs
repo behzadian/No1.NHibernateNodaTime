@@ -7,13 +7,10 @@ namespace No1.NHibernateNodaTime;
 
 public static class NHibernateNodaTimeModule
 {
-
-	private const string SEPARATOR = "";
-
 	public static AutoPersistenceModel EnableNodaTime(this AutoPersistenceModel convention)
 	{
 		ArgumentNullException.ThrowIfNull(convention);
-		return convention.Conventions.Add<NodaTimeTypesComponentConvention>();
+		return convention.Conventions.EnableNodaTime();
 	}
 
 	public static AutoPersistenceModel EnableNodaTime(this SetupConventionFinder<AutoPersistenceModel> convention)
@@ -22,79 +19,98 @@ public static class NHibernateNodaTimeModule
 		return convention.Add<NodaTimeTypesComponentConvention>();
 	}
 
-	public static void MapInstantProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapInstantProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<InstantCompositeUserType>(propertyPart, propertyName, InstantCompositeUserType.Columns);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<InstantCompositeUserType>(propertyPart, columnNameBuilder, propertyName, InstantCompositeUserType.Columns);
 	}
 
-	public static void MapZonedDateTimeProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapZonedDateTimeProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<ZonedDateTimeCompositeUserType>(propertyPart, propertyName, ZonedDateTimeCompositeUserType.Columns);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<ZonedDateTimeCompositeUserType>(propertyPart, columnNameBuilder, propertyName, ZonedDateTimeCompositeUserType.Columns);
 	}
 
-	public static void MapDurationProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapDurationProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<DurationCompositeUserType>(propertyPart, propertyName, DurationCompositeUserType.Columns);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<DurationCompositeUserType>(propertyPart, columnNameBuilder, propertyName, DurationCompositeUserType.Columns);
 	}
 
-	public static void MapAnnualDateProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapAnnualDateProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<AnnualDateCompositeUserType>(propertyPart, propertyName, AnnualDateCompositeUserType.Columns);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<AnnualDateCompositeUserType>(propertyPart, columnNameBuilder, propertyName, AnnualDateCompositeUserType.Columns);
 	}
 
-	public static void MapLocalDateProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapLocalDateProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<LocalDateCompositeUserType>(propertyPart, propertyName, LocalDateCompositeUserType.Columns);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<LocalDateCompositeUserType>(propertyPart, columnNameBuilder, propertyName, LocalDateCompositeUserType.Columns);
 	}
 
-	public static void MapLocalDateTimeProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapLocalDateTimeProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<LocalDateTimeCompositeUserType>(propertyPart, propertyName, LocalDateTimeCompositeUserType.Columns);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<LocalDateTimeCompositeUserType>(propertyPart, columnNameBuilder, propertyName, LocalDateTimeCompositeUserType.Columns);
 	}
 
-	public static void MapLocalTimeProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapOffsetDateProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<OffsetDateCompositeUserType>(propertyPart, columnNameBuilder, propertyName, OffsetDateCompositeUserType.Columns);
+	}
+
+	internal static void MapOffsetDateTimeProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<OffsetDateTimeCompositeUserType>(propertyPart, columnNameBuilder, propertyName, OffsetDateTimeCompositeUserType.Columns);
+	}
+
+	internal static void MapOffsetTimeProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<OffsetTimeCompositeUserType>(propertyPart, columnNameBuilder, propertyName, OffsetTimeCompositeUserType.Columns);
+	}
+
+	internal static void MapYearMonthProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<YearMonthCompositeUserType>(propertyPart, columnNameBuilder, propertyName, YearMonthCompositeUserType.Columns);
+	}
+
+	internal static void MapPeriodProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<PeriodCompositeUserType>(propertyPart, columnNameBuilder, propertyName, PeriodCompositeUserType.Columns);
+	}
+
+	internal static void MapLocalTimeProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
+	{
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
 		MapColumns<LocalTimeUserType>(propertyPart);
 	}
 
-	public static void MapOffsetProperty(PropertyPart propertyPart, string propertyName)
+	internal static void MapOffsetProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null)
 	{
 		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
 		MapColumns<OffsetUserType>(propertyPart);
 	}
 
-	public static void MapOffsetDateProperty(PropertyPart propertyPart, string propertyName)
-	{
-		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<OffsetDateCompositeUserType>(propertyPart, propertyName, OffsetDateCompositeUserType.Columns);
-	}
-
-	public static void MapOffsetDateTimeProperty(PropertyPart propertyPart, string propertyName)
-	{
-		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<OffsetDateTimeCompositeUserType>(propertyPart, propertyName, OffsetDateTimeCompositeUserType.Columns);
-	}
-
-	public static void MapOffsetTimeProperty(PropertyPart propertyPart, string propertyName)
-	{
-		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<OffsetTimeCompositeUserType>(propertyPart, propertyName, OffsetTimeCompositeUserType.Columns);
-	}
-
-	public static void MapYearMonthProperty(PropertyPart propertyPart, string propertyName)
-	{
-		ArgumentNullException.ThrowIfNull(propertyPart);
-		MapColumns<YearMonthCompositeUserType>(propertyPart, propertyName, YearMonthCompositeUserType.Columns);
-	}
-
-	private static void MapColumns<T>(PropertyPart propertyPart, string? prefix = null, params string[] columns)
+	private static void MapColumns<T>(PropertyPart propertyPart, Func<string, string>? columnNameBuilder = null, string? prefix = null, params string[] columns)
 	{
 		propertyPart.CustomType<T>();
 		propertyPart.Columns.Clear();
@@ -102,7 +118,9 @@ public static class NHibernateNodaTimeModule
 		{
 			foreach (var property in columns)
 			{
-				propertyPart.Columns.Add($"{prefix}{SEPARATOR}{property}");
+				var propertyFullName = $"{prefix}{property}";
+				var columnName = columnNameBuilder?.Invoke(propertyFullName) ?? propertyFullName;
+				propertyPart.Columns.Add(columnName);
 			}
 		}
 	}

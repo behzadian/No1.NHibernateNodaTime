@@ -2,6 +2,7 @@
 using FluentNHibernate.Conventions.AcceptanceCriteria;
 using FluentNHibernate.Conventions.Inspections;
 using FluentNHibernate.Conventions.Instances;
+using FluentNHibernate.Mapping;
 using NHibernate;
 using NodaTime;
 using System;
@@ -15,7 +16,7 @@ public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 {
 	void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
 	{
-		var prefix = instance.Name;
+		var prefix = instance.Name.SnakeCase();
 
 		switch (instance.Type)
 		{

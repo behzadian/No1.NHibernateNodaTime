@@ -1,14 +1,14 @@
 using NodaTime;
 
-namespace No1.NHibernateNodaTimeTests.TestEntities;
+namespace No1.NHibernateNodaTimeTests.Model;
 
 /// <summary>
 /// Sample entity for testing NodaTime Instant persistence
 /// </summary>
-public class DurationEntity
+public class LocalDateEntity
 {
 	public virtual int Id { get; set; }
 	public virtual string Name { get; set; } = string.Empty;
-	public virtual Duration Valauable { get; set; } = Duration.Epsilon;
-	public virtual Duration? Nullable { get; set; }
+	public virtual LocalDate Valauable { get; set; } = new LocalDate();
+	public virtual LocalDate? Nullable { get; set; }
 }

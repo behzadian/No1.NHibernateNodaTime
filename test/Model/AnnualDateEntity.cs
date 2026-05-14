@@ -1,6 +1,6 @@
 using NodaTime;
 
-namespace No1.NHibernateNodaTimeTests.TestEntities;
+namespace No1.NHibernateNodaTimeTests.Model;
 
 /// <summary>
 /// Sample entity for testing NodaTime Instant persistence
@@ -8,7 +8,7 @@ namespace No1.NHibernateNodaTimeTests.TestEntities;
 public class AnnualDateEntity
 {
 	public virtual int Id { get; set; }
-	public virtual string Name { get; set; } = string.Empty;
+	public virtual string NameProp { get; set; } = string.Empty;
 	public virtual AnnualDate Valauable { get; set; }
 	public virtual AnnualDate? Nullable { get; set; }
 }

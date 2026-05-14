@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using NodaTime.Calendars;
 using Xunit;
@@ -35,8 +35,8 @@ public class OffsetDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableCalendar, ValauableEra, ValauableYear, ValauableMonth, ValauableDay, ValauableGregorian, ValauableTimeNanos, ValauableOffsetNanos
-				FROM ""OffsetDateTimeEntity""
+				SELECT Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day, Valauable_Gregorian, Valauable_Time_Nanos, Valauable_Offset_Nanos
+				FROM ""offset_date_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -95,8 +95,8 @@ public class OffsetDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT NullableCalendar, NullableEra, NullableYear, NullableMonth, NullableDay, NullableGregorian, NullableTimeNanos, NullableOffsetNanos
-				FROM ""OffsetDateTimeEntity""
+				SELECT Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day, Nullable_Gregorian, Nullable_Time_Nanos, Nullable_Offset_Nanos
+				FROM ""offset_date_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

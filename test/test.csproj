@@ -36,7 +36,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EditorConfigFiles Remove=".editorconfig" />
+		<None Update="xunit.runner.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 	<Target Name="InstallHusky" AfterTargets="Restore" Condition="'$(HUSKY)' != '0'">
 		<Exec Command="dotnet tool restore" StandardOutputImportance="Low" />

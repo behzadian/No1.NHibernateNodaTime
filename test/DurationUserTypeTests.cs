@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
 
@@ -35,8 +35,8 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableSeconds, ValauableNanos, NullableSeconds, NullableNanos
-				FROM ""DurationEntity""
+				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
+				FROM ""durations""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -83,8 +83,8 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableSeconds, ValauableNanos, NullableSeconds, NullableNanos
-				FROM ""DurationEntity""
+				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
+				FROM ""durations""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)

@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NHibernate;
 using No1.NHibernateNodaTime;
-using No1.NHibernateNodaTimeTests.TestEntities;
+using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using NodaTime.Calendars;
 using Xunit;
@@ -35,8 +35,8 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT ValauableGregorian, ValauableCalendar, ValauableEra, ValauableYear, ValauableMonth, ValauableDay, ValauableTimeNanos
-				FROM ""LocalDateTimeEntity""
+				SELECT Valauable_Gregorian, Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day, Valauable_Time_Nanos
+				FROM ""local_date_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -94,8 +94,8 @@ public class LocalDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		using (var session = _sessionFactory.OpenSession())
 		{
 			var sql = @"
-				SELECT NullableGregorian, NullableCalendar, NullableEra, NullableYear, NullableMonth, NullableDay
-				FROM ""LocalDateTimeEntity""
+				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
+				FROM ""local_date_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
