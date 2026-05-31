@@ -31,8 +31,7 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 		NHibernateUtil.Int16,		// Month
 	];
 
-	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
-	{
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 
 		var counter = 0;
 
@@ -54,18 +53,14 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 		return new YearMonth(era, year, month, calendar);
 	}
 
-	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
-	{
-		if (value is YearMonth val)
-		{
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
+		if (value is YearMonth val) {
 			var counter = index;
 			NHibernateUtil.String.NullSafeSet(cmd, EraID(val.Era), counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, val.Calendar.Id, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, val.YearOfEra, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, val.Month, counter++, session);
-		}
-		else
-		{
+		} else {
 			var counter = index;
 			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
@@ -74,59 +69,47 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 		}
 	}
 
-	object? ICompositeUserType.GetPropertyValue(object component, int property)
-	{
-		if (component is YearMonth val)
-		{
-			return property switch
-			{
+	object? ICompositeUserType.GetPropertyValue(object component, int property) {
+		if (component is YearMonth val) {
+			return property switch {
 				0 => EraID(val.Era),
 				1 => val.Calendar.Id,
 				2 => val.YearOfEra,
 				3 => val.Month,
 				_ => throw new ArgumentOutOfRangeException(nameof(property))
 			};
-		}
-		else
-		{
+		} else {
 			throw new UnexpectedTypeException<YearMonth>(component);
 		}
 	}
 
-	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
-	{
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value) {
 		throw new InvalidOperationException("immutable");
 	}
 
-	object ICompositeUserType.DeepCopy(object value)
-	{
+	object ICompositeUserType.DeepCopy(object value) {
 		return value;
 	}
 
-	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
-	{
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session) {
 		return value;
 	}
 
-	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner) {
 		return cached;
 	}
 
-	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner) {
 		return original;
 	}
 
-	bool ICompositeUserType.Equals(object? x, object? y)
-	{
+	bool ICompositeUserType.Equals(object? x, object? y) {
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((YearMonth)x).Equals((YearMonth)y);
 	}
 
-	int ICompositeUserType.GetHashCode(object? x)
-	{
+	int ICompositeUserType.GetHashCode(object? x) {
 		return x?.GetHashCode() ?? 0;
 	}
 }

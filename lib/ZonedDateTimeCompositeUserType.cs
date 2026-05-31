@@ -31,8 +31,7 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 		NHibernateUtil.DateTimeNoMs,// Local
 	];
 
-	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
-	{
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
 		if (dr[names[counter++]] is not long secs)
@@ -50,19 +49,15 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 		return zdt.WithZone(zone);
 	}
 
-	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
-	{
-		if (value is ZonedDateTime zdt)
-		{
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
+		if (value is ZonedDateTime zdt) {
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSeconds(), counter++, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, zdt.Zone.Id, counter++, session);
 			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUtc), counter++, session);
 			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(zdt.ToDateTimeUnspecified), counter++, session);
-		}
-		else
-		{
+		} else {
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
@@ -72,12 +67,9 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 		}
 	}
 
-	object? ICompositeUserType.GetPropertyValue(object component, int property)
-	{
-		if (component is ZonedDateTime val)
-		{
-			return property switch
-			{
+	object? ICompositeUserType.GetPropertyValue(object component, int property) {
+		if (component is ZonedDateTime val) {
+			return property switch {
 				0 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds,
 				1 => val.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds,
 				2 => val.Zone.Id,
@@ -85,47 +77,38 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 				4 => TryOrDefault(val.ToDateTimeUnspecified),
 				_ => throw new ArgumentOutOfRangeException(nameof(property))
 			};
-		}
-		else
-		{
+		} else {
 			throw new UnexpectedTypeException<ZonedDateTime>(component);
 		}
 	}
 
-	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
-	{
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value) {
 		throw new InvalidOperationException("immutable");
 	}
 
-	object ICompositeUserType.DeepCopy(object value)
-	{
+	object ICompositeUserType.DeepCopy(object value) {
 		return value;
 	}
 
-	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
-	{
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session) {
 		return value;
 	}
 
-	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner) {
 		return cached;
 	}
 
-	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner) {
 		return original;
 	}
 
-	bool ICompositeUserType.Equals(object? x, object? y)
-	{
+	bool ICompositeUserType.Equals(object? x, object? y) {
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
 	}
 
-	int ICompositeUserType.GetHashCode(object? x)
-	{
+	int ICompositeUserType.GetHashCode(object? x) {
 		return x?.GetHashCode() ?? 0;
 	}
 }

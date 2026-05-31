@@ -15,8 +15,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistInstantInTwoColumns()
-	{
+	public async Task ShouldPersistInstantInTwoColumns() {
 		// Arrange
 		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
 		var entity = new InstantEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
@@ -24,15 +23,13 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check two columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valuable_Seconds, Valuable_Nanoseconds 
 				FROM ""instants""
@@ -52,8 +49,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 
 		// Act - Retrieve via NHibernate
 		InstantEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<InstantEntity>(savedId);
 		}
 
@@ -63,8 +59,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanosecondPrecision()
-	{
+	public async Task ShouldPreserveNanosecondPrecision() {
 		// Arrange - Create instant with specific nanosecond value
 		var instant = Instant
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
@@ -75,15 +70,13 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		// Act
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		InstantEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<InstantEntity>(savedId);
 		}
 
@@ -94,8 +87,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullableInstant()
-	{
+	public async Task ShouldHandleNullableInstant() {
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant();
 		var entity = new InstantEntity() { Name = "Test", Valuable = now, Nullable = null };
@@ -103,15 +95,13 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable_Seconds, Nullable_Nanoseconds 
 				FROM ""instants""
@@ -127,8 +117,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	}
 
 	[Fact]
-	public async Task ShouldHandleMinInstants()
-	{
+	public async Task ShouldHandleMinInstants() {
 		// Arrange
 		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
 		var minInstant = Instant.MinValue;
@@ -138,16 +127,14 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		// Act
 		int minId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			minId = (int)await session.SaveAsync(minEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		InstantEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMin = await session.GetAsync<InstantEntity>(minId);
 		}
 
@@ -155,8 +142,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	}
 
 	[Fact]
-	public async Task ShouldHandleMaxInstant()
-	{
+	public async Task ShouldHandleMaxInstant() {
 		// Arrange
 		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
 		var maxInstant = Instant.MaxValue;
@@ -166,16 +152,14 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		// Act
 		int maxId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			maxId = (int)await session.SaveAsync(maxEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		InstantEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMax = await session.GetAsync<InstantEntity>(maxId);
 		}
 

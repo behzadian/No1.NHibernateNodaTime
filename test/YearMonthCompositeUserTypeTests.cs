@@ -16,8 +16,7 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistInMultipleColumn()
-	{
+	public async Task ShouldPersistInMultipleColumn() {
 		// Arrange
 		var val = new YearMonth(Era.AnnoPersico, 1405, 1, CalendarSystem.PersianSimple);
 		var entity = new YearMonthEntity() { Valauable = val };
@@ -25,15 +24,13 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valauable_Era_ID, Valauable_Calendar_ID, Valauable_Year, Valauable_Month, ID
 				FROM ""year_months""
@@ -59,8 +56,7 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 
 		// Act - Retrieve via NHibernate
 		YearMonthEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<YearMonthEntity>(savedId);
 		}
 
@@ -70,23 +66,20 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanoseconds()
-	{
+	public async Task ShouldPreserveNanoseconds() {
 		var val = new YearMonth(Era.AnnoPersico, 1405, 1, CalendarSystem.PersianSimple);
 		var entity = new YearMonthEntity() { Valauable = val };
 
 		// Act
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		YearMonthEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<YearMonthEntity>(savedId);
 		}
 
@@ -96,23 +89,20 @@ public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var entity = new YearMonthEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable_Era_ID, Nullable_Calendar_ID, Nullable_Year, Nullable_Month, ID
 				FROM ""year_months""

@@ -30,8 +30,7 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 		NHibernateUtil.Int64,		// Nanos
 	];
 
-	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
-	{
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
 		if (dr[names[counter++]] is not int years)
@@ -49,8 +48,7 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 		if (dr[names[counter++]] is not long nanos)
 			return null;
 
-		var periodBuilder = new PeriodBuilder()
-		{
+		var periodBuilder = new PeriodBuilder() {
 			Years = years,
 			Months = months,
 			Weeks = weeks,
@@ -61,19 +59,15 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 		return periodBuilder.Build();
 	}
 
-	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
-	{
-		if (value is Period val)
-		{
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
+		if (value is Period val) {
 			var counter = index;
 			NHibernateUtil.Int16.NullSafeSet(cmd, val.Years, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, val.Months, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, val.Weeks, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, val.Days, counter++, session);
 			NHibernateUtil.Int64.NullSafeSet(cmd, val.Nanoseconds, counter++, session);
-		}
-		else
-		{
+		} else {
 			var counter = index;
 			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, null, counter++, session);
@@ -83,12 +77,9 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 		}
 	}
 
-	object? ICompositeUserType.GetPropertyValue(object component, int property)
-	{
-		if (component is Period period)
-		{
-			return property switch
-			{
+	object? ICompositeUserType.GetPropertyValue(object component, int property) {
+		if (component is Period period) {
+			return property switch {
 				0 => period.Years,
 				1 => period.Months,
 				2 => period.Weeks,
@@ -96,47 +87,38 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 				4 => period.Nanoseconds,
 				_ => throw new ArgumentOutOfRangeException(nameof(property))
 			};
-		}
-		else
-		{
+		} else {
 			throw new UnexpectedTypeException<Period>(component);
 		}
 	}
 
-	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
-	{
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value) {
 		throw new InvalidOperationException("immutable");
 	}
 
-	object ICompositeUserType.DeepCopy(object value)
-	{
+	object ICompositeUserType.DeepCopy(object value) {
 		return value;
 	}
 
-	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
-	{
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session) {
 		return value;
 	}
 
-	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner) {
 		return cached;
 	}
 
-	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner) {
 		return original;
 	}
 
-	bool ICompositeUserType.Equals(object? x, object? y)
-	{
+	bool ICompositeUserType.Equals(object? x, object? y) {
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((Period)x).Equals((Period)y);
 	}
 
-	int ICompositeUserType.GetHashCode(object? x)
-	{
+	int ICompositeUserType.GetHashCode(object? x) {
 		return x?.GetHashCode() ?? 0;
 	}
 }

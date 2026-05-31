@@ -9,8 +9,7 @@ using FluentNHibernate.Conventions.Instances;
 [UsedImplicitly]
 public class SnakeCaseColumnNameConvention : IPropertyConvention
 {
-	public void Apply(IPropertyInstance instance)
-	{
+	public void Apply(IPropertyInstance instance) {
 		instance.Column(instance.Property.Name.SnakeCase());
 	}
 }

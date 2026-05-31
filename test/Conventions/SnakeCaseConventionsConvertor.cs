@@ -4,8 +4,7 @@ namespace No1.FaraBank.Api.Repos.Conventions;
 
 public static partial class SnakeCaseConventionsConvertor
 {
-	public static string SnakeCase(this string name)
-	{
+	public static string SnakeCase(this string name) {
 		return WordPattern().Replace(name, "$1_$2").ToLower();
 	}
 

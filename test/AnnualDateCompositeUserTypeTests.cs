@@ -15,8 +15,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistIn2Columns()
-	{
+	public async Task ShouldPersistIn2Columns() {
 		// Arrange
 		var val = new AnnualDate(11, 27);
 		var entity = new AnnualDateEntity() { Valauable = val };
@@ -24,15 +23,13 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT valauable_month, valauable_day
 				FROM ""annual_dates""
@@ -52,8 +49,7 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 
 		// Act - Retrieve via NHibernate
 		AnnualDateEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<AnnualDateEntity>(savedId);
 		}
 
@@ -63,23 +59,20 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var entity = new AnnualDateEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT nullable_month, nullable_day
 				FROM ""annual_dates""
@@ -89,16 +82,14 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			for (int i = 0; i < result.Length; i++)
-			{
+			for (int i = 0; i < result.Length; i++) {
 				result[i].Should().BeNull();
 			}
 		}
 
 		// Act - Retrieve via NHibernate
 		AnnualDateEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<AnnualDateEntity>(savedId);
 		}
 

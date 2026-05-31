@@ -14,12 +14,10 @@ namespace No1.NHibernateNodaTime;
 
 public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 {
-	void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance)
-	{
+	void IConvention<IPropertyInspector, IPropertyInstance>.Apply(IPropertyInstance instance) {
 		var prefix = instance.Name.SnakeCase();
 
-		switch (instance.Type)
-		{
+		switch (instance.Type) {
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Instant) || instance.Type == typeof(Instant?):
 				instance.CustomType<InstantCompositeUserType>(prefix);
 				break;

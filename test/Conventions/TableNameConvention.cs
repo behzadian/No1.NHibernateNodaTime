@@ -7,8 +7,7 @@ namespace No1.NHibernateNodaTimeTests.Conventions;
 
 public class TableNameConvention : IClassConvention
 {
-	public void Apply(IClassInstance instance)
-	{
+	public void Apply(IClassInstance instance) {
 		string entityName = instance.EntityType.Name[..^"Entity".Length];
 		string entityPlural = entityName.Pluralize();
 		string tableName = entityPlural.SnakeCase();

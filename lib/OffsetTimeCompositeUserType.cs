@@ -31,8 +31,7 @@ public sealed class OffsetTimeCompositeUserType : ICompositeUserType
 		OffsetUserType.NHType
 	];
 
-	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
-	{
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var timeNames = names[..1];
 		var offsetNames = names[1..];
 
@@ -45,66 +44,51 @@ public sealed class OffsetTimeCompositeUserType : ICompositeUserType
 		return new OffsetTime(time.Value, offset.Value);
 	}
 
-	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
-	{
-		if (value is OffsetTime val)
-		{
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
+		if (value is OffsetTime val) {
 			LocalTimeUserType.Instance.NullSafeSet(cmd, val.TimeOfDay, index, session);
 			OffsetUserType.Instance.NullSafeSet(cmd, val.Offset, index + TimeColumnsCount, session);
-		}
-		else
-		{
+		} else {
 			LocalTimeUserType.Instance.NullSafeSet(cmd, null, index, session);
 			OffsetUserType.Instance.NullSafeSet(cmd, null, index + TimeColumnsCount, session);
 		}
 	}
 
-	object? ICompositeUserType.GetPropertyValue(object component, int property)
-	{
-		if (component is OffsetTime val)
-		{
+	object? ICompositeUserType.GetPropertyValue(object component, int property) {
+		if (component is OffsetTime val) {
 			return property < TimeColumnsCount ? val.TimeOfDay : val.Offset;
-		}
-		else
-		{
+		} else {
 			throw new UnexpectedTypeException<OffsetTime>(component);
 		}
 	}
 
-	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
-	{
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value) {
 		throw new InvalidOperationException("immutable");
 	}
 
-	object ICompositeUserType.DeepCopy(object value)
-	{
+	object ICompositeUserType.DeepCopy(object value) {
 		return value;
 	}
 
-	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
-	{
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session) {
 		return value;
 	}
 
-	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner) {
 		return cached;
 	}
 
-	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner) {
 		return original;
 	}
 
-	bool ICompositeUserType.Equals(object? x, object? y)
-	{
+	bool ICompositeUserType.Equals(object? x, object? y) {
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((OffsetTime)x).Equals((OffsetTime)y);
 	}
 
-	int ICompositeUserType.GetHashCode(object? x)
-	{
+	int ICompositeUserType.GetHashCode(object? x) {
 		return x?.GetHashCode() ?? 0;
 	}
 }

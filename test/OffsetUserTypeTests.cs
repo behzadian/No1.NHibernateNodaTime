@@ -16,8 +16,7 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistIn1Column()
-	{
+	public async Task ShouldPersistIn1Column() {
 		// Arrange
 		var val = Offset.FromHours(1);
 		var entity = new OffsetEntity() { Valauable = val };
@@ -25,15 +24,13 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valauable, ID
 				FROM ""offsets""
@@ -52,8 +49,7 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 
 		// Act - Retrieve via NHibernate
 		OffsetEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<OffsetEntity>(savedId);
 		}
 
@@ -63,23 +59,20 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanoseconds()
-	{
+	public async Task ShouldPreserveNanoseconds() {
 		var val = Offset.FromNanoseconds(123456789);
 		var entity = new OffsetEntity() { Valauable = val };
 
 		// Act
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		OffsetEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<OffsetEntity>(savedId);
 		}
 
@@ -89,23 +82,20 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var entity = new OffsetEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable, Id
 				FROM ""offsets""
@@ -120,8 +110,7 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 	}
 
 	[Fact]
-	public async Task ShouldHandleMin()
-	{
+	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = Offset.MinValue;
 		var minEntity = new OffsetEntity() { Nullable = min };
@@ -129,16 +118,14 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		// Act
 		int minId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			minId = (int)await session.SaveAsync(minEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		OffsetEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMin = await session.GetAsync<OffsetEntity>(minId);
 		}
 
@@ -146,8 +133,7 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 	}
 
 	[Fact]
-	public async Task ShouldHandleMax()
-	{
+	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = Offset.MaxValue;
 		var maxEntity = new OffsetEntity() { Nullable = max };
@@ -155,16 +141,14 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		// Act
 		int maxId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			maxId = (int)await session.SaveAsync(maxEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		OffsetEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMax = await session.GetAsync<OffsetEntity>(maxId);
 		}
 
