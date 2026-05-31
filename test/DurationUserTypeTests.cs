@@ -15,8 +15,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistDuratrionIn2Columns()
-	{
+	public async Task ShouldPersistDuratrionIn2Columns() {
 		// Arrange
 		var duration1 = Duration.FromHours(1.5);
 		var duration2 = Duration.FromTicks(360000001);
@@ -25,15 +24,13 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
 				FROM ""durations""
@@ -52,8 +49,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 
 		// Act - Retrieve via NHibernate
 		DurationEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<DurationEntity>(savedId);
 		}
 
@@ -64,8 +60,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var duration = Duration.FromMinutes(67);
 		var entity = new DurationEntity() { Name = "Test", Valauable = duration, Nullable = null };
@@ -73,15 +68,13 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
 				FROM ""durations""
@@ -99,8 +92,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	}
 
 	[Fact]
-	public async Task ShouldHandleMin()
-	{
+	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = Duration.MinValue;
 		var minEntity = new DurationEntity() { Name = "Min", Nullable = min };
@@ -108,16 +100,14 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		// Act
 		int minId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			minId = (int)await session.SaveAsync(minEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		DurationEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMin = await session.GetAsync<DurationEntity>(minId);
 		}
 
@@ -125,8 +115,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	}
 
 	[Fact]
-	public async Task ShouldHandleMax()
-	{
+	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = Duration.MaxValue;
 		var maxEntity = new DurationEntity() { Name = "Max", Nullable = max };
@@ -134,16 +123,14 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		// Act
 		int maxId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			maxId = (int)await session.SaveAsync(maxEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		DurationEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMax = await session.GetAsync<DurationEntity>(maxId);
 		}
 

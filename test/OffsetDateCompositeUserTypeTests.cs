@@ -16,8 +16,7 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistOffsetDateInMultiColumns()
-	{
+	public async Task ShouldPersistOffsetDateInMultiColumns() {
 		// Arrange
 		var val = new OffsetDate(new LocalDate(1405, 1, 25, CalendarSystem.PersianSimple), Offset.FromNanoseconds(123_456_789L));
 		var entity = new OffsetDateEntity() { Valauable = val };
@@ -25,15 +24,13 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day, Valauable_Gregorian, Valauable_Offset_Nanos
 				FROM ""offset_dates""
@@ -64,8 +61,7 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 
 		// Act - Retrieve via NHibernate
 		OffsetDateEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<OffsetDateEntity>(savedId);
 		}
 
@@ -75,23 +71,20 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var entity = new OffsetDateEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
 				FROM ""offset_dates""
@@ -101,16 +94,14 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			for (int i = 0; i < result.Length; i++)
-			{
+			for (int i = 0; i < result.Length; i++) {
 				result[i].Should().BeNull();
 			}
 		}
 	}
 
 	[Fact]
-	public async Task ShouldHandleMin()
-	{
+	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = new OffsetDate(LocalDate.MinIsoValue, Offset.MinValue);
 		var minEntity = new OffsetDateEntity() { Nullable = min };
@@ -118,16 +109,14 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Act
 		int minId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			minId = (int)await session.SaveAsync(minEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		OffsetDateEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMin = await session.GetAsync<OffsetDateEntity>(minId);
 		}
 
@@ -135,8 +124,7 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	}
 
 	[Fact]
-	public async Task ShouldHandleMax()
-	{
+	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = new OffsetDate(LocalDate.MaxIsoValue, Offset.MaxValue);
 		var maxEntity = new OffsetDateEntity() { Nullable = max };
@@ -144,16 +132,14 @@ public class OffsetDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Act
 		int maxId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			maxId = (int)await session.SaveAsync(maxEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		OffsetDateEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMax = await session.GetAsync<OffsetDateEntity>(maxId);
 		}
 

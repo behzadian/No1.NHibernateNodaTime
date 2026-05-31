@@ -9,10 +9,8 @@ using System.Reflection;
 
 public static class ReflectionUtility
 {
-	public static Expression<Func<T, object>> GetPropertExpression<T>(string propertyName)
-	{
-		if (string.IsNullOrEmpty(propertyName))
-		{
+	public static Expression<Func<T, object>> GetPropertExpression<T>(string propertyName) {
+		if (string.IsNullOrEmpty(propertyName)) {
 			throw new ArgumentException("propertyName must be provided", nameof(propertyName));
 		}
 

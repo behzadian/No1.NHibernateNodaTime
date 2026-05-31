@@ -25,52 +25,40 @@ public class Overrides :
 {
 	private readonly Func<string, string> columnNameBuilder = SnakeCaseConventionsConvertor.SnakeCase;
 
-	void IAutoMappingOverride<AnnualDateEntity>.Override(AutoMapping<AnnualDateEntity> mapping)
-	{
+	void IAutoMappingOverride<AnnualDateEntity>.Override(AutoMapping<AnnualDateEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping)
-	{
+	void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping)
-	{
+	void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping)
-	{
+	void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<LocalDateTimeEntity>.Override(AutoMapping<LocalDateTimeEntity> mapping)
-	{
+	void IAutoMappingOverride<LocalDateTimeEntity>.Override(AutoMapping<LocalDateTimeEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<LocalTimeEntity>.Override(AutoMapping<LocalTimeEntity> mapping)
-	{
+	void IAutoMappingOverride<LocalTimeEntity>.Override(AutoMapping<LocalTimeEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<OffsetDateEntity>.Override(AutoMapping<OffsetDateEntity> mapping)
-	{
+	void IAutoMappingOverride<OffsetDateEntity>.Override(AutoMapping<OffsetDateEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<OffsetDateTimeEntity>.Override(AutoMapping<OffsetDateTimeEntity> mapping)
-	{
+	void IAutoMappingOverride<OffsetDateTimeEntity>.Override(AutoMapping<OffsetDateTimeEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<OffsetEntity>.Override(AutoMapping<OffsetEntity> mapping)
-	{
+	void IAutoMappingOverride<OffsetEntity>.Override(AutoMapping<OffsetEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<OffsetTimeEntity>.Override(AutoMapping<OffsetTimeEntity> mapping)
-	{
+	void IAutoMappingOverride<OffsetTimeEntity>.Override(AutoMapping<OffsetTimeEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<YearMonthEntity>.Override(AutoMapping<YearMonthEntity> mapping)
-	{
+	void IAutoMappingOverride<YearMonthEntity>.Override(AutoMapping<YearMonthEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<ZonedDateTimeEntity>.Override(AutoMapping<ZonedDateTimeEntity> mapping)
-	{
+	void IAutoMappingOverride<ZonedDateTimeEntity>.Override(AutoMapping<ZonedDateTimeEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
 }

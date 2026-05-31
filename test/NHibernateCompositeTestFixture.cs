@@ -21,11 +21,9 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 	public ISessionFactory SessionFactory => _sessionFactory
 		?? throw new InvalidOperationException("SessionFactory not initialized. Ensure InitializeAsync was called.");
 
-	public async Task InitializeAsync()
-	{
+	public async Task InitializeAsync() {
 		// Create and start PostgreSQL container
-		try
-		{
+		try {
 			_container = new PostgreSqlBuilder()
 				.WithImage("postgres:16-alpine")
 				.WithDatabase("testdb")
@@ -36,9 +34,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 
 			await _container.StartAsync();
 			Console.WriteLine($"Starting PG on port: {_container.GetMappedPublicPort(5432)}");
-		}
-		catch (Exception ex)
-		{
+		} catch (Exception ex) {
 			throw new InvalidOperationException(
 				"Failed to start PostgreSQL test container. " +
 				"Ensure Docker is running and accessible. " +
@@ -68,8 +64,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 				 )
 			//.ExportTo("hbms")
 			)
-			.ExposeConfiguration(cfg =>
-			{
+			.ExposeConfiguration(cfg => {
 				cfg.Properties[NHibernate.Cfg.Environment.PropertyUseReflectionOptimizer] = "false";
 
 				// Create schema
@@ -84,12 +79,10 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 		_sessionFactory = nhibernateConfig.BuildSessionFactory();
 	}
 
-	public async Task DisposeAsync()
-	{
+	public async Task DisposeAsync() {
 		_sessionFactory?.Dispose();
 
-		if (_container != null)
-		{
+		if (_container != null) {
 			await _container.DisposeAsync();
 		}
 	}

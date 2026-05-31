@@ -7,8 +7,7 @@ namespace No1.NHibernateNodaTimeTests.Conventions;
 [UsedImplicitly]
 public class SnakeCaseIdConvention : IIdConvention
 {
-	public void Apply(IIdentityInstance instance)
-	{
+	public void Apply(IIdentityInstance instance) {
 		instance.Column("id"); // or instance.Property.Name.Underscore()
 	}
 }

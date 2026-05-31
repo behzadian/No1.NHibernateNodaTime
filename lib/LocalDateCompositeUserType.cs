@@ -35,8 +35,7 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 		NHibernateUtil.Date,		// Date
 	];
 
-	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
-	{
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
 		if (dr[names[counter++]] is not string calendarId)
@@ -59,10 +58,8 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 		return new LocalDate(era, year, month, day, calendar);
 	}
 
-	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session)
-	{
-		if (value is LocalDate ld)
-		{
+	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
+		if (value is LocalDate ld) {
 			var counter = index;
 			NHibernateUtil.String.NullSafeSet(cmd, ld.Calendar.Id, counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, EraID(ld.Era), counter++, session);
@@ -70,9 +67,7 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 			NHibernateUtil.Int16.NullSafeSet(cmd, ld.Month, counter++, session);
 			NHibernateUtil.Int16.NullSafeSet(cmd, ld.Day, counter++, session);
 			NHibernateUtil.Date.NullSafeSet(cmd, TryOrDefault(ld.ToDateTimeUnspecified), counter++, session);
-		}
-		else
-		{
+		} else {
 			var counter = index;
 			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
 			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
@@ -83,12 +78,9 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 		}
 	}
 
-	object? ICompositeUserType.GetPropertyValue(object component, int property)
-	{
-		if (component is LocalDate ld)
-		{
-			return property switch
-			{
+	object? ICompositeUserType.GetPropertyValue(object component, int property) {
+		if (component is LocalDate ld) {
+			return property switch {
 				0 => ld.Calendar.Name,
 				1 => EraID(ld.Era),
 				2 => ld.YearOfEra,
@@ -97,47 +89,38 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 				5 => TryOrDefault(ld.ToDateTimeUnspecified),
 				_ => throw new ArgumentOutOfRangeException(nameof(property))
 			};
-		}
-		else
-		{
+		} else {
 			throw new UnexpectedTypeException<LocalDate>(component);
 		}
 	}
 
-	void ICompositeUserType.SetPropertyValue(object component, int property, object value)
-	{
+	void ICompositeUserType.SetPropertyValue(object component, int property, object value) {
 		throw new InvalidOperationException("immutable");
 	}
 
-	object ICompositeUserType.DeepCopy(object value)
-	{
+	object ICompositeUserType.DeepCopy(object value) {
 		return value;
 	}
 
-	object ICompositeUserType.Disassemble(object value, ISessionImplementor session)
-	{
+	object ICompositeUserType.Disassemble(object value, ISessionImplementor session) {
 		return value;
 	}
 
-	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Assemble(object cached, ISessionImplementor session, object owner) {
 		return cached;
 	}
 
-	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner)
-	{
+	object ICompositeUserType.Replace(object original, object target, ISessionImplementor session, object owner) {
 		return original;
 	}
 
-	bool ICompositeUserType.Equals(object? x, object? y)
-	{
+	bool ICompositeUserType.Equals(object? x, object? y) {
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((LocalDate)x).Equals((LocalDate)y);
 	}
 
-	int ICompositeUserType.GetHashCode(object? x)
-	{
+	int ICompositeUserType.GetHashCode(object? x) {
 		return x?.GetHashCode() ?? 0;
 	}
 }

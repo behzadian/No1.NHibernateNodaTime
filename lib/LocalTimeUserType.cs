@@ -27,20 +27,17 @@ public sealed class LocalTimeUserType : IUserType
 
 	bool IUserType.IsMutable => false;
 
-	bool IUserType.Equals(object x, object y)
-	{
+	bool IUserType.Equals(object x, object y) {
 		if (ReferenceEquals(x, y)) return true;
 		if (x == null || y == null) return false;
 		return ((LocalTime)x).Equals((LocalTime)y);
 	}
 
-	int IUserType.GetHashCode(object x)
-	{
+	int IUserType.GetHashCode(object x) {
 		return x?.GetHashCode() ?? 0;
 	}
 
-	object? IUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner)
-	{
+	object? IUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
 		if (dr[names[counter++]] is not long nanos)
@@ -49,37 +46,29 @@ public sealed class LocalTimeUserType : IUserType
 		return LocalTime.FromNanosecondsSinceMidnight(nanos);
 	}
 
-	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session)
-	{
-		if (value is LocalTime lt)
-		{
+	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session) {
+		if (value is LocalTime lt) {
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, lt.NanosecondOfDay, counter++, session);
-		}
-		else
-		{
+		} else {
 			var counter = index;
 			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
-	object IUserType.DeepCopy(object value)
-	{
+	object IUserType.DeepCopy(object value) {
 		return value;
 	}
 
-	object IUserType.Replace(object original, object target, object owner)
-	{
+	object IUserType.Replace(object original, object target, object owner) {
 		throw new NotImplementedException();
 	}
 
-	object IUserType.Assemble(object cached, object owner)
-	{
+	object IUserType.Assemble(object cached, object owner) {
 		throw new NotImplementedException();
 	}
 
-	object IUserType.Disassemble(object value)
-	{
+	object IUserType.Disassemble(object value) {
 		throw new NotImplementedException();
 	}
 }

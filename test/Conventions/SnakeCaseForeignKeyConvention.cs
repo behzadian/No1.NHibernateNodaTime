@@ -8,8 +8,7 @@ namespace No1.NHibernateNodaTimeTests.Conventions;
 [UsedImplicitly]
 public class SnakeCaseForeignKeyConvention : IReferenceConvention
 {
-	public void Apply(IManyToOneInstance instance)
-	{
+	public void Apply(IManyToOneInstance instance) {
 		instance.Column(instance.Property.Name.SnakeCase() + "_id");
 	}
 }

@@ -15,8 +15,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistZonedDateTimeIn5Columns()
-	{
+	public async Task ShouldPersistZonedDateTimeIn5Columns() {
 		// Arrange
 		var zdt = Instant.FromUtc(2024, 12, 25, 10, 30, 45).InZone(DateTimeZoneProviders.Tzdb["Asia/Tehran"]);
 		var entity = new ZonedDateTimeEntity() { Name = "Test Event", Valauable = zdt };
@@ -24,15 +23,13 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valauable_Seconds, Valauable_Nanoseconds, Valauable_Zone_ID, Valauable_UTC, Valauable_Local
 				FROM ""zoned_date_times""
@@ -60,8 +57,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 
 		// Act - Retrieve via NHibernate
 		ZonedDateTimeEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<ZonedDateTimeEntity>(savedId);
 		}
 
@@ -71,8 +67,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanosecondPrecision()
-	{
+	public async Task ShouldPreserveNanosecondPrecision() {
 		var zdt = Instant
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
 			.PlusNanoseconds(123456789)
@@ -83,15 +78,13 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Act
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		ZonedDateTimeEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<ZonedDateTimeEntity>(savedId);
 		}
 
@@ -102,8 +95,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
 		var entity = new ZonedDateTimeEntity() { Name = "Test", Valauable = now, Nullable = null };
@@ -111,15 +103,13 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable_Seconds, Nullable_Nanoseconds, Nullable_Zone_ID, Nullable_UTC, Nullable_Local
 				FROM ""zoned_date_times""
@@ -129,16 +119,14 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			for (int i = 0; i < result.Length; i++)
-			{
+			for (int i = 0; i < result.Length; i++) {
 				result[i].Should().BeNull();
 			}
 		}
 	}
 
 	[Fact]
-	public async Task ShouldHandleMin()
-	{
+	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = Instant.MinValue.InUtc();
 
@@ -147,16 +135,14 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Act
 		int minId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			minId = (int)await session.SaveAsync(minEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		ZonedDateTimeEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMin = await session.GetAsync<ZonedDateTimeEntity>(minId);
 		}
 
@@ -164,8 +150,7 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 	}
 
 	[Fact]
-	public async Task ShouldHandleMax()
-	{
+	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = Instant.MaxValue.InUtc();
 
@@ -174,16 +159,14 @@ public class ZonedDateTimeCompositeUserTypeTests(NHibernateCompositeTestFixture 
 		// Act
 		int maxId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			maxId = (int)await session.SaveAsync(maxEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		ZonedDateTimeEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMax = await session.GetAsync<ZonedDateTimeEntity>(maxId);
 		}
 

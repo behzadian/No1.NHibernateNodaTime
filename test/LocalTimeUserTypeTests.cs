@@ -16,8 +16,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistLocalTimeTimeIn1Column()
-	{
+	public async Task ShouldPersistLocalTimeTimeIn1Column() {
 		// Arrange
 		var val = new LocalTime(17, 16, 15, 14);
 		var entity = new LocalTimeEntity() { Name = "Test Event", Valauable = val };
@@ -25,15 +24,13 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Act - Save
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Act - Verify in database (check columns were created)
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valauable, id
 				FROM ""local_times""
@@ -52,8 +49,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 
 		// Act - Retrieve via NHibernate
 		LocalTimeEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
 		}
 
@@ -63,23 +59,20 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanoseconds()
-	{
+	public async Task ShouldPreserveNanoseconds() {
 		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
 		var entity = new LocalTimeEntity() { Name = "Precision Test", Valauable = val };
 
 		// Act
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		LocalTimeEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
 		}
 
@@ -89,8 +82,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable()
-	{
+	public async Task ShouldHandleNullable() {
 		// Arrange
 		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
 		var entity = new LocalTimeEntity() { Name = "Test", Nullable = null };
@@ -98,15 +90,13 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Act - Save without ModifiedAt
 		int savedId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			savedId = (int)await session.SaveAsync(entity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert - Both columns should be NULL
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable, Id
 				FROM ""local_times""
@@ -121,8 +111,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	}
 
 	[Fact]
-	public async Task ShouldHandleMin()
-	{
+	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = LocalTime.MinValue;
 		var minEntity = new LocalTimeEntity() { Name = "Min", Nullable = min };
@@ -130,16 +119,14 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Act
 		int minId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			minId = (int)await session.SaveAsync(minEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		LocalTimeEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMin = await session.GetAsync<LocalTimeEntity>(minId);
 		}
 
@@ -147,8 +134,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	}
 
 	[Fact]
-	public async Task ShouldHandleMax()
-	{
+	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = LocalTime.MaxValue;
 		var maxEntity = new LocalTimeEntity() { Name = "Max", Nullable = max };
@@ -156,16 +142,14 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Act
 		int maxId;
 		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction())
-		{
+		using (var transaction = session.BeginTransaction()) {
 			maxId = (int)await session.SaveAsync(maxEntity);
 			await transaction.CommitAsync();
 		}
 
 		// Assert
 		LocalTimeEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession())
-		{
+		using (var session = _sessionFactory.OpenSession()) {
 			retrievedMax = await session.GetAsync<LocalTimeEntity>(maxId);
 		}
 
