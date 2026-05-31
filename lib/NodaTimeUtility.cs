@@ -12,20 +12,15 @@ namespace No1.NHibernateNodaTime;
 
 public static partial class NodaTimeUtility
 {
-	public static int OnlyNanoseconds(this Instant instant)
-	{
+	public static int OnlyNanoseconds(this Instant instant) {
 		return instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds;
 	}
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-	internal static T? TryOrDefault<T>(Func<T> func)
-	{
-		try
-		{
+	internal static T? TryOrDefault<T>(Func<T> func) {
+		try {
 			return func();
-		}
-		catch (Exception)
-		{
+		} catch (Exception) {
 			return default;
 		}
 	}
@@ -41,23 +36,20 @@ public static partial class NodaTimeUtility
 		{ Era.Common.Name, Era.Common},
 	};
 
-	internal static Era EraByID(string eraId)
-	{
+	internal static Era EraByID(string eraId) {
 		return Eras[eraId] ?? throw new UnsupportedValueException(eraId);
 	}
 
-	internal static string EraID(Era era)
-	{
+	internal static string EraID(Era era) {
 		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new UnsupportedValueException(era);
 	}
 
-	public static bool IsUsable(this string? text)
-	{
+	public static bool IsUsable(this string? text) {
 		return !string.IsNullOrEmpty(text);
 	}
 
-	public static string SnakeCase(this string name)
-	{
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's safe to suppress a warning when you're not making security decisions based on the result of the normalization (for example, when you're displaying the result in the UI).")]
+	public static string SnakeCase(this string name) {
 		return WordPattern().Replace(name, "$1_$2").ToLowerInvariant();
 	}
 
@@ -65,22 +57,18 @@ public static partial class NodaTimeUtility
 	private static partial Regex WordPattern();
 
 	public static bool Is<T>(this Type type)
-		where T : struct
-	{
+		where T : struct {
 		if (type == typeof(T))
 			return true;
 
 		return type == typeof(T?);
 	}
 
-	public static void OverrideEntity<TEntity>(AutoMapping<TEntity> mapping, Func<string, string>? columnNameBuilder = null)
-	{
+	public static void OverrideEntity<TEntity>(AutoMapping<TEntity> mapping, Func<string, string>? columnNameBuilder = null) {
 		ArgumentNullException.ThrowIfNull(mapping);
 
-		foreach (var property in typeof(TEntity).GetProperties())
-		{
-			switch (property)
-			{
+		foreach (var property in typeof(TEntity).GetProperties()) {
+			switch (property) {
 				case PropertyInfo when property.PropertyType.Is<AnnualDate>():
 					MapAnnualDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;

@@ -1,9 +1,15 @@
 # Remove the line below if you want to inherit .editorconfig settings from higher directories
+# version: 260516
 root = true
 
 # C# files
 [*.cs]
-dotnet_diagnostic.CA1308.severity = none
+csharp_place_constructor_initializer_on_same_line = true
+dotnet_diagnostic.SA1009.severity = none
+dotnet_diagnostic.SA1111.severity = none
+dotnet_diagnostic.S6964.severity = none
+dotnet_diagnostic.SA1128.severity = none
+
 
 #### Core EditorConfig Options ####
 
@@ -161,13 +167,24 @@ csharp_style_allow_embedded_statements_on_same_line_experimental = true
 #### C# Formatting Rules ####
 
 # New line preferences
-csharp_new_line_before_catch = true
-csharp_new_line_before_else = true
-csharp_new_line_before_finally = true
-csharp_new_line_before_members_in_anonymous_types = true
-csharp_new_line_before_members_in_object_initializers = true
-csharp_new_line_before_open_brace = all
-csharp_new_line_between_query_expression_clauses = true
+csharp_new_line_before_catch = false
+csharp_new_line_before_else = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_anonymous_types = false
+csharp_new_line_before_members_in_object_initializers = false
+csharp_new_line_between_query_expression_clauses = false
+csharp_new_line_before_open_brace_types = true
+csharp_new_line_before_open_brace_methods = false
+csharp_new_line_before_open_brace_properties = false
+csharp_new_line_before_open_brace_accessors = false
+csharp_new_line_before_open_brace_anonymous_methods = false
+csharp_new_line_before_open_brace_control_blocks = false
+csharp_new_line_before_open_brace_anonymous_types = false
+csharp_new_line_before_open_brace_object_collection_array_initializers = false
+csharp_new_line_before_open_brace_lambda_expression = false
+csharp_new_line_before_open_brace_local_function = false
+csharp_new_line_before_open_brace = types
+csharp_new_line_before_base_constructor = false
 
 # Indentation preferences
 csharp_indent_block_contents = true
@@ -246,3 +263,7 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+
+
+resharper_place_constructor_initializer_on_same_line = true

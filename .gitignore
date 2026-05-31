@@ -1,8 +1,9 @@
+# version: 260516
 .*/
-!.gitignore
-!.gitattributes
-!.editorconfig
+.env
+\!*/
+bin/
+obj/
 !.github/
 !.husky/
-bin
-obj
+*.lscache
