@@ -1,5 +1,9 @@
-# version: 260516
+# Global Git Ignore
+# Version 260604.1109
+# Version 260604.1049
+
 .*/
+.*
 .env
 \!*/
 bin/
@@ -7,3 +11,4 @@ obj/
 !.github/
 !.husky/
 *.lscache
+*.DotSettings.user
