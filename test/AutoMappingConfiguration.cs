@@ -1,6 +1,5 @@
 using FluentNHibernate;
 using FluentNHibernate.Automapping;
-using NHibernate.Criterion;
 using NodaTime;
 
 namespace No1.NHibernateNodaTimeTests;

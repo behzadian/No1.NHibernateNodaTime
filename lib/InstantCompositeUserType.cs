@@ -1,50 +1,51 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
-using NHibernate.Mapping;
 using NHibernate.Type;
 using NHibernate.UserTypes;
 using NodaTime;
 using System.Data.Common;
-using System.Diagnostics.Metrics;
 using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
 /// <summary>
 /// Composite UserType that stores NodaTime Instant as two separate columns:
-/// - Seconds since Unix epoch (long)
-/// - Nanoseconds component (int)
+/// - Seconds since Unix epoch (long).
+/// - Nanoseconds component (int).
 /// </summary>
 public sealed class InstantCompositeUserType : ICompositeUserType
 {
+	internal static readonly string[] Columns = ["Seconds", "Nanoseconds", "Timestamp",];
+
 	Type ICompositeUserType.ReturnedClass => typeof(Instant?);
 
 	bool ICompositeUserType.IsMutable => false;
-
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "Timestamp",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,			// Seconds
-        NHibernateUtil.Int32,			// Nanoseconds
-		NHibernateUtil.DateTimeNoMs,	// Timestamp
-    ];
+		NHibernateUtil.Int64,
+		NHibernateUtil.Int32,
+		NHibernateUtil.DateTimeNoMs,
+	];
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var index = 0;
 
-		if (dr[names[index++]] is not long secs)
+		if (dr[names[index++]] is not long secs) {
 			return null;
+		}
 
-		if (dr[names[index++]] is not int nanos)
+		if (dr[names[index++]] is not int nanos) {
 			return null;
+		}
 
 		return Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is Instant instant) {
 			var counter = index;
@@ -65,7 +66,7 @@ public sealed class InstantCompositeUserType : ICompositeUserType
 				0 => val.ToUnixTimeSecondsAndNanoseconds().seconds,
 				1 => val.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
 				2 => TryOrDefault(val.ToDateTimeUtc),
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
+				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
 			throw new UnexpectedTypeException<Instant>(component);
@@ -94,8 +95,14 @@ public sealed class InstantCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((Instant)x).Equals((Instant)y);
 	}
 

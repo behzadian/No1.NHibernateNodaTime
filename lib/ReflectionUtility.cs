@@ -1,15 +1,11 @@
-﻿namespace No1.NHibernateNodaTime;
+namespace No1.NHibernateNodaTime;
 
-using FluentNHibernate.Automapping;
-using FluentNHibernate.Mapping;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
-public static class ReflectionUtility
+internal static class ReflectionUtility
 {
-	public static Expression<Func<T, object>> GetPropertExpression<T>(string propertyName) {
+	internal static Expression<Func<T, object>> GetPropertExpression<T>(string propertyName) {
 		if (string.IsNullOrEmpty(propertyName)) {
 			throw new ArgumentException("propertyName must be provided", nameof(propertyName));
 		}

@@ -1,44 +1,44 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class AnnualDateCompositeUserType : ICompositeUserType
 {
+	internal static readonly string[] Columns = ["Month", "Day",];
+
 	Type ICompositeUserType.ReturnedClass => typeof(AnnualDate?);
 
 	bool ICompositeUserType.IsMutable => false;
-
-	internal static string[] Columns => ["Month", "Day",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int16,		// Month
-		NHibernateUtil.Int16,		// Day
+		NHibernateUtil.Int16,
+		NHibernateUtil.Int16,
 	];
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
-		if (dr[names[counter++]] is not short month)
+		if (dr[names[counter++]] is not short month) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not short day)
+		if (dr[names[counter++]] is not short day) {
 			return null;
+		}
 
 		return new AnnualDate(month, day);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is AnnualDate ad) {
 			var counter = index;
@@ -56,7 +56,7 @@ public sealed class AnnualDateCompositeUserType : ICompositeUserType
 			return property switch {
 				0 => val.Month,
 				1 => val.Day,
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
+				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
 			throw new UnexpectedTypeException<AnnualDate>(component);
@@ -84,8 +84,14 @@ public sealed class AnnualDateCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((AnnualDate)x).Equals((AnnualDate)y);
 	}
 

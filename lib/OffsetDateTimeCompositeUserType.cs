@@ -1,29 +1,22 @@
-using FluentNHibernate.Mapping;
-using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
-using static No1.NHibernateNodaTime.NodaTimeUtility;
-
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 {
+	internal static readonly string[] Columns = [.. LocalDateTimeCompositeUserType.Columns, .. OffsetUserType.Columns];
+
+	private static readonly int DateTimeColumnsCount = LocalDateTimeCompositeUserType.Columns.Length;
+
 	Type ICompositeUserType.ReturnedClass => typeof(OffsetDateTime?);
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns = [.. LocalDateTimeCompositeUserType.Columns, .. OffsetUserType.Columns];
-	internal static int DateTimeColumnsCount => LocalDateTimeCompositeUserType.Columns.Length;
-
 	string[] ICompositeUserType.PropertyNames => Columns;
-
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
@@ -40,7 +33,9 @@ public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 
 		var offset = (Offset?)OffsetUserType.Instance.NullSafeGet(dr, timeName, session, owner);
 
-		if (date is null || offset is null) return null;
+		if (date is null || offset is null) {
+			return null;
+		}
 
 		return new OffsetDateTime(date.Value, offset.Value);
 	}
@@ -84,8 +79,14 @@ public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((OffsetDateTime)x).Equals((OffsetDateTime)y);
 	}
 

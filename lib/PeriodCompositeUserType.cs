@@ -1,52 +1,54 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class PeriodCompositeUserType : ICompositeUserType
 {
+	internal static readonly string[] Columns = ["Years", "Months", "Weeks", "Days", "Nanos",];
+
 	Type ICompositeUserType.ReturnedClass => typeof(ZonedDateTime?);
 
 	bool ICompositeUserType.IsMutable => false;
-
-	internal static string[] Columns => ["Years", "Months", "Weeks", "Days", "Nanos",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int16,		// Years
-		NHibernateUtil.Int16,		// Months
-		NHibernateUtil.Int16,		// Weeks
-		NHibernateUtil.Int16,		// Days
-		NHibernateUtil.Int64,		// Nanos
+		NHibernateUtil.Int16,       // Years
+		NHibernateUtil.Int16,       // Months
+		NHibernateUtil.Int16,       // Weeks
+		NHibernateUtil.Int16,       // Days
+		NHibernateUtil.Int64,       // Nanos
 	];
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
-		if (dr[names[counter++]] is not int years)
+		if (dr[names[counter++]] is not int years) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not int months)
+		if (dr[names[counter++]] is not int months) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not int weeks)
+		if (dr[names[counter++]] is not int weeks) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not int days)
+		if (dr[names[counter++]] is not int days) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not long nanos)
+		if (dr[names[counter++]] is not long nanos) {
 			return null;
+		}
 
 		var periodBuilder = new PeriodBuilder() {
 			Years = years,
@@ -59,6 +61,7 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 		return periodBuilder.Build();
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is Period val) {
 			var counter = index;
@@ -85,7 +88,7 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 				2 => period.Weeks,
 				3 => period.Days,
 				4 => period.Nanoseconds,
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
+				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
 			throw new UnexpectedTypeException<Period>(component);
@@ -113,8 +116,14 @@ public sealed class PeriodCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((Period)x).Equals((Period)y);
 	}
 

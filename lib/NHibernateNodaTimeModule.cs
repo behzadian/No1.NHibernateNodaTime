@@ -1,7 +1,6 @@
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Mapping;
-using NodaTime;
 
 namespace No1.NHibernateNodaTime;
 

@@ -1,11 +1,8 @@
-﻿using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping;
 using FluentNHibernate.Automapping.Alterations;
 using No1.FaraBank.Api.Repos.Conventions;
 using No1.NHibernateNodaTime;
 using No1.NHibernateNodaTimeTests.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace No1.NHibernateNodaTimeTests.Overrides;
 

@@ -1,14 +1,7 @@
-﻿using FluentNHibernate.Conventions;
-using FluentNHibernate.Conventions.AcceptanceCriteria;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Inspections;
 using FluentNHibernate.Conventions.Instances;
-using FluentNHibernate.Mapping;
-using NHibernate;
 using NodaTime;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Text;
 
 namespace No1.NHibernateNodaTime;
 
