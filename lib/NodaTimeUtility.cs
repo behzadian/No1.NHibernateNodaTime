@@ -19,46 +19,7 @@ public static partial class NodaTimeUtility
 		{ Era.Common.Name, Era.Common },
 	};
 
-	internal static bool IsUsable(this string? text) {
-		return !string.IsNullOrEmpty(text);
-	}
-
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's safe to suppress a warning when you're not making security decisions based on the result of the normalization (for example, when you're displaying the result in the UI).")]
-	internal static string SnakeCase(this string name) {
-		return WordPattern().Replace(name, "$1_$2").ToLowerInvariant();
-	}
-
-	internal static int OnlyNanoseconds(this Instant instant) {
-		return instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds;
-	}
-
-	internal static bool Is<T>(this Type type)
-		where T : struct {
-		if (type == typeof(T)) {
-			return true;
-		}
-
-		return type == typeof(T?);
-	}
-
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Skip")]
-	internal static T? TryOrDefault<T>(Func<T> func) {
-		try {
-			return func();
-		} catch (Exception) {
-			return default;
-		}
-	}
-
-	internal static Era EraByID(string eraId) {
-		return Eras[eraId] ?? throw new UnsupportedValueException(eraId);
-	}
-
-	internal static string EraID(Era era) {
-		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new UnsupportedValueException(era);
-	}
-
-	internal static void OverrideEntity<TEntity>(AutoMapping<TEntity> mapping, Func<string, string>? columnNameBuilder = null) {
+	public static void OverrideEntity<TEntity>(AutoMapping<TEntity> mapping, Func<string, string>? columnNameBuilder = null) {
 		ArgumentNullException.ThrowIfNull(mapping);
 
 		foreach (var property in typeof(TEntity).GetProperties()) {
@@ -116,6 +77,45 @@ public static partial class NodaTimeUtility
 					break;
 			}
 		}
+	}
+
+	internal static bool IsUsable(this string? text) {
+		return !string.IsNullOrEmpty(text);
+	}
+
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's safe to suppress a warning when you're not making security decisions based on the result of the normalization (for example, when you're displaying the result in the UI).")]
+	internal static string SnakeCase(this string name) {
+		return WordPattern().Replace(name, "$1_$2").ToLowerInvariant();
+	}
+
+	internal static int OnlyNanoseconds(this Instant instant) {
+		return instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds;
+	}
+
+	internal static bool Is<T>(this Type type)
+		where T : struct {
+		if (type == typeof(T)) {
+			return true;
+		}
+
+		return type == typeof(T?);
+	}
+
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Skip")]
+	internal static T? TryOrDefault<T>(Func<T> func) {
+		try {
+			return func();
+		} catch (Exception) {
+			return default;
+		}
+	}
+
+	internal static Era EraByID(string eraId) {
+		return Eras[eraId] ?? throw new UnsupportedValueException(eraId);
+	}
+
+	internal static string EraID(Era era) {
+		return Eras.FirstOrDefault(x => x.Value.Equals(era)).Key ?? throw new UnsupportedValueException(era);
 	}
 
 	[GeneratedRegex(@"([a-z\d])([A-Z])")]
