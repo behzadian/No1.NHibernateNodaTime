@@ -9,31 +9,75 @@
 		<IsPackable>true</IsPackable>
 		<AssemblyName>No1.NHibernateNodaTime</AssemblyName>
 		<RootNamespace>No1.NHibernateNodaTime</RootNamespace>
+		<Title>No1.NHibernateNodaTime</Title>
+		<Description>Mappers for all NodaTime types to be storable with NHibernate</Description>
+		<PackageProjectUrl>https://github.com/behzadian/No1.NHibernateNodaTime</PackageProjectUrl>
 		<PackageId>No1.NHibernateNodaTime</PackageId>
-		<Authors>Hank Ben</Authors>
+		<Authors>Hank Benz</Authors>
 		<Company>No1</Company>
 		<Product>No1.NHibernateNodaTime</Product>
-		<Version>1.2.0.0</Version>
+		<Version>1.2.1</Version>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-	</PropertyGroup>
-	<PropertyGroup>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>git@github.com:behzadian/No1.NHibernateNodaTime.git</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<NoWarn>CS1591,SA1600,SA1200,SA1601,SA1633,SA1500,RCS1194,SA1300</NoWarn>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
-
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FluentNHibernate" Version="3.4.1" />
-		<PackageReference Include="Humanizer" Version="3.0.10" />
-		<PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-		<PackageReference Include="NHibernate" Version="5.6.0" />
-		<PackageReference Include="System.Data.SQLite" Version="2.0.2" />
-		<PackageReference Include="NodaTime" Version="3.2.2" />
+		<!-- Microsoft Code Analysis -->
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<!-- StyleCop Analyzers -->
+		<PackageReference Include="StyleCop.Analyzers">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<!-- Roslynator -->
+		<PackageReference Include="Roslynator.Analyzers">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<!-- SonarAnalyzer -->
+		<PackageReference Include="SonarAnalyzer.CSharp">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
-	<Target Name="InstallHusky" AfterTargets="Restore" Condition="'$(HUSKY)' != '0'">
+
+	<ItemGroup>
+		<PackageReference Include="FluentNHibernate" />
+		<PackageReference Include="Humanizer" />
+		<PackageReference Include="JetBrains.Annotations" />
+		<PackageReference Include="NHibernate" />
+		<PackageReference Include="System.Data.SQLite" />
+		<PackageReference Include="NodaTime" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="test" />
+	</ItemGroup>
+
+	<!-- Git hooks: skip in CI/Docker (no .git / not wanted in images). Local dev: run restore from
+	repo root so dotnet-tools.json is found. -->
+	<Target Name="InstallHusky" AfterTargets="Restore"
+		Condition="'$(HUSKY)' != '0' AND '$(CI)' != 'true'">
 		<Exec Command="dotnet tool restore" StandardOutputImportance="Low" />
 		<Exec Command="dotnet husky install" StandardOutputImportance="Low" />
 	</Target>

@@ -1,63 +1,65 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
-using NodaTime.Calendars;
 using System.Data.Common;
 using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class LocalDateCompositeUserType : ICompositeUserType
 {
 	public static readonly ICompositeUserType Instance = new LocalDateCompositeUserType();
+
+	internal static readonly string[] Columns = ["Calendar", "Era", "Year", "Month", "Day", "Gregorian",];
 
 	Type ICompositeUserType.ReturnedClass => typeof(LocalDate?);
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns => ["Calendar", "Era", "Year", "Month", "Day", "Gregorian",];
-
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.String,		// Calendar
-		NHibernateUtil.String,		// Era
-		NHibernateUtil.Int16,		// Year
-		NHibernateUtil.Int16,		// Month
-		NHibernateUtil.Int16,		// Day
-		NHibernateUtil.Date,		// Date
+		NHibernateUtil.String,      // Calendar
+		NHibernateUtil.String,      // Era
+		NHibernateUtil.Int16,       // Year
+		NHibernateUtil.Int16,       // Month
+		NHibernateUtil.Int16,       // Day
+		NHibernateUtil.Date,        // Date
 	];
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
-		if (dr[names[counter++]] is not string calendarId)
+		if (dr[names[counter++]] is not string calendarId) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not string eraId)
+		if (dr[names[counter++]] is not string eraId) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not short year)
+		if (dr[names[counter++]] is not short year) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not short month)
+		if (dr[names[counter++]] is not short month) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not short day)
+		if (dr[names[counter++]] is not short day) {
 			return null;
+		}
 
 		var calendar = CalendarSystem.ForId(calendarId);
 		var era = EraByID(eraId);
 		return new LocalDate(era, year, month, day, calendar);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is LocalDate ld) {
 			var counter = index;
@@ -87,7 +89,7 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 				3 => ld.Month,
 				4 => ld.Day,
 				5 => TryOrDefault(ld.ToDateTimeUnspecified),
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
+				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
 			throw new UnexpectedTypeException<LocalDate>(component);
@@ -115,8 +117,14 @@ public sealed class LocalDateCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((LocalDate)x).Equals((LocalDate)y);
 	}
 

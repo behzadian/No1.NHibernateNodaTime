@@ -1,4 +1,7 @@
 # Global EditorStyle file
+# Version 260614.0927
+# Version 260610.1214
+# Version 260610.1211
 # Version 260604.1109
 # Version 260604.1049
 
@@ -7,7 +10,11 @@ root = true
 
 [*]
 indent_style = tab
-indent_size = tab
+indent_size = 4
+tab_width = 4
+max_line_length = 200
+charset = utf-8
+end_of_line = lf
 
 # C# files
 [*.cs]
@@ -16,17 +23,11 @@ dotnet_diagnostic.SA1009.severity = none
 dotnet_diagnostic.SA1111.severity = none
 dotnet_diagnostic.S6964.severity = none
 dotnet_diagnostic.SA1128.severity = none
-max_line_length = 200
+dotnet_diagnostic.IDE0005.severity = error
 
 #### Core EditorConfig Options ####
 
-# Indentation and spacing
-indent_size = 4
-indent_style = tab
-tab_width = 4
-
 # New line preferences
-end_of_line = lf
 insert_final_newline = false
 
 #### .NET Code Actions ####

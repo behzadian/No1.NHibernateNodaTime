@@ -1,25 +1,20 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.SqlTypes;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
-using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class LocalTimeUserType : IUserType
 {
 	public static readonly IUserType Instance = new LocalTimeUserType();
 
 	public static readonly IType NHType = NHibernateUtil.Custom(typeof(LocalTimeUserType));
 
-	internal static string[] Columns => ["TimeNanos",];
+	internal static readonly string[] Columns = ["TimeNanos",];
 
 	SqlType[] IUserType.SqlTypes => [NHibernateUtil.Int64.SqlType];
 
@@ -28,8 +23,14 @@ public sealed class LocalTimeUserType : IUserType
 	bool IUserType.IsMutable => false;
 
 	bool IUserType.Equals(object x, object y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((LocalTime)x).Equals((LocalTime)y);
 	}
 
@@ -37,15 +38,18 @@ public sealed class LocalTimeUserType : IUserType
 		return x?.GetHashCode() ?? 0;
 	}
 
-	object? IUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
+	object? IUserType.NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long nanos)
+		if (rs[names[counter++]] is not long nanos) {
 			return null;
+		}
 
 		return LocalTime.FromNanosecondsSinceMidnight(nanos);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session) {
 		if (value is LocalTime lt) {
 			var counter = index;

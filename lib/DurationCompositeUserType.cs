@@ -1,18 +1,12 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
-using NHibernate.SqlTypes;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
-using System.Diagnostics.Metrics;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class DurationCompositeUserType : ICompositeUserType
 {
 	internal static readonly string[] Columns = ["Seconds", "Nanos"];
@@ -50,7 +44,7 @@ public sealed class DurationCompositeUserType : ICompositeUserType
 			return property switch {
 				0 => duration.TotalSeconds,
 				1 => duration.SubsecondNanoseconds,
-				_ => throw new NotImplementedException()
+				_ => throw new NotImplementedException(),
 			};
 		} else {
 			throw new UnexpectedTypeException<Duration>(component);
@@ -58,15 +52,18 @@ public sealed class DurationCompositeUserType : ICompositeUserType
 	}
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
-		if (dr[names[0]] is not long secs)
+		if (dr[names[0]] is not long secs) {
 			return null;
+		}
 
-		if (dr[names[1]] is not int nanos)
+		if (dr[names[1]] is not int nanos) {
 			return null;
+		}
 
 		return Duration.FromSeconds(secs).Plus(Duration.FromNanoseconds(nanos));
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is Duration duration) {
 			var counter = index;

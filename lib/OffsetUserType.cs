@@ -1,26 +1,20 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
-using NHibernate.Mapping;
 using NHibernate.SqlTypes;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
-using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class OffsetUserType : IUserType
 {
-	public static readonly IUserType Instance = new OffsetUserType();
+	internal static readonly IUserType Instance = new OffsetUserType();
 
-	public static readonly IType NHType = NHibernateUtil.Custom(typeof(OffsetUserType));
+	internal static readonly IType NHType = NHibernateUtil.Custom(typeof(OffsetUserType));
 
-	public static readonly string[] Columns = ["OffsetNanos"];
+	internal static readonly string[] Columns = ["OffsetNanos"];
 
 	SqlType[] IUserType.SqlTypes => [NHibernateUtil.Int64.SqlType];
 
@@ -29,8 +23,14 @@ public sealed class OffsetUserType : IUserType
 	bool IUserType.IsMutable => false;
 
 	bool IUserType.Equals(object x, object y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((Offset)x).Equals((Offset)y);
 	}
 
@@ -38,15 +38,18 @@ public sealed class OffsetUserType : IUserType
 		return x?.GetHashCode() ?? 0;
 	}
 
-	object? IUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
+	object? IUserType.NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long nanos)
+		if (rs[names[counter++]] is not long nanos) {
 			return null;
+		}
 
 		return Offset.FromNanoseconds(nanos);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session) {
 		if (value is Offset offset) {
 			var counter = index;

@@ -1,4 +1,4 @@
-﻿using FluentNHibernate.Conventions;
+using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.Instances;
 using Humanizer;
 using No1.FaraBank.Api.Repos.Conventions;

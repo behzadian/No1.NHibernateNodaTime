@@ -1,51 +1,50 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
-using System.Globalization;
 using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class YearMonthCompositeUserType : ICompositeUserType
 {
+	internal static readonly string[] Columns = ["EraID", "CalendarID", "Year", "Month",];
+
 	Type ICompositeUserType.ReturnedClass => typeof(YearMonth?);
 
 	bool ICompositeUserType.IsMutable => false;
-
-	internal static readonly string[] Columns = ["EraID", "CalendarID", "Year", "Month",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.String,		// Era
-		NHibernateUtil.String,		// Calendar
-		NHibernateUtil.Int16,		// Year
-		NHibernateUtil.Int16,		// Month
+		NHibernateUtil.String,      // Era
+		NHibernateUtil.String,      // Calendar
+		NHibernateUtil.Int16,       // Year
+		NHibernateUtil.Int16,       // Month
 	];
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
-
 		var counter = 0;
 
-		if (dr[names[counter++]] is not string eraId)
+		if (dr[names[counter++]] is not string eraId) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not string calId)
+		if (dr[names[counter++]] is not string calId) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not short year)
+		if (dr[names[counter++]] is not short year) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not short month)
+		if (dr[names[counter++]] is not short month) {
 			return null;
+		}
 
 		var era = EraByID(eraId);
 		var calendar = CalendarSystem.ForId(calId);
@@ -53,6 +52,7 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 		return new YearMonth(era, year, month, calendar);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is YearMonth val) {
 			var counter = index;
@@ -76,7 +76,7 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 				1 => val.Calendar.Id,
 				2 => val.YearOfEra,
 				3 => val.Month,
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
+				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
 			throw new UnexpectedTypeException<YearMonth>(component);
@@ -104,8 +104,14 @@ public sealed class YearMonthCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((YearMonth)x).Equals((YearMonth)y);
 	}
 

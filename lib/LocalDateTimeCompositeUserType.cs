@@ -1,30 +1,24 @@
-using FluentNHibernate.Mapping;
-using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
-using NodaTime.Calendars;
 using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 {
 	internal static readonly ICompositeUserType Instance = new LocalDateTimeCompositeUserType();
+
+	internal static readonly string[] Columns = [.. LocalDateCompositeUserType.Columns, .. LocalTimeUserType.Columns];
+
+	private static readonly int DateTimeColumnsCount = LocalDateCompositeUserType.Columns.Length;
 
 	Type ICompositeUserType.ReturnedClass => typeof(LocalDateTime?);
 
 	bool ICompositeUserType.IsMutable => false;
 
-	internal static string[] Columns = [.. LocalDateCompositeUserType.Columns, .. LocalTimeUserType.Columns];
-	internal static int DateTimeColumnsCount => LocalDateCompositeUserType.Columns.Length;
-
 	string[] ICompositeUserType.PropertyNames => Columns;
-
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
@@ -41,7 +35,9 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 
 		var time = (LocalTime?)LocalTimeUserType.Instance.NullSafeGet(dr, timeName, session, owner);
 
-		if (date is null || time is null) return null;
+		if (date is null || time is null) {
+			return null;
+		}
 
 		return date.Value + time.Value;
 	}
@@ -85,8 +81,14 @@ public sealed class LocalDateTimeCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((LocalDateTime)x).Equals((LocalDateTime)y);
 	}
 

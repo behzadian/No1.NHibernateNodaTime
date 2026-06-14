@@ -1,47 +1,48 @@
-using FluentNHibernate.Mapping;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
 using NHibernate.UserTypes;
-using NHibernate.Util;
 using NodaTime;
 using System.Data.Common;
 
 using static No1.NHibernateNodaTime.NodaTimeUtility;
+
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// </summary>
 public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 {
+	internal static readonly string[] Columns = ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
+
 	Type ICompositeUserType.ReturnedClass => typeof(ZonedDateTime?);
 
 	bool ICompositeUserType.IsMutable => false;
-
-	internal static string[] Columns => ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
 
 	string[] ICompositeUserType.PropertyNames => Columns;
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,		// Seconds
-		NHibernateUtil.Int32,		// Nanoseconds
-		NHibernateUtil.String,		// ZoneID
-		NHibernateUtil.DateTimeNoMs,// Utc
-		NHibernateUtil.DateTimeNoMs,// Local
+		NHibernateUtil.Int64,       // Seconds
+		NHibernateUtil.Int32,       // Nanoseconds
+		NHibernateUtil.String,      // ZoneID
+		NHibernateUtil.DateTimeNoMs, // Utc
+		NHibernateUtil.DateTimeNoMs, // Local
 	];
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		var counter = 0;
 
-		if (dr[names[counter++]] is not long secs)
+		if (dr[names[counter++]] is not long secs) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not int nanos)
+		if (dr[names[counter++]] is not int nanos) {
 			return null;
+		}
 
-		if (dr[names[counter++]] is not string zoneId)
+		if (dr[names[counter++]] is not string zoneId) {
 			return null;
+		}
 
 		var zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(zoneId) ?? throw new UnsupportedValueException(zoneId);
 		var instant = Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
@@ -49,6 +50,7 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 		return zdt.WithZone(zone);
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulnes")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
 		if (value is ZonedDateTime zdt) {
 			var counter = index;
@@ -75,7 +77,7 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 				2 => val.Zone.Id,
 				3 => TryOrDefault(val.ToDateTimeUtc),
 				4 => TryOrDefault(val.ToDateTimeUnspecified),
-				_ => throw new ArgumentOutOfRangeException(nameof(property))
+				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
 			throw new UnexpectedTypeException<ZonedDateTime>(component);
@@ -103,8 +105,14 @@ public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
 	}
 
 	bool ICompositeUserType.Equals(object? x, object? y) {
-		if (ReferenceEquals(x, y)) return true;
-		if (x == null || y == null) return false;
+		if (ReferenceEquals(x, y)) {
+			return true;
+		}
+
+		if (x == null || y == null) {
+			return false;
+		}
+
 		return ((ZonedDateTime)x).Equals((ZonedDateTime)y);
 	}
 

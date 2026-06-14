@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using No1.FaraBank.Api.Repos.Conventions;
 
 namespace No1.NHibernateNodaTimeTests.Conventions;
