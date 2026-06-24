@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace No1.NHibernateNodaTime;
 
-[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Assembly, AllowMultiple = false)]
 public sealed partial class StorageMethodAttribute(StorageMethods method = StorageMethods.Simple) : Attribute
 {
 	public StorageMethods Method { get; } = method;
