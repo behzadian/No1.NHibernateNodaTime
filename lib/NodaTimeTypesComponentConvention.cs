@@ -12,7 +12,7 @@ public sealed class NodaTimeTypesComponentConvention : IPropertyConvention
 
 		switch (instance.Type) {
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(Instant) || instance.Type == typeof(Instant?):
-				instance.CustomType<InstantCompositeUserType>(prefix);
+				instance.CustomType<InstantSimpleUserType>(prefix);
 				break;
 
 			case FluentNHibernate.MappingModel.TypeReference when instance.Type == typeof(ZonedDateTime) || instance.Type == typeof(ZonedDateTime?):

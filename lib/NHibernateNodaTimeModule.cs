@@ -16,10 +16,16 @@ public static class NHibernateNodaTimeModule
 		return convention.Add<NodaTimeTypesComponentConvention>();
 	}
 
-	internal static void MapInstantProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null) {
+	internal static void MapInstantSimpleProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null) {
 		ArgumentNullException.ThrowIfNull(propertyPart);
 		ArgumentNullException.ThrowIfNull(propertyName);
-		MapColumns<InstantCompositeUserType>(propertyPart, columnNameBuilder, propertyName, InstantCompositeUserType.Columns);
+		MapColumns<InstantSimpleUserType>(propertyPart, columnNameBuilder, propertyName, InstantSimpleUserType.Columns);
+	}
+
+	internal static void MapInstantPreciseProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null) {
+		ArgumentNullException.ThrowIfNull(propertyPart);
+		ArgumentNullException.ThrowIfNull(propertyName);
+		MapColumns<InstantPreciseUserType>(propertyPart, columnNameBuilder, propertyName, InstantPreciseUserType.Columns);
 	}
 
 	internal static void MapZonedDateTimeProperty(PropertyPart propertyPart, string propertyName, Func<string, string>? columnNameBuilder = null) {

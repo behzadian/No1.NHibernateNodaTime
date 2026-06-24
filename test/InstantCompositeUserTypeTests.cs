@@ -18,7 +18,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldPersistInstantInTwoColumns() {
 		// Arrange
 		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
-		var entity = new InstantEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
+		var entity = new InstantPreciseEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
 
 		// Act - Save
 		int savedId;
@@ -48,9 +48,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Act - Retrieve via NHibernate
-		InstantEntity? retrievedEvent;
+		InstantPreciseEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<InstantEntity>(savedId);
+			retrievedEvent = await session.GetAsync<InstantPreciseEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -65,7 +65,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
 			.PlusNanoseconds(123456789);
 
-		var entity = new InstantEntity() { Name = "Precision Test", Valuable = instant, Nullable = instant };
+		var entity = new InstantPreciseEntity() { Name = "Precision Test", Valuable = instant, Nullable = instant };
 
 		// Act
 		int savedId;
@@ -75,9 +75,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			await transaction.CommitAsync();
 		}
 
-		InstantEntity? retrievedEvent;
+		InstantPreciseEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<InstantEntity>(savedId);
+			retrievedEvent = await session.GetAsync<InstantPreciseEntity>(savedId);
 		}
 
 		// Assert
@@ -90,7 +90,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldHandleNullableInstant() {
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant();
-		var entity = new InstantEntity() { Name = "Test", Valuable = now, Nullable = null };
+		var entity = new InstantPreciseEntity() { Name = "Test", Valuable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -122,7 +122,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
 		var minInstant = Instant.MinValue;
 
-		var minEntity = new InstantEntity() { Name = "Min", Valuable = minInstant, Nullable = minInstant };
+		var minEntity = new InstantPreciseEntity() { Name = "Min", Valuable = minInstant, Nullable = minInstant };
 
 		// Act
 		int minId;
@@ -133,9 +133,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Assert
-		InstantEntity? retrievedMin;
+		InstantPreciseEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<InstantEntity>(minId);
+			retrievedMin = await session.GetAsync<InstantPreciseEntity>(minId);
 		}
 
 		retrievedMin!.Valuable.Should().Be(minInstant);
@@ -147,7 +147,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
 		var maxInstant = Instant.MaxValue;
 
-		var maxEntity = new InstantEntity() { Name = "Max", Valuable = maxInstant, Nullable = maxInstant };
+		var maxEntity = new InstantPreciseEntity() { Name = "Max", Valuable = maxInstant, Nullable = maxInstant };
 
 		// Act
 		int maxId;
@@ -158,9 +158,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Assert
-		InstantEntity? retrievedMax;
+		InstantPreciseEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<InstantEntity>(maxId);
+			retrievedMax = await session.GetAsync<InstantPreciseEntity>(maxId);
 		}
 
 		retrievedMax!.Valuable.Should().Be(maxInstant);

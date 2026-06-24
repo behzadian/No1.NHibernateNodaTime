@@ -13,7 +13,7 @@ namespace No1.NHibernateNodaTime;
 /// - Seconds since Unix epoch (long).
 /// - Nanoseconds component (int).
 /// </summary>
-public sealed class InstantCompositeUserType : ICompositeUserType
+public sealed class InstantPreciseUserType : ICompositeUserType
 {
 	internal static readonly string[] Columns = ["Seconds", "Nanoseconds", "Timestamp",];
 

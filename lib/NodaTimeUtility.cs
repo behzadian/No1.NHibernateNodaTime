@@ -32,8 +32,12 @@ public static partial class NodaTimeUtility
 					MapDurationProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<Instant>():
-					MapInstantProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<Instant>() && StorageMethodAttribute.SimpleStorageEnabled(property):
+					MapInstantSimpleProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<Instant>() && StorageMethodAttribute.PreciseStorageEnabled(property):
+					MapInstantPreciseProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
 				case PropertyInfo when property.PropertyType.Is<LocalDate>():

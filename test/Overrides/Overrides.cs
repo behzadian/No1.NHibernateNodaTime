@@ -9,7 +9,7 @@ namespace No1.NHibernateNodaTimeTests.Overrides;
 public class Overrides :
 	IAutoMappingOverride<AnnualDateEntity>,
 	IAutoMappingOverride<DurationEntity>,
-	IAutoMappingOverride<InstantEntity>,
+	IAutoMappingOverride<InstantPreciseEntity>,
 	IAutoMappingOverride<LocalDateEntity>,
 	IAutoMappingOverride<LocalDateTimeEntity>,
 	IAutoMappingOverride<LocalTimeEntity>,
@@ -28,7 +28,7 @@ public class Overrides :
 	void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping) {
+	void IAutoMappingOverride<InstantPreciseEntity>.Override(AutoMapping<InstantPreciseEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
 	void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping) {
