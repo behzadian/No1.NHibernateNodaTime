@@ -16,7 +16,7 @@
 		<Authors>Hank Benz</Authors>
 		<Company>No1</Company>
 		<Product>No1.NHibernateNodaTime</Product>
-		<Version>1.2.1</Version>
+		<Version>2.0.0</Version>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>git@github.com:behzadian/No1.NHibernateNodaTime.git</RepositoryUrl>
