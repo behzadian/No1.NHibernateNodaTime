@@ -13,7 +13,7 @@ public class InstantCompleteEntity
 
 	[StorageMethod(StorageMethods.Complete)]
 	public virtual Instant Valuable { get; set; }
-	
+
 	[StorageMethod(StorageMethods.Complete)]
 	public virtual Instant? Nullable { get; set; }
 }
