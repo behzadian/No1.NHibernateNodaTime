@@ -8,16 +8,13 @@ using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-/// <summary>
-/// Composite UserType that stores NodaTime Instant as two separate columns:
-/// - Seconds since Unix epoch (long).
-/// - Nanoseconds component (int).
-/// </summary>
-public sealed class InstantPreciseUserType : ICompositeUserType
+public sealed class LocalDateCompactUserType : ICompositeUserType
 {
-	internal static readonly string[] Columns = ["Seconds", "Nanoseconds", "Timestamp",];
+	public static readonly ICompositeUserType Instance = new LocalDateCompactUserType();
 
-	Type ICompositeUserType.ReturnedClass => typeof(Instant?);
+	internal static readonly string[] Columns = ["Calendar", "Gregorian",];
+
+	Type ICompositeUserType.ReturnedClass => typeof(LocalDate?);
 
 	bool ICompositeUserType.IsMutable => false;
 
@@ -25,60 +22,56 @@ public sealed class InstantPreciseUserType : ICompositeUserType
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		NHibernateUtil.Int64,
-		NHibernateUtil.Int32,
-		NHibernateUtil.DateTimeNoMs,
+		NHibernateUtil.String,      // Calendar
+		NHibernateUtil.Date,        // Date
 	];
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
-		var index = 0;
+		var counter = 0;
 
-		if (dr[names[index++]] is not long secs) {
+		if (dr[names[counter++]] is not string calendarId) {
 			return null;
 		}
 
-		if (dr[names[index++]] is not int nanos) {
+		if (dr[names[counter++]] is not DateTime dateTime) {
 			return null;
 		}
 
-		return Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
+		var calendar = CalendarSystem.ForId(calendarId);
+		return new LocalDate(dateTime.Year, dateTime.Month, dateTime.Day, calendar).WithCalendar(calendar);
 	}
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
-		if (value is Instant instant) {
+		if (value is LocalDate ld) {
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().seconds, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, instant.ToUnixTimeSecondsAndNanoseconds().nanoseconds, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, TryOrDefault(instant.ToDateTimeUtc), counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, ld.Calendar.Id, counter++, session);
+			NHibernateUtil.Date.NullSafeSet(cmd, TryOrDefault(ld.ToDateTimeUnspecified), counter++, session);
 		} else {
 			var counter = index;
-			NHibernateUtil.Int64.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.Int32.NullSafeSet(cmd, null, counter++, session);
-			NHibernateUtil.DateTimeNoMs.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.String.NullSafeSet(cmd, null, counter++, session);
+			NHibernateUtil.Date.NullSafeSet(cmd, null, counter++, session);
 		}
 	}
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property) {
-		if (component is Instant val) {
+		if (component is LocalDate ld) {
 			return property switch {
-				0 => val.ToUnixTimeSecondsAndNanoseconds().seconds,
-				1 => val.ToUnixTimeSecondsAndNanoseconds().nanoseconds,
-				2 => TryOrDefault(val.ToDateTimeUtc),
+				0 => ld.Calendar.Name,
+				5 => TryOrDefault(ld.ToDateTimeUnspecified),
 				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
-			throw new UnexpectedTypeException<Instant>(component);
+			throw new UnexpectedTypeException<LocalDate>(component);
 		}
 	}
 
 	void ICompositeUserType.SetPropertyValue(object component, int property, object value) {
-		throw new InvalidOperationException("Instant is immutable");
+		throw new InvalidOperationException("immutable");
 	}
 
 	object ICompositeUserType.DeepCopy(object value) {
-		// Instant is immutable
 		return value;
 	}
 
@@ -103,7 +96,7 @@ public sealed class InstantPreciseUserType : ICompositeUserType
 			return false;
 		}
 
-		return ((Instant)x).Equals((Instant)y);
+		return ((LocalDate)x).Equals((LocalDate)y);
 	}
 
 	int ICompositeUserType.GetHashCode(object? x) {

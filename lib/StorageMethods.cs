@@ -5,10 +5,10 @@ public enum StorageMethods
 	/// <summary>
 	/// .
 	/// </summary>
-	Simple = 0,
+	Compact = 0,
 
 	/// <summary>
 	/// .
 	/// </summary>
-	Precise = 1,
+	Complete = 1,
 }

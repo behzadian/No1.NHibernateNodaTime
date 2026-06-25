@@ -9,7 +9,7 @@ using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-public sealed class ZonedDateTimeCompositeUserType : ICompositeUserType
+public sealed class ZonedDateTimeCompleteUserType : ICompositeUserType
 {
 	internal static readonly string[] Columns = ["Seconds", "Nanoseconds", "ZoneID", "UTC", "Local",];
 

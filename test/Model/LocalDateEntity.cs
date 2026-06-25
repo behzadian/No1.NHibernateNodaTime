@@ -1,3 +1,4 @@
+using No1.NHibernateNodaTime;
 using NodaTime;
 
 namespace No1.NHibernateNodaTimeTests.Model;
@@ -5,6 +6,7 @@ namespace No1.NHibernateNodaTimeTests.Model;
 /// <summary>
 /// Sample entity for testing NodaTime Instant persistence
 /// </summary>
+[StorageMethod(StorageMethods.Complete)]
 public class LocalDateEntity
 {
 	public virtual int Id { get; set; }

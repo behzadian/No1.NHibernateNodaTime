@@ -8,9 +8,9 @@ using static No1.NHibernateNodaTime.NodaTimeUtility;
 
 namespace No1.NHibernateNodaTime;
 
-public sealed class LocalDateCompositeUserType : ICompositeUserType
+public sealed class LocalDateCompleteUserType : ICompositeUserType
 {
-	public static readonly ICompositeUserType Instance = new LocalDateCompositeUserType();
+	public static readonly ICompositeUserType Instance = new LocalDateCompleteUserType();
 
 	internal static readonly string[] Columns = ["Calendar", "Era", "Year", "Month", "Day", "Gregorian",];
 

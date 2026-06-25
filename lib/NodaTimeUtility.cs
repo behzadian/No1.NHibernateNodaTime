@@ -28,36 +28,56 @@ public static partial class NodaTimeUtility
 					MapAnnualDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<Duration>():
-					MapDurationProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<Duration>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapDurationCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<Instant>() && StorageMethodAttribute.SimpleStorageEnabled(property):
-					MapInstantSimpleProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<Duration>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapDurationCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<Instant>() && StorageMethodAttribute.PreciseStorageEnabled(property):
-					MapInstantPreciseProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<Instant>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapInstantCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<LocalDate>():
-					MapLocalDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<Instant>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapInstantCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<LocalDateTime>():
-					MapLocalDateTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<LocalDate>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapLocalDateCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<LocalDate>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapLocalDateCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<LocalDateTime>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapLocalDateTimeCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<LocalDateTime>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapLocalDateTimeCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
 				case PropertyInfo when property.PropertyType.Is<LocalTime>():
 					MapLocalTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<OffsetDate>():
-					MapOffsetDateProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<OffsetDate>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapOffsetDateCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<OffsetDateTime>():
-					MapOffsetDateTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<OffsetDate>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapOffsetDateCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<OffsetDateTime>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapOffsetDateTimeCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<OffsetDateTime>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapOffsetDateTimeCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
 				case PropertyInfo when property.PropertyType.Is<OffsetTime>():
@@ -68,16 +88,24 @@ public static partial class NodaTimeUtility
 					MapOffsetProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType == typeof(Period):
-					MapPeriodProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType == typeof(Period) && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapPeriodCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType == typeof(Period) && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapPeriodCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
 				case PropertyInfo when property.PropertyType.Is<YearMonth>():
 					MapYearMonthProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 
-				case PropertyInfo when property.PropertyType.Is<ZonedDateTime>():
-					MapZonedDateTimeProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+				case PropertyInfo when property.PropertyType.Is<ZonedDateTime>() && StorageMethodAttribute.CompactStorageEnabled(property):
+					MapZonedDateTimeCompactProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
+					break;
+
+				case PropertyInfo when property.PropertyType.Is<ZonedDateTime>() && StorageMethodAttribute.CompleteStorageEnabled(property):
+					MapZonedDateTimeCompleteProperty(mapping.Map(ReflectionUtility.GetPropertExpression<TEntity>(property.Name)), property.Name, columnNameBuilder);
 					break;
 			}
 		}

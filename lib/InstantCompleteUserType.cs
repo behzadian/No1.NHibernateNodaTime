@@ -1,6 +1,5 @@
 using NHibernate;
 using NHibernate.Engine;
-using NHibernate.SqlTypes;
 using NHibernate.Type;
 using NHibernate.UserTypes;
 using NodaTime;
@@ -14,16 +13,37 @@ namespace No1.NHibernateNodaTime;
 /// - Seconds since Unix epoch (long).
 /// - Nanoseconds component (int).
 /// </summary>
-public sealed class InstantSimpleUserType : IUserType
+public sealed class InstantCompleteUserType : ICompositeUserType
 {
-	internal static readonly string[] Columns = ["Timestamp",];
+	internal static readonly string[] Columns = ["Seconds", "Nanoseconds", "Timestamp",];
 
-	SqlType[] IUserType.SqlTypes => [NHibernateUtil.UtcDbTimestamp.SqlType];
+	Type ICompositeUserType.ReturnedClass => typeof(Instant?);
 
-	Type IUserType.ReturnedType => typeof(Instant);
+	bool ICompositeUserType.IsMutable => false;
 
-	bool IUserType.IsMutable => false;
+	string[] ICompositeUserType.PropertyNames => Columns;
 
+	IType[] ICompositeUserType.PropertyTypes =>
+	[
+		NHibernateUtil.Int64,
+		NHibernateUtil.Int32,
+		NHibernateUtil.DateTimeNoMs,
+	];
+
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
+	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
+		var index = 0;
+
+		if (dr[names[index++]] is not long secs) {
+			return null;
+		}
+
+		if (dr[names[index++]] is not int nanos) {
+			return null;
+		}
+
+		return Instant.FromUnixTimeSeconds(secs).PlusNanoseconds(nanos);
+	}
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
@@ -88,37 +108,5 @@ public sealed class InstantSimpleUserType : IUserType
 
 	int ICompositeUserType.GetHashCode(object? x) {
 		return x?.GetHashCode() ?? 0;
-	}
-
-	bool IUserType.Equals(object x, object y) {
-		throw new NotImplementedException();
-	}
-
-	int IUserType.GetHashCode(object x) {
-		throw new NotImplementedException();
-	}
-
-	object IUserType.NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner) {
-		throw new NotImplementedException();
-	}
-
-	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session) {
-		throw new NotImplementedException();
-	}
-
-	object IUserType.DeepCopy(object value) {
-		throw new NotImplementedException();
-	}
-
-	object IUserType.Replace(object original, object target, object owner) {
-		throw new NotImplementedException();
-	}
-
-	object IUserType.Assemble(object cached, object owner) {
-		throw new NotImplementedException();
-	}
-
-	object IUserType.Disassemble(object value) {
-		throw new NotImplementedException();
 	}
 }

@@ -7,7 +7,7 @@ using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
-public sealed class DurationCompositeUserType : ICompositeUserType
+public sealed class DurationCompleteUserType : ICompositeUserType
 {
 	internal static readonly string[] Columns = ["Seconds", "Nanos"];
 

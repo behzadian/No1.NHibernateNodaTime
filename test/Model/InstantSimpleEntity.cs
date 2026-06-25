@@ -6,14 +6,13 @@ namespace No1.NHibernateNodaTimeTests.Model;
 /// <summary>
 /// Sample entity for testing NodaTime Instant persistence
 /// </summary>
-public class InstantSimpleEntity
+public class InstantCompactEntity
 {
 	public virtual int Id { get; set; }
-	public virtual string Name { get; set; } = string.Empty;
 
-	[StorageMethod(StorageMethods.Simple)]
+	[StorageMethod(StorageMethods.Compact)]
 	public virtual Instant Valuable { get; set; }
 
-	[StorageMethod(StorageMethods.Simple)]
+	[StorageMethod(StorageMethods.Compact)]
 	public virtual Instant? Nullable { get; set; }
 }

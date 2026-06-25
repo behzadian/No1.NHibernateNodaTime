@@ -62,7 +62,7 @@ public class NHibernateCompositeTestFixture : IAsyncLifetime
 					.EnableNodaTime()
 					.UseOverridesFromAssemblyOf<NHibernateCompositeTestFixture>()
 				 )
-			//.ExportTo("hbms")
+				.ExportTo("hbms")
 			)
 			.ExposeConfiguration(cfg => {
 				cfg.Properties[NHibernate.Cfg.Environment.PropertyUseReflectionOptimizer] = "false";

@@ -7,11 +7,11 @@ using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
-public sealed class PeriodCompositeUserType : ICompositeUserType
+public sealed class PeriodCompleteUserType : ICompositeUserType
 {
 	internal static readonly string[] Columns = ["Years", "Months", "Weeks", "Days", "Nanos",];
 
-	Type ICompositeUserType.ReturnedClass => typeof(ZonedDateTime?);
+	Type ICompositeUserType.ReturnedClass => typeof(Period);
 
 	bool ICompositeUserType.IsMutable => false;
 

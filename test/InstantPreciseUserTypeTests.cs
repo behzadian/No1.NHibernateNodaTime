@@ -10,7 +10,7 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class InstantCompleteUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
@@ -18,7 +18,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldPersistInstantInTwoColumns() {
 		// Arrange
 		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
-		var entity = new InstantPreciseEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
+		var entity = new InstantCompleteEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
 
 		// Act - Save
 		int savedId;
@@ -32,7 +32,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Valuable_Seconds, Valuable_Nanoseconds 
-				FROM ""instants""
+				FROM ""instant_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -48,9 +48,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Act - Retrieve via NHibernate
-		InstantPreciseEntity? retrievedEvent;
+		InstantCompleteEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<InstantPreciseEntity>(savedId);
+			retrievedEvent = await session.GetAsync<InstantCompleteEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -65,7 +65,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
 			.PlusNanoseconds(123456789);
 
-		var entity = new InstantPreciseEntity() { Name = "Precision Test", Valuable = instant, Nullable = instant };
+		var entity = new InstantCompleteEntity() { Name = "Precision Test", Valuable = instant, Nullable = instant };
 
 		// Act
 		int savedId;
@@ -75,9 +75,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 			await transaction.CommitAsync();
 		}
 
-		InstantPreciseEntity? retrievedEvent;
+		InstantCompleteEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<InstantPreciseEntity>(savedId);
+			retrievedEvent = await session.GetAsync<InstantCompleteEntity>(savedId);
 		}
 
 		// Assert
@@ -90,7 +90,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldHandleNullableInstant() {
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant();
-		var entity = new InstantPreciseEntity() { Name = "Test", Valuable = now, Nullable = null };
+		var entity = new InstantCompleteEntity() { Name = "Test", Valuable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -104,7 +104,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT Nullable_Seconds, Nullable_Nanoseconds 
-				FROM ""instants""
+				FROM ""instant_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -122,7 +122,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
 		var minInstant = Instant.MinValue;
 
-		var minEntity = new InstantPreciseEntity() { Name = "Min", Valuable = minInstant, Nullable = minInstant };
+		var minEntity = new InstantCompleteEntity() { Name = "Min", Valuable = minInstant, Nullable = minInstant };
 
 		// Act
 		int minId;
@@ -133,9 +133,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Assert
-		InstantPreciseEntity? retrievedMin;
+		InstantCompleteEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<InstantPreciseEntity>(minId);
+			retrievedMin = await session.GetAsync<InstantCompleteEntity>(minId);
 		}
 
 		retrievedMin!.Valuable.Should().Be(minInstant);
@@ -147,7 +147,7 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
 		var maxInstant = Instant.MaxValue;
 
-		var maxEntity = new InstantPreciseEntity() { Name = "Max", Valuable = maxInstant, Nullable = maxInstant };
+		var maxEntity = new InstantCompleteEntity() { Name = "Max", Valuable = maxInstant, Nullable = maxInstant };
 
 		// Act
 		int maxId;
@@ -158,9 +158,9 @@ public class InstantCompositeUserTypeTests(NHibernateCompositeTestFixture fixtur
 		}
 
 		// Assert
-		InstantPreciseEntity? retrievedMax;
+		InstantCompleteEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<InstantPreciseEntity>(maxId);
+			retrievedMax = await session.GetAsync<InstantCompleteEntity>(maxId);
 		}
 
 		retrievedMax!.Valuable.Should().Be(maxInstant);

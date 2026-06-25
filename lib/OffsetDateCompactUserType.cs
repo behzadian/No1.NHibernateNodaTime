@@ -6,13 +6,13 @@ using System.Data.Common;
 
 namespace No1.NHibernateNodaTime;
 
-public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
+public sealed class OffsetDateCompactUserType : ICompositeUserType
 {
-	internal static readonly string[] Columns = [.. LocalDateTimeCompositeUserType.Columns, .. OffsetUserType.Columns];
+	internal static readonly string[] Columns = [.. LocalDateCompactUserType.Columns, .. OffsetUserType.Columns];
 
-	private static readonly int DateTimeColumnsCount = LocalDateTimeCompositeUserType.Columns.Length;
+	private static readonly int DateColumnsCount = LocalDateCompactUserType.Columns.Length;
 
-	Type ICompositeUserType.ReturnedClass => typeof(OffsetDateTime?);
+	Type ICompositeUserType.ReturnedClass => typeof(OffsetDate?);
 
 	bool ICompositeUserType.IsMutable => false;
 
@@ -20,41 +20,42 @@ public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 
 	IType[] ICompositeUserType.PropertyTypes =>
 	[
-		..LocalDateTimeCompositeUserType.Instance.PropertyTypes,
+		..LocalDateCompactUserType.Instance.PropertyTypes,
 		OffsetUserType.NHType
 	];
 
 	object? ICompositeUserType.NullSafeGet(DbDataReader dr, string[] names, ISessionImplementor session, object owner) {
 		// Split names between date and time parts
-		var dateNames = names[..DateTimeColumnsCount];
-		var timeName = names[DateTimeColumnsCount..];
+		var dateNames = names[..DateColumnsCount];
+		var timeName = names[DateColumnsCount..];
 
-		var date = (LocalDateTime?)LocalDateTimeCompositeUserType.Instance.NullSafeGet(dr, dateNames, session, owner);
+		var date = (LocalDate?)LocalDateCompactUserType.Instance.NullSafeGet(dr, dateNames, session, owner);
 
-		var offset = (Offset?)OffsetUserType.Instance.NullSafeGet(dr, timeName, session, owner);
+		var time = (Offset?)OffsetUserType.Instance.NullSafeGet(dr, timeName, session, owner);
 
-		if (date is null || offset is null) {
+		if (date is null || time is null) {
 			return null;
 		}
 
-		return new OffsetDateTime(date.Value, offset.Value);
+		OffsetDate value = new(date.Value, time.Value);
+		return value;
 	}
 
 	void ICompositeUserType.NullSafeSet(DbCommand cmd, object? value, int index, bool[] settable, ISessionImplementor session) {
-		if (value is OffsetDateTime val) {
-			LocalDateTimeCompositeUserType.Instance.NullSafeSet(cmd, val.LocalDateTime, index, settable, session);
-			OffsetUserType.Instance.NullSafeSet(cmd, val.Offset, index + DateTimeColumnsCount, session);
+		if (value is OffsetDate ldt) {
+			LocalDateCompactUserType.Instance.NullSafeSet(cmd, ldt.Date, index, settable, session);
+			OffsetUserType.Instance.NullSafeSet(cmd, ldt.Offset, index + DateColumnsCount, session);
 		} else {
-			LocalDateTimeCompositeUserType.Instance.NullSafeSet(cmd, null, index, settable, session);
-			OffsetUserType.Instance.NullSafeSet(cmd, null, index + DateTimeColumnsCount, session);
+			LocalDateCompactUserType.Instance.NullSafeSet(cmd, null, index, settable, session);
+			OffsetUserType.Instance.NullSafeSet(cmd, null, index + DateColumnsCount, session);
 		}
 	}
 
 	object? ICompositeUserType.GetPropertyValue(object component, int property) {
-		if (component is OffsetDateTime val) {
-			return property < DateTimeColumnsCount ? LocalDateTimeCompositeUserType.Instance.GetPropertyValue(val.LocalDateTime, property) : val.Offset;
+		if (component is OffsetDate val) {
+			return property < DateColumnsCount ? LocalDateCompactUserType.Instance.GetPropertyValue(val.Date, property) : val.Offset;
 		} else {
-			throw new UnexpectedTypeException<OffsetDateTime>(component);
+			throw new UnexpectedTypeException<OffsetDate>(component);
 		}
 	}
 
@@ -87,7 +88,7 @@ public sealed class OffsetDateTimeCompositeUserType : ICompositeUserType
 			return false;
 		}
 
-		return ((OffsetDateTime)x).Equals((OffsetDateTime)y);
+		return ((OffsetDate)x).Equals((OffsetDate)y);
 	}
 
 	int ICompositeUserType.GetHashCode(object? x) {
