@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Humanizer;
 using NHibernate;
 using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;

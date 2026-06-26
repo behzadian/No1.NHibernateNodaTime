@@ -7,7 +7,7 @@ using Xunit;
 
 namespace No1.NHibernateNodaTimeTests;
 
-	public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
