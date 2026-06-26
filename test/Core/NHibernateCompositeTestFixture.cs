@@ -8,7 +8,7 @@ using No1.NHibernateNodaTimeTests.Conventions;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace No1.NHibernateNodaTimeTests;
+namespace No1.NHibernateNodaTimeTests.Core;
 
 /// <summary>
 /// Test fixture for InstantCompositeUserType using AutoMapping

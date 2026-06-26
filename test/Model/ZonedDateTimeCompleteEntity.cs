@@ -7,7 +7,7 @@ namespace No1.NHibernateNodaTimeTests.Model;
 /// Sample entity for testing NodaTime Instant persistence
 /// </summary>
 [StorageMethod(StorageMethods.Complete)]
-public class ZonedDateTimeEntity
+public class ZonedDateTimeCompleteEntity
 {
 	public virtual int Id { get; set; }
 	public virtual string Name { get; set; } = string.Empty;

@@ -1,5 +1,7 @@
 using FluentAssertions;
+using Humanizer;
 using NHibernate;
+using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
@@ -9,7 +11,7 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
@@ -18,7 +20,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		// Arrange
 		var duration1 = Duration.FromHours(1.5);
 		var duration2 = Duration.FromTicks(360000001);
-		var entity = new DurationEntity() { Name = "Test Event", Valauable = duration1, Nullable = duration2 };
+		var entity = new DurationCompactEntity() { Valauable = duration1, Nullable = duration2 };
 
 		// Act - Save
 		int savedId;
@@ -32,7 +34,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
-				FROM ""durations""
+				FROM ""duration_compacts""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -47,9 +49,9 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		}
 
 		// Act - Retrieve via NHibernate
-		DurationEntity? retrievedEvent;
+		DurationCompactEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<DurationEntity>(savedId);
+			retrievedEvent = await session.GetAsync<DurationCompactEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -62,7 +64,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldHandleNullable() {
 		// Arrange
 		var duration = Duration.FromMinutes(67);
-		var entity = new DurationEntity() { Name = "Test", Valauable = duration, Nullable = null };
+		var entity = new DurationCompactEntity() { Valauable = duration, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -76,7 +78,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
 				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
-				FROM ""durations""
+				FROM ""duration_Compacts""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -94,7 +96,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = Duration.MinValue;
-		var minEntity = new DurationEntity() { Name = "Min", Nullable = min };
+		var minEntity = new DurationCompactEntity() { Nullable = min };
 
 		// Act
 		int minId;
@@ -105,9 +107,9 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		}
 
 		// Assert
-		DurationEntity? retrievedMin;
+		DurationCompactEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<DurationEntity>(minId);
+			retrievedMin = await session.GetAsync<DurationCompactEntity>(minId);
 		}
 
 		retrievedMin.Nullable.Should().Be(min);
@@ -117,7 +119,7 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = Duration.MaxValue;
-		var maxEntity = new DurationEntity() { Name = "Max", Nullable = max };
+		var maxEntity = new DurationCompactEntity() { Nullable = max };
 
 		// Act
 		int maxId;
@@ -128,11 +130,12 @@ public class DurationCompositeUserTypeTests(NHibernateCompositeTestFixture fixtu
 		}
 
 		// Assert
-		DurationEntity? retrievedMax;
+		DurationCompactEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<DurationEntity>(maxId);
+			retrievedMax = await session.GetAsync<DurationCompactEntity>(maxId);
 		}
 
-		retrievedMax.Nullable.Should().Be(max);
+		retrievedMax.Nullable.Should().NotBeNull();
+		((long)retrievedMax.Nullable!.Value.TotalMilliseconds).Should().Be((long)max.TotalMilliseconds);
 	}
 }

@@ -1,8 +1,9 @@
 using FluentAssertions;
 using NHibernate;
+using No1.NHibernateNodaTime;
+using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
-using NodaTime.Calendars;
 using Xunit;
 
 namespace No1.NHibernateNodaTimeTests;
@@ -10,15 +11,15 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class ZonedDateTimeCompactUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistLocalDateIn4Columns() {
+	public async Task ShouldPersistZonedDateTimeIn5Columns() {
 		// Arrange
-		var val = new LocalDate(1405, 1, 25, CalendarSystem.PersianSimple);
-		var entity = new LocalDateEntity() { Name = "Test Event", Valauable = val };
+		var zdt = Instant.FromUtc(2024, 12, 25, 10, 30, 45).InZone(DateTimeZoneProviders.Tzdb["Asia/Tehran"]);
+		var entity = new ZonedDateTimeCompleteEntity() { Name = "Test Event", Valauable = zdt };
 
 		// Act - Save
 		int savedId;
@@ -31,46 +32,49 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Valauable_Gregorian, Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day
-				FROM ""local_dates""
+				SELECT Valauable_Seconds, Valauable_Nanoseconds, Valauable_Zone_ID, Valauable_UTC, Valauable_Local
+				FROM ""zoned_date_time_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
+
 			var counter = 0;
-			var date = Convert.ToDateTime(result[counter++]);
-			var cal = Convert.ToString(result[counter++]);
-			var era = Convert.ToString(result[counter++]);
-			var year = Convert.ToInt16(result[counter++]);
-			var month = Convert.ToInt16(result[counter++]);
-			var day = Convert.ToInt16(result[counter++]);
+			var seconds = Convert.ToInt64(result[counter++]);
+			var nanos = Convert.ToInt32(result[counter++]);
+			var zone = Convert.ToString(result[counter++]);
+			var utc = Convert.ToDateTime(result[counter++]);
+			var local = Convert.ToDateTime(result[counter++]);
 
 			// Assert - Verify raw column values
-			date.Should().Be(val.ToDateTimeUnspecified());
-			cal.Should().Be("Persian Simple");
-			era.Should().Be("AP");
-			year.Should().Be(1405);
-			month.Should().Be(1);
-			day.Should().Be(25);
+			seconds.Should().Be(zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().seconds);
+			nanos.Should().Be(zdt.ToInstant().ToUnixTimeSecondsAndNanoseconds().nanoseconds);
+			zone.Should().Be("Asia/Tehran");
+			utc.Should().Be(new DateTime(new DateOnly(2024, 12, 25), new TimeOnly(10, 30, 45), DateTimeKind.Local));
+			local.Should().Be(new DateTime(new DateOnly(2024, 12, 25), new TimeOnly(14, 0, 45), DateTimeKind.Utc));
 		}
 
 		// Act - Retrieve via NHibernate
-		LocalDateEntity? retrievedEvent;
+		ZonedDateTimeCompleteEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<LocalDateEntity>(savedId);
+			retrievedEvent = await session.GetAsync<ZonedDateTimeCompleteEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.Valauable.Should().Be(val);
+		retrievedEvent!.Valauable.Should().Be(zdt);
 	}
 
 	[Fact]
-	public async Task ShouldPreserveEra() {
-		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new LocalDateEntity() { Name = "Precision Test", Valauable = val };
+	public async Task ShouldPreserveNanosecondPrecision() {
+		var zdt = Instant
+			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
+			.PlusNanoseconds(123456789)
+			.InUtc();
+
+		var entity = new ZonedDateTimeCompleteEntity() { Name = "Precision Test", Valauable = zdt };
 
 		// Act
 		int savedId;
@@ -80,21 +84,22 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 			await transaction.CommitAsync();
 		}
 
-		LocalDateEntity? retrievedEvent;
+		ZonedDateTimeCompleteEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<LocalDateEntity>(savedId);
+			retrievedEvent = await session.GetAsync<ZonedDateTimeCompleteEntity>(savedId);
 		}
 
 		// Assert
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent.Valauable.Should().Be(val);
+		retrievedEvent!.Valauable.Should().Be(zdt);
+		retrievedEvent.Valauable.ToInstant().OnlyNanoseconds().Should().Be(123456789);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable() {
 		// Arrange
-		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new LocalDateEntity() { Name = "Test", Nullable = null };
+		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
+		var entity = new ZonedDateTimeCompleteEntity() { Name = "Test", Valauable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -107,8 +112,8 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
-				FROM ""local_dates""
+				SELECT Nullable_Seconds, Nullable_Nanoseconds, Nullable_Zone_ID, Nullable_UTC, Nullable_Local
+				FROM ""zoned_date_time_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -124,8 +129,9 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 	[Fact]
 	public async Task ShouldHandleMin() {
 		// Arrange
-		var min = LocalDate.MinIsoValue;
-		var minEntity = new LocalDateEntity() { Name = "Min", Nullable = min };
+		var min = Instant.MinValue.InUtc();
+
+		var minEntity = new ZonedDateTimeCompleteEntity() { Name = "Min", Nullable = min };
 
 		// Act
 		int minId;
@@ -136,19 +142,20 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		}
 
 		// Assert
-		LocalDateEntity? retrievedMin;
+		ZonedDateTimeCompleteEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<LocalDateEntity>(minId);
+			retrievedMin = await session.GetAsync<ZonedDateTimeCompleteEntity>(minId);
 		}
 
-		retrievedMin.Nullable.Should().Be(min);
+		retrievedMin!.Nullable.Should().Be(min);
 	}
 
 	[Fact]
 	public async Task ShouldHandleMax() {
 		// Arrange
-		var max = LocalDate.MaxIsoValue;
-		var maxEntity = new LocalDateEntity() { Name = "Max", Nullable = max };
+		var max = Instant.MaxValue.InUtc();
+
+		var maxEntity = new ZonedDateTimeCompleteEntity() { Name = "Max", Nullable = max };
 
 		// Act
 		int maxId;
@@ -159,9 +166,9 @@ public class LocalDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixt
 		}
 
 		// Assert
-		LocalDateEntity? retrievedMax;
+		ZonedDateTimeCompleteEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<LocalDateEntity>(maxId);
+			retrievedMax = await session.GetAsync<ZonedDateTimeCompleteEntity>(maxId);
 		}
 
 		retrievedMax.Nullable.Should().Be(max);

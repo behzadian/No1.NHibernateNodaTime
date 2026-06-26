@@ -10,15 +10,16 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class DurationCompleteUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistIn1Column() {
+	public async Task ShouldPersistDuratrionIn2Columns() {
 		// Arrange
-		var val = Offset.FromHours(1);
-		var entity = new OffsetEntity() { Valauable = val };
+		var duration1 = Duration.FromHours(1.5);
+		var duration2 = Duration.FromTicks(360000001);
+		var entity = new DurationCompleteEntity() { Name = "Test Event", Valauable = duration1, Nullable = duration2 };
 
 		// Act - Save
 		int savedId;
@@ -31,59 +32,38 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Valauable, ID
-				FROM ""offsets""
+				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
+				FROM ""duration_completes""
 				WHERE id = :id";
 
-			var result = await session
-				.CreateSQLQuery(sql)
+			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var nanos = Convert.ToInt64(result[0]);
-
 			// Assert - Verify raw column values
-			nanos.Should().Be((long)TimeSpan.FromHours(1).TotalNanoseconds);
+			Convert.ToInt64(result[0]).Should().Be((long)(duration1.ToInt128Nanoseconds() / 1_000_000_000L));
+			Convert.ToInt32(result[1]).Should().Be(0);
+			Convert.ToInt64(result[2]).Should().Be((long)(duration2.ToInt128Nanoseconds() / 1_000_000_000L));
+			Convert.ToInt32(result[3]).Should().Be(100);
 		}
 
 		// Act - Retrieve via NHibernate
-		OffsetEntity? retrievedEvent;
+		DurationCompleteEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<OffsetEntity>(savedId);
+			retrievedEvent = await session.GetAsync<DurationCompleteEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent.Valauable.Should().Be(val);
-	}
-
-	[Fact]
-	public async Task ShouldPreserveNanoseconds() {
-		var val = Offset.FromNanoseconds(123456789);
-		var entity = new OffsetEntity() { Valauable = val };
-
-		// Act
-		int savedId;
-		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction()) {
-			savedId = (int)await session.SaveAsync(entity);
-			await transaction.CommitAsync();
-		}
-
-		OffsetEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<OffsetEntity>(savedId);
-		}
-
-		// Assert
-		retrievedEvent.Should().NotBeNull();
-		retrievedEvent.Valauable.Should().Be(val);
+		retrievedEvent.Valauable.Should().Be(duration1);
+		retrievedEvent.Nullable.Should().Be(duration2);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable() {
 		// Arrange
-		var entity = new OffsetEntity() { Nullable = null };
+		var duration = Duration.FromMinutes(67);
+		var entity = new DurationCompleteEntity() { Name = "Test", Valauable = duration, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -96,23 +76,26 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Nullable, Id
-				FROM ""offsets""
+				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
+				FROM ""duration_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			result[0].Should().BeNull();
+			result[0].Should().NotBeNull();
+			result[1].Should().NotBeNull();
+			result[2].Should().BeNull();
+			result[3].Should().BeNull();
 		}
 	}
 
 	[Fact]
 	public async Task ShouldHandleMin() {
 		// Arrange
-		var min = Offset.MinValue;
-		var minEntity = new OffsetEntity() { Nullable = min };
+		var min = Duration.MinValue;
+		var minEntity = new DurationCompleteEntity() { Name = "Min", Nullable = min };
 
 		// Act
 		int minId;
@@ -123,9 +106,9 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		}
 
 		// Assert
-		OffsetEntity? retrievedMin;
+		DurationCompleteEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<OffsetEntity>(minId);
+			retrievedMin = await session.GetAsync<DurationCompleteEntity>(minId);
 		}
 
 		retrievedMin.Nullable.Should().Be(min);
@@ -134,8 +117,8 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 	[Fact]
 	public async Task ShouldHandleMax() {
 		// Arrange
-		var max = Offset.MaxValue;
-		var maxEntity = new OffsetEntity() { Nullable = max };
+		var max = Duration.MaxValue;
+		var maxEntity = new DurationCompleteEntity() { Name = "Max", Nullable = max };
 
 		// Act
 		int maxId;
@@ -146,9 +129,9 @@ public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClas
 		}
 
 		// Assert
-		OffsetEntity? retrievedMax;
+		DurationCompleteEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<OffsetEntity>(maxId);
+			retrievedMax = await session.GetAsync<DurationCompleteEntity>(maxId);
 		}
 
 		retrievedMax.Nullable.Should().Be(max);

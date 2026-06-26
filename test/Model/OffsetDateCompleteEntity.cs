@@ -7,10 +7,9 @@ namespace No1.NHibernateNodaTimeTests.Model;
 /// Sample entity for testing NodaTime Instant persistence
 /// </summary>
 [StorageMethod(StorageMethods.Complete)]
-public class DurationEntity
+public class OffsetDateCompleteEntity
 {
 	public virtual int Id { get; set; }
-	public virtual string Name { get; set; } = string.Empty;
-	public virtual Duration Valauable { get; set; } = Duration.Epsilon;
-	public virtual Duration? Nullable { get; set; }
+	public virtual OffsetDate Valauable { get; set; }
+	public virtual OffsetDate? Nullable { get; set; }
 }

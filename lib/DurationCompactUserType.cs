@@ -46,7 +46,8 @@ public sealed class DurationCompactUserType : IUserType
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
 	void IUserType.NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session) {
 		if (value is Duration duration) {
-			NHibernateUtil.Int64.NullSafeSet(cmd, duration.TotalMilliseconds, index, session);
+			var millis = (long)(duration.ToInt128Nanoseconds() / (long)Math.Pow(10, 6));
+			NHibernateUtil.Int64.NullSafeSet(cmd, millis, index, session);
 		} else {
 			NHibernateUtil.Int64.NullSafeSet(cmd, null, index, session);
 		}

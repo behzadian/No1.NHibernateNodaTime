@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NHibernate;
+using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
@@ -9,15 +10,15 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class InstantCompactUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistIn2Columns() {
+	public async Task ShouldPersistInstantInTwoColumns() {
 		// Arrange
-		var val = new AnnualDate(11, 27);
-		var entity = new AnnualDateEntity() { Valauable = val };
+		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
+		var entity = new InstantCompactEntity() { Valuable = instant, Nullable = instant };
 
 		// Act - Save
 		int savedId;
@@ -27,40 +28,39 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 			await transaction.CommitAsync();
 		}
 
-		// Act - Verify in database (check columns were created)
+		// Act - Verify in database (check two columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT valauable_month, valauable_day
-				FROM ""annual_dates""
+				SELECT Valuable, ID
+				FROM ""instant_compacts""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var month = Convert.ToInt16(result[0]);
-			var day = Convert.ToInt16(result[1]);
+			var dateTime = Convert.ToDateTime(result[0]);
 
 			// Assert - Verify raw column values
-			month.Should().Be((short)val.Month);
-			day.Should().Be((short)val.Day);
+			dateTime.Should().Be(instant.ToDateTimeUtc());
 		}
 
 		// Act - Retrieve via NHibernate
-		AnnualDateEntity? retrievedEvent;
+		InstantCompactEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<AnnualDateEntity>(savedId);
+			retrievedEvent = await session.GetAsync<InstantCompactEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.Valauable.Should().Be(val);
+		retrievedEvent!.Valuable.Should().Be(instant);
 	}
 
 	[Fact]
-	public async Task ShouldHandleNullable() {
+	public async Task ShouldHandleNullableInstant() {
 		// Arrange
-		var entity = new AnnualDateEntity() { Nullable = null };
+		var now = SystemClock.Instance.GetCurrentInstant();
+		var entity = new InstantCompactEntity() { Valuable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -73,27 +73,16 @@ public class AnnualDateCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT nullable_month, nullable_day
-				FROM ""annual_dates""
+				SELECT Nullable, ID
+				FROM ""instant_compacts""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			for (int i = 0; i < result.Length; i++) {
-				result[i].Should().BeNull();
-			}
+			result[0].Should().BeNull();
+			result[1].Should().NotBeNull();
 		}
-
-		// Act - Retrieve via NHibernate
-		AnnualDateEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<AnnualDateEntity>(savedId);
-		}
-
-		// Assert - Verify object reconstruction
-		retrievedEvent.Should().NotBeNull();
-		retrievedEvent!.Nullable.Should().BeNull();
 	}
 }

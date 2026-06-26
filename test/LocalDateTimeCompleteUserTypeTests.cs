@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NHibernate;
+using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
@@ -9,15 +10,15 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class LocalDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistInMultiColumns() {
+	public async Task ShouldPersistLocalDateTimeInMultiColumns() {
 		// Arrange
-		var val = new OffsetTime(new LocalTime(17, 16, 15, 14), Offset.FromHoursAndMinutes(8, 15));
-		var entity = new OffsetTimeEntity() { Valauable = val };
+		var val = new LocalDateTime(1405, 1, 25, 17, 16, 15, 14, CalendarSystem.PersianSimple);
+		var entity = new LocalDateTimeCompleteEntity() { Name = "Test Event", Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -30,38 +31,49 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Valauable_Time_Nanos, Valauable_Offset_Nanos
-				FROM ""offset_times""
+				SELECT Valauable_Gregorian, Valauable_Calendar, Valauable_Era, Valauable_Year, Valauable_Month, Valauable_Day, Valauable_Time_Nanos
+				FROM ""local_date_time_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var index = 0;
-			var time = Convert.ToInt64(result[index++]);
-			var offset = Convert.ToInt64(result[index++]);
+
+			var counter = 0;
+			var date = Convert.ToDateTime(result[counter++]);
+			var cal = Convert.ToString(result[counter++]);
+			var era = Convert.ToString(result[counter++]);
+			var year = Convert.ToInt16(result[counter++]);
+			var month = Convert.ToInt16(result[counter++]);
+			var day = Convert.ToInt16(result[counter++]);
+			var time = Convert.ToInt64(result[counter++]);
 
 			// Assert - Verify raw column values
+			date.Should().Be(val.ToDateTimeUnspecified().Date);
+			cal.Should().Be("Persian Simple");
+			era.Should().Be("AP");
+			year.Should().Be(1405);
+			month.Should().Be(1);
+			day.Should().Be(25);
 			time.Should().Be((long)TimeSpan.Parse("17:16:15.014").TotalNanoseconds);
-			offset.Should().Be((long)(8.25 * 3600 * 1_000_000_000L));
 		}
 
 		// Act - Retrieve via NHibernate
-		OffsetTimeEntity? retrievedEvent;
+		LocalDateTimeCompleteEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<OffsetTimeEntity>(savedId);
+			retrievedEvent = await session.GetAsync<LocalDateTimeCompleteEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
 		retrievedEvent.Should().NotBeNull();
-		retrievedEvent.Valauable.Should().Be(val);
+		retrievedEvent!.Valauable.Should().Be(val);
 	}
 
 	[Fact]
 	public async Task ShouldHandleNullable() {
 		// Arrange
-		var entity = new OffsetTimeEntity() { Nullable = null };
+		var entity = new LocalDateTimeCompleteEntity() { Name = "Test", Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -74,8 +86,8 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Nullable_Time_Nanos, Nullable_Offset_Nanos
-				FROM ""offset_times""
+				SELECT Nullable_Gregorian, Nullable_Calendar, Nullable_Era, Nullable_Year, Nullable_Month, Nullable_Day
+				FROM ""local_date_time_completes""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -91,9 +103,8 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 	[Fact]
 	public async Task ShouldHandleMin() {
 		// Arrange
-		var minMin = new OffsetTime(LocalTime.MinValue, Offset.MinValue);
-		var minMax = new OffsetTime(LocalTime.MinValue, Offset.MaxValue);
-		var minEntity = new OffsetTimeEntity() { Valauable = minMin, Nullable = minMax, };
+		var min = LocalDateTime.MinIsoValue;
+		var minEntity = new LocalDateTimeCompleteEntity() { Name = "Min", Nullable = min };
 
 		// Act
 		int minId;
@@ -104,21 +115,19 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		}
 
 		// Assert
-		OffsetTimeEntity? retrievedMin;
+		LocalDateTimeCompleteEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<OffsetTimeEntity>(minId);
+			retrievedMin = await session.GetAsync<LocalDateTimeCompleteEntity>(minId);
 		}
 
-		retrievedMin.Valauable.Should().Be(minMin);
-		retrievedMin.Nullable.Should().Be(minMax);
+		retrievedMin.Nullable.Should().Be(min);
 	}
 
 	[Fact]
 	public async Task ShouldHandleMax() {
 		// Arrange
-		var maxMin = new OffsetTime(LocalTime.MaxValue, Offset.MinValue);
-		var maxMax = new OffsetTime(LocalTime.MaxValue, Offset.MaxValue);
-		var maxEntity = new OffsetTimeEntity() { Valauable = maxMin, Nullable = maxMax, };
+		var max = LocalDateTime.MaxIsoValue;
+		var maxEntity = new LocalDateTimeCompleteEntity() { Name = "Max", Nullable = max };
 
 		// Act
 		int maxId;
@@ -129,12 +138,11 @@ public class OffsetTimeCompositeUserTypeTests(NHibernateCompositeTestFixture fix
 		}
 
 		// Assert
-		OffsetTimeEntity? retrievedMax;
+		LocalDateTimeCompleteEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<OffsetTimeEntity>(maxId);
+			retrievedMax = await session.GetAsync<LocalDateTimeCompleteEntity>(maxId);
 		}
 
-		retrievedMax.Valauable.Should().Be(maxMin);
-		retrievedMax.Nullable.Should().Be(maxMax);
+		retrievedMax.Nullable.Should().Be(max);
 	}
 }
