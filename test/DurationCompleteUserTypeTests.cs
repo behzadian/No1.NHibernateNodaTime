@@ -19,7 +19,7 @@ public class DurationCompleteUserTypeTests(NHibernateCompositeTestFixture fixtur
 		// Arrange
 		var duration1 = Duration.FromHours(1.5);
 		var duration2 = Duration.FromTicks(360000001);
-		var entity = new DurationCompleteEntity() { Name = "Test Event", Valauable = duration1, Nullable = duration2 };
+		var entity = new DurationCompleteEntity() { Valauable = duration1, Nullable = duration2 };
 
 		// Act - Save
 		int savedId;
@@ -63,7 +63,7 @@ public class DurationCompleteUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldHandleNullable() {
 		// Arrange
 		var duration = Duration.FromMinutes(67);
-		var entity = new DurationCompleteEntity() { Name = "Test", Valauable = duration, Nullable = null };
+		var entity = new DurationCompleteEntity() { Valauable = duration, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -95,7 +95,7 @@ public class DurationCompleteUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = Duration.MinValue;
-		var minEntity = new DurationCompleteEntity() { Name = "Min", Nullable = min };
+		var minEntity = new DurationCompleteEntity() { Nullable = min };
 
 		// Act
 		int minId;
@@ -118,7 +118,7 @@ public class DurationCompleteUserTypeTests(NHibernateCompositeTestFixture fixtur
 	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = Duration.MaxValue;
-		var maxEntity = new DurationCompleteEntity() { Name = "Max", Nullable = max };
+		var maxEntity = new DurationCompleteEntity() { Nullable = max };
 
 		// Act
 		int maxId;

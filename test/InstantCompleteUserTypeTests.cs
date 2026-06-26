@@ -19,7 +19,7 @@ public class InstantCompleteUserTypeTests(NHibernateCompositeTestFixture fixture
 	public async Task ShouldPersistInstantInTwoColumns() {
 		// Arrange
 		var instant = Instant.FromUtc(2024, 12, 25, 10, 30, 45);
-		var entity = new InstantCompleteEntity() { Name = "Test Event", Valuable = instant, Nullable = instant };
+		var entity = new InstantCompleteEntity() { Valuable = instant, Nullable = instant };
 
 		// Act - Save
 		int savedId;
@@ -66,7 +66,7 @@ public class InstantCompleteUserTypeTests(NHibernateCompositeTestFixture fixture
 			.FromUnixTimeSeconds(1609459200) // 2021-01-01 00:00:00
 			.PlusNanoseconds(123456789);
 
-		var entity = new InstantCompleteEntity() { Name = "Precision Test", Valuable = instant, Nullable = instant };
+		var entity = new InstantCompleteEntity() { Valuable = instant, Nullable = instant };
 
 		// Act
 		int savedId;
@@ -91,7 +91,7 @@ public class InstantCompleteUserTypeTests(NHibernateCompositeTestFixture fixture
 	public async Task ShouldHandleNullableInstant() {
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant();
-		var entity = new InstantCompleteEntity() { Name = "Test", Valuable = now, Nullable = null };
+		var entity = new InstantCompleteEntity() { Valuable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -123,7 +123,7 @@ public class InstantCompleteUserTypeTests(NHibernateCompositeTestFixture fixture
 		//var minInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MinValue.Ticks, DateTimeKind.Utc));
 		var minInstant = Instant.MinValue;
 
-		var minEntity = new InstantCompleteEntity() { Name = "Min", Valuable = minInstant, Nullable = minInstant };
+		var minEntity = new InstantCompleteEntity() { Valuable = minInstant, Nullable = minInstant };
 
 		// Act
 		int minId;
@@ -148,7 +148,7 @@ public class InstantCompleteUserTypeTests(NHibernateCompositeTestFixture fixture
 		//var maxInstant = Instant.FromDateTimeUtc(new DateTime(DateTime.MaxValue.Ticks, DateTimeKind.Utc));
 		var maxInstant = Instant.MaxValue;
 
-		var maxEntity = new InstantCompleteEntity() { Name = "Max", Valuable = maxInstant, Nullable = maxInstant };
+		var maxEntity = new InstantCompleteEntity() { Valuable = maxInstant, Nullable = maxInstant };
 
 		// Act
 		int maxId;

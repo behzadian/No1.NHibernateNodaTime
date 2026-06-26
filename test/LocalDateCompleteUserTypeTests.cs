@@ -19,7 +19,7 @@ public class LocalDateCompleteUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldPersistLocalDateIn4Columns() {
 		// Arrange
 		var val = new LocalDate(1405, 1, 25, CalendarSystem.PersianSimple);
-		var entity = new LocalDateCompleteEntity() { Name = "Test Event", Valauable = val };
+		var entity = new LocalDateCompleteEntity() { Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -71,7 +71,7 @@ public class LocalDateCompleteUserTypeTests(NHibernateCompositeTestFixture fixtu
 	[Fact]
 	public async Task ShouldPreserveEra() {
 		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new LocalDateCompleteEntity() { Name = "Precision Test", Valauable = val };
+		var entity = new LocalDateCompleteEntity() { Valauable = val };
 
 		// Act
 		int savedId;
@@ -95,7 +95,7 @@ public class LocalDateCompleteUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldHandleNullable() {
 		// Arrange
 		var val = new LocalDate(Era.AnnoPersico, 1405, 1, 25, CalendarSystem.PersianArithmetic);
-		var entity = new LocalDateCompleteEntity() { Name = "Test", Nullable = null };
+		var entity = new LocalDateCompleteEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -126,7 +126,7 @@ public class LocalDateCompleteUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = LocalDate.MinIsoValue;
-		var minEntity = new LocalDateCompleteEntity() { Name = "Min", Nullable = min };
+		var minEntity = new LocalDateCompleteEntity() { Nullable = min };
 
 		// Act
 		int minId;
@@ -149,7 +149,7 @@ public class LocalDateCompleteUserTypeTests(NHibernateCompositeTestFixture fixtu
 	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = LocalDate.MaxIsoValue;
-		var maxEntity = new LocalDateCompleteEntity() { Name = "Max", Nullable = max };
+		var maxEntity = new LocalDateCompleteEntity() { Nullable = max };
 
 		// Act
 		int maxId;

@@ -7,6 +7,9 @@ using No1.NHibernateNodaTimeTests.Model;
 namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class Overrides :
+	IAutoMappingOverride<StorageClassSpecifiedCompactTestEntity>,
+	IAutoMappingOverride<StorageClassSpecifiedCompleteTestEntity>,
+	IAutoMappingOverride<StorageUnspecifiedTestEntity>,
 	IAutoMappingOverride<AnnualDateEntity>,
 	IAutoMappingOverride<DurationCompactEntity>,
 	IAutoMappingOverride<DurationCompleteEntity>,
@@ -90,6 +93,18 @@ public class Overrides :
 	}
 
 	void IAutoMappingOverride<OffsetDateCompactEntity>.Override(AutoMapping<OffsetDateCompactEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<StorageClassSpecifiedCompactTestEntity>.Override(AutoMapping<StorageClassSpecifiedCompactTestEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<StorageClassSpecifiedCompleteTestEntity>.Override(AutoMapping<StorageClassSpecifiedCompleteTestEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<StorageUnspecifiedTestEntity>.Override(AutoMapping<StorageUnspecifiedTestEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
 }

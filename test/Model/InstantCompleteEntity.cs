@@ -10,7 +10,6 @@ namespace No1.NHibernateNodaTimeTests.Model;
 public class InstantCompleteEntity
 {
 	public virtual int Id { get; set; }
-	public virtual string Name { get; set; } = string.Empty;
 
 	public virtual Instant Valuable { get; set; }
 

@@ -7,10 +7,7 @@ using Xunit;
 
 namespace No1.NHibernateNodaTimeTests;
 
-/// <summary>
-/// Tests for InstantCompositeUserType that stores Instant in two columns
-/// </summary>
-public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+	public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 

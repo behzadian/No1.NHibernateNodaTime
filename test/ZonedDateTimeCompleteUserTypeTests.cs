@@ -19,7 +19,7 @@ public class ZonedDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 	public async Task ShouldPersistZonedDateTimeIn5Columns() {
 		// Arrange
 		var zdt = Instant.FromUtc(2024, 12, 25, 10, 30, 45).InZone(DateTimeZoneProviders.Tzdb["Asia/Tehran"]);
-		var entity = new ZonedDateTimeCompleteEntity() { Name = "Test Event", Valauable = zdt };
+		var entity = new ZonedDateTimeCompleteEntity() { Valauable = zdt };
 
 		// Act - Save
 		int savedId;
@@ -74,7 +74,7 @@ public class ZonedDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 			.PlusNanoseconds(123456789)
 			.InUtc();
 
-		var entity = new ZonedDateTimeCompleteEntity() { Name = "Precision Test", Valauable = zdt };
+		var entity = new ZonedDateTimeCompleteEntity() { Valauable = zdt };
 
 		// Act
 		int savedId;
@@ -99,7 +99,7 @@ public class ZonedDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 	public async Task ShouldHandleNullable() {
 		// Arrange
 		var now = SystemClock.Instance.GetCurrentInstant().InUtc();
-		var entity = new ZonedDateTimeCompleteEntity() { Name = "Test", Valauable = now, Nullable = null };
+		var entity = new ZonedDateTimeCompleteEntity() { Valauable = now, Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -131,7 +131,7 @@ public class ZonedDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 		// Arrange
 		var min = Instant.MinValue.InUtc();
 
-		var minEntity = new ZonedDateTimeCompleteEntity() { Name = "Min", Nullable = min };
+		var minEntity = new ZonedDateTimeCompleteEntity() { Nullable = min };
 
 		// Act
 		int minId;
@@ -155,7 +155,7 @@ public class ZonedDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 		// Arrange
 		var max = Instant.MaxValue.InUtc();
 
-		var maxEntity = new ZonedDateTimeCompleteEntity() { Name = "Max", Nullable = max };
+		var maxEntity = new ZonedDateTimeCompleteEntity() { Nullable = max };
 
 		// Act
 		int maxId;

@@ -18,7 +18,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	public async Task ShouldPersistLocalTimeTimeIn1Column() {
 		// Arrange
 		var val = new LocalTime(17, 16, 15, 14);
-		var entity = new LocalTimeEntity() { Name = "Test Event", Valauable = val };
+		var entity = new LocalTimeEntity() { Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -60,7 +60,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	[Fact]
 	public async Task ShouldPreserveNanoseconds() {
 		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new LocalTimeEntity() { Name = "Precision Test", Valauable = val };
+		var entity = new LocalTimeEntity() { Valauable = val };
 
 		// Act
 		int savedId;
@@ -84,7 +84,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	public async Task ShouldHandleNullable() {
 		// Arrange
 		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new LocalTimeEntity() { Name = "Test", Nullable = null };
+		var entity = new LocalTimeEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -113,7 +113,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = LocalTime.MinValue;
-		var minEntity = new LocalTimeEntity() { Name = "Min", Nullable = min };
+		var minEntity = new LocalTimeEntity() { Nullable = min };
 
 		// Act
 		int minId;
@@ -136,7 +136,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = LocalTime.MaxValue;
-		var maxEntity = new LocalTimeEntity() { Name = "Max", Nullable = max };
+		var maxEntity = new LocalTimeEntity() { Nullable = max };
 
 		// Act
 		int maxId;

@@ -18,7 +18,7 @@ public class LocalDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 	public async Task ShouldPersistLocalDateTimeInMultiColumns() {
 		// Arrange
 		var val = new LocalDateTime(1405, 1, 25, 17, 16, 15, 14, CalendarSystem.PersianSimple);
-		var entity = new LocalDateTimeCompleteEntity() { Name = "Test Event", Valauable = val };
+		var entity = new LocalDateTimeCompleteEntity() { Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -73,7 +73,7 @@ public class LocalDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 	[Fact]
 	public async Task ShouldHandleNullable() {
 		// Arrange
-		var entity = new LocalDateTimeCompleteEntity() { Name = "Test", Nullable = null };
+		var entity = new LocalDateTimeCompleteEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -104,7 +104,7 @@ public class LocalDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 	public async Task ShouldHandleMin() {
 		// Arrange
 		var min = LocalDateTime.MinIsoValue;
-		var minEntity = new LocalDateTimeCompleteEntity() { Name = "Min", Nullable = min };
+		var minEntity = new LocalDateTimeCompleteEntity() { Nullable = min };
 
 		// Act
 		int minId;
@@ -127,7 +127,7 @@ public class LocalDateTimeCompleteUserTypeTests(NHibernateCompositeTestFixture f
 	public async Task ShouldHandleMax() {
 		// Arrange
 		var max = LocalDateTime.MaxIsoValue;
-		var maxEntity = new LocalDateTimeCompleteEntity() { Name = "Max", Nullable = max };
+		var maxEntity = new LocalDateTimeCompleteEntity() { Nullable = max };
 
 		// Act
 		int maxId;

@@ -10,7 +10,6 @@ namespace No1.NHibernateNodaTimeTests.Model;
 public class LocalTimeEntity
 {
 	public virtual int Id { get; set; }
-	public virtual string Name { get; set; } = string.Empty;
 	public virtual LocalTime Valauable { get; set; }
 	public virtual LocalTime? Nullable { get; set; }
 }

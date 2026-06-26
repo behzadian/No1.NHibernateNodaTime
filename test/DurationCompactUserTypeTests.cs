@@ -16,10 +16,10 @@ public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistDuratrionIn2Columns() {
+	public async Task ShouldPersistDuratrionIn1Columns() {
 		// Arrange
 		var duration1 = Duration.FromHours(1.5);
-		var duration2 = Duration.FromTicks(360000001);
+		var duration2 = Duration.FromMilliseconds(360000001);
 		var entity = new DurationCompactEntity() { Valauable = duration1, Nullable = duration2 };
 
 		// Act - Save
@@ -33,7 +33,7 @@ public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture
 		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
+				SELECT valauable, nullable
 				FROM ""duration_compacts""
 				WHERE id = :id";
 
@@ -42,10 +42,8 @@ public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture
 				.UniqueResultAsync<object[]>();
 
 			// Assert - Verify raw column values
-			Convert.ToInt64(result[0]).Should().Be((long)(duration1.ToInt128Nanoseconds() / 1_000_000_000L));
-			Convert.ToInt32(result[1]).Should().Be(0);
-			Convert.ToInt64(result[2]).Should().Be((long)(duration2.ToInt128Nanoseconds() / 1_000_000_000L));
-			Convert.ToInt32(result[3]).Should().Be(100);
+			Convert.ToInt64(result[0]).Should().Be((long)(duration1.ToInt128Nanoseconds() / 1_000_000L));
+			Convert.ToInt64(result[1]).Should().Be((long)(duration2.ToInt128Nanoseconds() / 1_000_000L));
 		}
 
 		// Act - Retrieve via NHibernate
@@ -77,8 +75,8 @@ public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT valauable_seconds, valauable_nanos, nullable_seconds, nullable_nanos
-				FROM ""duration_Compacts""
+				SELECT valauable, nullable
+				FROM ""duration_compacts""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -86,9 +84,7 @@ public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture
 				.UniqueResultAsync<object[]>();
 
 			result[0].Should().NotBeNull();
-			result[1].Should().NotBeNull();
-			result[2].Should().BeNull();
-			result[3].Should().BeNull();
+			result[1].Should().BeNull();
 		}
 	}
 
@@ -136,6 +132,6 @@ public class DurationCompactUserTypeTests(NHibernateCompositeTestFixture fixture
 		}
 
 		retrievedMax.Nullable.Should().NotBeNull();
-		((long)retrievedMax.Nullable!.Value.TotalMilliseconds).Should().Be((long)max.TotalMilliseconds);
+		(retrievedMax.Nullable!.Value.ToInt128Nanoseconds() / 1_000_000).Should().Be(max.ToInt128Nanoseconds() / 1_000_000);
 	}
 }

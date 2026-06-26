@@ -39,7 +39,7 @@ public sealed class LocalDateCompactUserType : ICompositeUserType
 		}
 
 		var calendar = CalendarSystem.ForId(calendarId);
-		return new LocalDate(dateTime.Year, dateTime.Month, dateTime.Day, calendar).WithCalendar(calendar);
+		return new LocalDate(dateTime.Year, dateTime.Month, dateTime.Day).WithCalendar(calendar);
 	}
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Beautifulness")]
@@ -59,7 +59,7 @@ public sealed class LocalDateCompactUserType : ICompositeUserType
 		if (component is LocalDate ld) {
 			return property switch {
 				0 => ld.Calendar.Name,
-				5 => TryOrDefault(ld.ToDateTimeUnspecified),
+				1 => TryOrDefault(ld.ToDateTimeUnspecified),
 				_ => throw new ArgumentOutOfRangeException(nameof(property)),
 			};
 		} else {
