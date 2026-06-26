@@ -10,15 +10,15 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class OffsetTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistLocalTimeTimeIn1Column() {
+	public async Task ShouldPersistInMultiColumns() {
 		// Arrange
-		var val = new LocalTime(17, 16, 15, 14);
-		var entity = new LocalTimeEntity() { Valauable = val };
+		var val = new OffsetTime(new LocalTime(17, 16, 15, 14), Offset.FromHoursAndMinutes(8, 15));
+		var entity = new OffsetTimeEntity() { Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -31,25 +31,27 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Valauable, id
-				FROM ""local_times""
+				SELECT Valauable_Time_Nanos, Valauable_Offset_Nanos
+				FROM ""offset_times""
 				WHERE id = :id";
 
-			var result = await session
-				.CreateSQLQuery(sql)
+			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var nanos = Convert.ToInt64(result[0]);
+			var index = 0;
+			var time = Convert.ToInt64(result[index++]);
+			var offset = Convert.ToInt64(result[index++]);
 
 			// Assert - Verify raw column values
-			nanos.Should().Be((long)TimeSpan.Parse("17:16:15.014").TotalNanoseconds);
+			time.Should().Be((long)TimeSpan.Parse("17:16:15.014").TotalNanoseconds);
+			offset.Should().Be((long)(8.25 * 3600 * 1_000_000_000L));
 		}
 
 		// Act - Retrieve via NHibernate
-		LocalTimeEntity? retrievedEvent;
+		OffsetTimeEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
+			retrievedEvent = await session.GetAsync<OffsetTimeEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -58,33 +60,9 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	}
 
 	[Fact]
-	public async Task ShouldPreserveNanoseconds() {
-		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new LocalTimeEntity() { Valauable = val };
-
-		// Act
-		int savedId;
-		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction()) {
-			savedId = (int)await session.SaveAsync(entity);
-			await transaction.CommitAsync();
-		}
-
-		LocalTimeEntity? retrievedEvent;
-		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
-		}
-
-		// Assert
-		retrievedEvent.Should().NotBeNull();
-		retrievedEvent.Valauable.Should().Be(val);
-	}
-
-	[Fact]
 	public async Task ShouldHandleNullable() {
 		// Arrange
-		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new LocalTimeEntity() { Nullable = null };
+		var entity = new OffsetTimeEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -97,23 +75,26 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Nullable, Id
-				FROM ""local_times""
+				SELECT Nullable_Time_Nanos, Nullable_Offset_Nanos
+				FROM ""offset_times""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			result[0].Should().BeNull();
+			for (int i = 0; i < result.Length; i++) {
+				result[i].Should().BeNull();
+			}
 		}
 	}
 
 	[Fact]
 	public async Task ShouldHandleMin() {
 		// Arrange
-		var min = LocalTime.MinValue;
-		var minEntity = new LocalTimeEntity() { Nullable = min };
+		var minMin = new OffsetTime(LocalTime.MinValue, Offset.MinValue);
+		var minMax = new OffsetTime(LocalTime.MinValue, Offset.MaxValue);
+		var minEntity = new OffsetTimeEntity() { Valauable = minMin, Nullable = minMax, };
 
 		// Act
 		int minId;
@@ -124,19 +105,21 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		}
 
 		// Assert
-		LocalTimeEntity? retrievedMin;
+		OffsetTimeEntity? retrievedMin;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<LocalTimeEntity>(minId);
+			retrievedMin = await session.GetAsync<OffsetTimeEntity>(minId);
 		}
 
-		retrievedMin.Nullable.Should().Be(min);
+		retrievedMin.Valauable.Should().Be(minMin);
+		retrievedMin.Nullable.Should().Be(minMax);
 	}
 
 	[Fact]
 	public async Task ShouldHandleMax() {
 		// Arrange
-		var max = LocalTime.MaxValue;
-		var maxEntity = new LocalTimeEntity() { Nullable = max };
+		var maxMin = new OffsetTime(LocalTime.MaxValue, Offset.MinValue);
+		var maxMax = new OffsetTime(LocalTime.MaxValue, Offset.MaxValue);
+		var maxEntity = new OffsetTimeEntity() { Valauable = maxMin, Nullable = maxMax, };
 
 		// Act
 		int maxId;
@@ -147,11 +130,12 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		}
 
 		// Assert
-		LocalTimeEntity? retrievedMax;
+		OffsetTimeEntity? retrievedMax;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<LocalTimeEntity>(maxId);
+			retrievedMax = await session.GetAsync<OffsetTimeEntity>(maxId);
 		}
 
-		retrievedMax.Nullable.Should().Be(max);
+		retrievedMax.Valauable.Should().Be(maxMin);
+		retrievedMax.Nullable.Should().Be(maxMax);
 	}
 }

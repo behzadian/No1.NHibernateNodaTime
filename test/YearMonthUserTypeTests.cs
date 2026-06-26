@@ -3,6 +3,7 @@ using NHibernate;
 using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
+using NodaTime.Calendars;
 using Xunit;
 
 namespace No1.NHibernateNodaTimeTests;
@@ -10,15 +11,15 @@ namespace No1.NHibernateNodaTimeTests;
 /// <summary>
 /// Tests for InstantCompositeUserType that stores Instant in two columns
 /// </summary>
-public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
+public class YearMonthCompositeUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
 
 	[Fact]
-	public async Task ShouldPersistLocalTimeTimeIn1Column() {
+	public async Task ShouldPersistInMultipleColumn() {
 		// Arrange
-		var val = new LocalTime(17, 16, 15, 14);
-		var entity = new LocalTimeEntity() { Valauable = val };
+		var val = new YearMonth(Era.AnnoPersico, 1405, 1, CalendarSystem.PersianSimple);
+		var entity = new YearMonthEntity() { Valauable = val };
 
 		// Act - Save
 		int savedId;
@@ -31,8 +32,8 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Act - Verify in database (check columns were created)
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Valauable, id
-				FROM ""local_times""
+				SELECT Valauable_Era_ID, Valauable_Calendar_ID, Valauable_Year, Valauable_Month, ID
+				FROM ""year_months""
 				WHERE id = :id";
 
 			var result = await session
@@ -40,16 +41,23 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 				.SetParameter("id", savedId)
 				.UniqueResultAsync<object[]>();
 
-			var nanos = Convert.ToInt64(result[0]);
+			var counter = 0;
+			var eraId = Convert.ToString(result[counter++]);
+			var calId = Convert.ToString(result[counter++]);
+			var year = Convert.ToInt16(result[counter++]);
+			var month = Convert.ToInt16(result[counter++]);
 
 			// Assert - Verify raw column values
-			nanos.Should().Be((long)TimeSpan.Parse("17:16:15.014").TotalNanoseconds);
+			eraId.Should().Be("AP");
+			calId.Should().Be("Persian Simple");
+			year.Should().Be(1405);
+			month.Should().Be(1);
 		}
 
 		// Act - Retrieve via NHibernate
-		LocalTimeEntity? retrievedEvent;
+		YearMonthEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
+			retrievedEvent = await session.GetAsync<YearMonthEntity>(savedId);
 		}
 
 		// Assert - Verify object reconstruction
@@ -59,8 +67,8 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 
 	[Fact]
 	public async Task ShouldPreserveNanoseconds() {
-		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new LocalTimeEntity() { Valauable = val };
+		var val = new YearMonth(Era.AnnoPersico, 1405, 1, CalendarSystem.PersianSimple);
+		var entity = new YearMonthEntity() { Valauable = val };
 
 		// Act
 		int savedId;
@@ -70,9 +78,9 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 			await transaction.CommitAsync();
 		}
 
-		LocalTimeEntity? retrievedEvent;
+		YearMonthEntity? retrievedEvent;
 		using (var session = _sessionFactory.OpenSession()) {
-			retrievedEvent = await session.GetAsync<LocalTimeEntity>(savedId);
+			retrievedEvent = await session.GetAsync<YearMonthEntity>(savedId);
 		}
 
 		// Assert
@@ -83,8 +91,7 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 	[Fact]
 	public async Task ShouldHandleNullable() {
 		// Arrange
-		var val = LocalTime.FromHourMinuteSecondNanosecond(1, 2, 3, 4);
-		var entity = new LocalTimeEntity() { Nullable = null };
+		var entity = new YearMonthEntity() { Nullable = null };
 
 		// Act - Save without ModifiedAt
 		int savedId;
@@ -97,8 +104,8 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 		// Assert - Both columns should be NULL
 		using (var session = _sessionFactory.OpenSession()) {
 			var sql = @"
-				SELECT Nullable, Id
-				FROM ""local_times""
+				SELECT Nullable_Era_ID, Nullable_Calendar_ID, Nullable_Year, Nullable_Month, ID
+				FROM ""year_months""
 				WHERE id = :id";
 
 			var result = await session.CreateSQLQuery(sql)
@@ -107,51 +114,5 @@ public class LocalTimeUserTypeTests(NHibernateCompositeTestFixture fixture) : IC
 
 			result[0].Should().BeNull();
 		}
-	}
-
-	[Fact]
-	public async Task ShouldHandleMin() {
-		// Arrange
-		var min = LocalTime.MinValue;
-		var minEntity = new LocalTimeEntity() { Nullable = min };
-
-		// Act
-		int minId;
-		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction()) {
-			minId = (int)await session.SaveAsync(minEntity);
-			await transaction.CommitAsync();
-		}
-
-		// Assert
-		LocalTimeEntity? retrievedMin;
-		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMin = await session.GetAsync<LocalTimeEntity>(minId);
-		}
-
-		retrievedMin.Nullable.Should().Be(min);
-	}
-
-	[Fact]
-	public async Task ShouldHandleMax() {
-		// Arrange
-		var max = LocalTime.MaxValue;
-		var maxEntity = new LocalTimeEntity() { Nullable = max };
-
-		// Act
-		int maxId;
-		using (var session = _sessionFactory.OpenSession())
-		using (var transaction = session.BeginTransaction()) {
-			maxId = (int)await session.SaveAsync(maxEntity);
-			await transaction.CommitAsync();
-		}
-
-		// Assert
-		LocalTimeEntity? retrievedMax;
-		using (var session = _sessionFactory.OpenSession()) {
-			retrievedMax = await session.GetAsync<LocalTimeEntity>(maxId);
-		}
-
-		retrievedMax.Nullable.Should().Be(max);
 	}
 }

@@ -7,43 +7,56 @@ using No1.NHibernateNodaTimeTests.Model;
 namespace No1.NHibernateNodaTimeTests.Overrides;
 
 public class Overrides :
+	IAutoMappingOverride<StorageClassSpecifiedCompactTestEntity>,
+	IAutoMappingOverride<StorageClassSpecifiedCompleteTestEntity>,
+	IAutoMappingOverride<StorageUnspecifiedTestEntity>,
 	IAutoMappingOverride<AnnualDateEntity>,
-	IAutoMappingOverride<DurationEntity>,
-	IAutoMappingOverride<InstantEntity>,
-	IAutoMappingOverride<LocalDateEntity>,
-	IAutoMappingOverride<LocalDateTimeEntity>,
+	IAutoMappingOverride<DurationCompactEntity>,
+	IAutoMappingOverride<DurationCompleteEntity>,
+	IAutoMappingOverride<InstantCompactEntity>,
+	IAutoMappingOverride<InstantCompleteEntity>,
+	IAutoMappingOverride<LocalDateCompactEntity>,
+	IAutoMappingOverride<LocalDateCompleteEntity>,
+	IAutoMappingOverride<LocalDateTimeCompactEntity>,
+	IAutoMappingOverride<LocalDateTimeCompleteEntity>,
 	IAutoMappingOverride<LocalTimeEntity>,
-	IAutoMappingOverride<OffsetDateEntity>,
-	IAutoMappingOverride<OffsetDateTimeEntity>,
+	IAutoMappingOverride<OffsetDateCompactEntity>,
+	IAutoMappingOverride<OffsetDateCompleteEntity>,
+	IAutoMappingOverride<OffsetDateTimeCompactEntity>,
+	IAutoMappingOverride<OffsetDateTimeCompleteEntity>,
 	IAutoMappingOverride<OffsetEntity>,
 	IAutoMappingOverride<OffsetTimeEntity>,
 	IAutoMappingOverride<YearMonthEntity>,
-	IAutoMappingOverride<ZonedDateTimeEntity>
+	IAutoMappingOverride<ZonedDateTimeCompactEntity>,
+	IAutoMappingOverride<ZonedDateTimeCompleteEntity>
 {
 	private readonly Func<string, string> columnNameBuilder = SnakeCaseConventionsConvertor.SnakeCase;
 
 	void IAutoMappingOverride<AnnualDateEntity>.Override(AutoMapping<AnnualDateEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<DurationEntity>.Override(AutoMapping<DurationEntity> mapping) {
+	void IAutoMappingOverride<DurationCompactEntity>.Override(AutoMapping<DurationCompactEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<InstantEntity>.Override(AutoMapping<InstantEntity> mapping) {
+	void IAutoMappingOverride<InstantCompleteEntity>.Override(AutoMapping<InstantCompleteEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<LocalDateEntity>.Override(AutoMapping<LocalDateEntity> mapping) {
+	void IAutoMappingOverride<InstantCompactEntity>.Override(AutoMapping<InstantCompactEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<LocalDateTimeEntity>.Override(AutoMapping<LocalDateTimeEntity> mapping) {
+	void IAutoMappingOverride<LocalDateCompleteEntity>.Override(AutoMapping<LocalDateCompleteEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+	void IAutoMappingOverride<LocalDateTimeCompleteEntity>.Override(AutoMapping<LocalDateTimeCompleteEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
 	void IAutoMappingOverride<LocalTimeEntity>.Override(AutoMapping<LocalTimeEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<OffsetDateEntity>.Override(AutoMapping<OffsetDateEntity> mapping) {
+	void IAutoMappingOverride<OffsetDateCompleteEntity>.Override(AutoMapping<OffsetDateCompleteEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<OffsetDateTimeEntity>.Override(AutoMapping<OffsetDateTimeEntity> mapping) {
+	void IAutoMappingOverride<OffsetDateTimeCompleteEntity>.Override(AutoMapping<OffsetDateTimeCompleteEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
 	void IAutoMappingOverride<OffsetEntity>.Override(AutoMapping<OffsetEntity> mapping) {
@@ -55,7 +68,43 @@ public class Overrides :
 	void IAutoMappingOverride<YearMonthEntity>.Override(AutoMapping<YearMonthEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
-	void IAutoMappingOverride<ZonedDateTimeEntity>.Override(AutoMapping<ZonedDateTimeEntity> mapping) {
+	void IAutoMappingOverride<ZonedDateTimeCompleteEntity>.Override(AutoMapping<ZonedDateTimeCompleteEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<DurationCompleteEntity>.Override(AutoMapping<DurationCompleteEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<LocalDateCompactEntity>.Override(AutoMapping<LocalDateCompactEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<LocalDateTimeCompactEntity>.Override(AutoMapping<LocalDateTimeCompactEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<OffsetDateTimeCompactEntity>.Override(AutoMapping<OffsetDateTimeCompactEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<ZonedDateTimeCompactEntity>.Override(AutoMapping<ZonedDateTimeCompactEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<OffsetDateCompactEntity>.Override(AutoMapping<OffsetDateCompactEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<StorageClassSpecifiedCompactTestEntity>.Override(AutoMapping<StorageClassSpecifiedCompactTestEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<StorageClassSpecifiedCompleteTestEntity>.Override(AutoMapping<StorageClassSpecifiedCompleteTestEntity> mapping) {
+		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
+	}
+
+	void IAutoMappingOverride<StorageUnspecifiedTestEntity>.Override(AutoMapping<StorageUnspecifiedTestEntity> mapping) {
 		NodaTimeUtility.OverrideEntity(mapping, columnNameBuilder);
 	}
 }

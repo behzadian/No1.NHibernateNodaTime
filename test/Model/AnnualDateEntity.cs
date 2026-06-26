@@ -8,7 +8,6 @@ namespace No1.NHibernateNodaTimeTests.Model;
 public class AnnualDateEntity
 {
 	public virtual int Id { get; set; }
-	public virtual string NameProp { get; set; } = string.Empty;
 	public virtual AnnualDate Valauable { get; set; }
 	public virtual AnnualDate? Nullable { get; set; }
 }

@@ -1,14 +1,12 @@
 using FluentAssertions;
 using NHibernate;
+using No1.NHibernateNodaTimeTests.Core;
 using No1.NHibernateNodaTimeTests.Model;
 using NodaTime;
 using Xunit;
 
 namespace No1.NHibernateNodaTimeTests;
 
-/// <summary>
-/// Tests for InstantCompositeUserType that stores Instant in two columns
-/// </summary>
 public class OffsetUserTypeTests(NHibernateCompositeTestFixture fixture) : IClassFixture<NHibernateCompositeTestFixture>
 {
 	private readonly ISessionFactory _sessionFactory = fixture.SessionFactory;
