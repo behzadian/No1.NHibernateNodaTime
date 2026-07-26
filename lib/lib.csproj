@@ -66,7 +66,6 @@
 		<PackageReference Include="Humanizer" />
 		<PackageReference Include="JetBrains.Annotations" />
 		<PackageReference Include="NHibernate" />
-		<PackageReference Include="System.Data.SQLite" />
 		<PackageReference Include="NodaTime" />
 	</ItemGroup>
 
